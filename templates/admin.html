@@ -1,0 +1,79 @@
+{% extends "nav_footer_template.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center text-primary">Admin Dashboard</h2>
+  <p class="text-center text-muted">Manage users and their privileges</p>
+
+  <!-- Create User Form -->
+  <div class="card my-4">
+    <div class="card-body">
+      <h5 class="card-title">Create New User</h5>
+      <form method="POST" action="{{ url_for('admin_dashboard') }}">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="mb-3">
+          <label for="privilege_id" class="form-label">Privilege</label>
+          <select class="form-select" id="privilege_id" name="privilege_id">
+            {% for privilege in privileges %}
+            <option value="{{ privilege.id }}">{{ privilege.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" name="create_user" class="btn btn-primary">Create User</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <table class="table table-dark table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Privilege</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('update_user', user_id=user.id) }}" class="d-inline">
+            <select name="privilege_id" class="form-select form-select-sm d-inline w-auto">
+              {% for privilege in privileges %}
+              <option value="{{ privilege.id }}" {% if privilege.id == user.privilege_id %}selected{% endif %}>
+                {{ privilege.name }}
+              </option>
+              {% endfor %}
+            </select>
+            <input type="hidden" name="username" value="{{ user.username }}">
+            <input type="hidden" name="email" value="{{ user.email }}">
+            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+          </form>
+        </td>
+        <td>
+          <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

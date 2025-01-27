@@ -1,0 +1,79 @@
+{% extends "/nav_footer_template.html"%}
+
+{% block content %}
+  <!-- Hero Section -->
+  <header>
+    <h1>LoreKeeper</h1>
+    <p>Preserve and share the stories of your adventures.</p>
+    <a href="/store" class="btn btn-store">Visit Store</a>
+    <a href="/register" class="btn btn-primary">Get Started</a>
+    <a href="/login" class="btn btn-outline-light">Log In</a>
+  </header>
+
+  <!-- About Section -->
+  <section id="about">
+    <div class="container">
+      <h2>What is Lorekeeper?</h2>
+      <p class="text-center">Your ultimate toolkit for creating characters, managing campaigns, and sharing epic stories.</p>
+      <div class="row text-center">
+        <div class="col-md-3">
+          <img src="{{ url_for('static', filename='images/character.png') }}" alt="Character Creation">
+          <h4>Character Creation</h4>
+          <p>Create and customize your heroes.</p>
+        </div>
+        <div class="col-md-3">
+          <img src="{{ url_for('static', filename='images/campaign.png') }}" alt="Campaign Management">
+          <h4>Campaign Management</h4>
+          <p>Organize and track your campaigns.</p>
+        </div>
+        <div class="col-md-3">
+          <img src="{{ url_for('static', filename='images/story.png') }}" alt="Story Sharing">
+          <h4>Story Sharing</h4>
+          <p>Share tales and collaborate with others.</p>
+        </div>
+        <div class="col-md-3">
+          <img src="{{ url_for('static', filename='images/store.png') }}" alt="Online Store">
+          <h4>Online Store</h4>
+          <p>Access pre-made adventures and tools.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- News Section -->
+  <section id="news">
+    <div class="container">
+      <h2>Latest News</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">New Feature: Campaign Archive</h5>
+              <p class="card-text">Easily organize and revisit your past campaigns.</p>
+              <a href="#" class="btn btn-primary">Read More</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Upcoming Q&A</h5>
+              <p class="card-text">Join us for a live Q&A session next week.</p>
+              <a href="#" class="btn btn-primary">Learn More</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Community Spotlight</h5>
+              <p class="card-text">Explore stories and creations from our community.</p>
+              <a href="#" class="btn btn-primary">Discover More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% endblock %}

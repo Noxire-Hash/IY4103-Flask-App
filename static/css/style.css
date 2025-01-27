@@ -1,0 +1,390 @@
+/* Root variables for consistent theming */
+:root {
+  --background-color: #121212; /* Dark background */
+  --text-color: #e4e4e7; /* Light text */
+  --text-muted: #a1a1b1; /* Muted text */
+  --accent-color: #b198ed; /* Purple accent */
+  --card-background: #1e1e2f; /* Card background */
+  --input-background: #29293d; /* Input fields */
+  --input-border: #404056; /* Input border */
+  --btn-hover: #9b84d6; /* Button hover effect */
+  --store-btn-color: #ff7043; /* Store button color (orange) */
+  --store-btn-hover: #ff5722; /* Store button hover */
+  --card-shadow: rgba(0, 0, 0, 0.5); /* Subtle card shadow */
+  --section-padding: 60px; /* Consistent section spacing */
+  --element-spacing: 20px; /* Spacing between smaller elements */
+}
+
+/* General Reset */
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #121212, #1a1a2e, #121212);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Smooth scrolling effect */
+  color: var(--text-color);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures footer stays at the bottom */
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--input-border);
+  padding: 10px 20px;
+}
+.navbar-brand, .nav-link {
+  color: var(--text-color) !important;
+  transition: color 0.2s ease-in-out;
+}
+.nav-link:hover {
+  color: var(--accent-color) !important;
+}
+
+/* Hero Section */
+header {
+  text-align: center;
+  padding: var(--section-padding) 20px;
+}
+header h1 {
+  font-family: 'Cinzel', serif;
+  color: var(--accent-color);
+  font-size: 3.5rem;
+  margin-bottom: var(--element-spacing);
+  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+}
+header p {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  margin-bottom: var(--element-spacing);
+}
+header .btn {
+  margin: 0 10px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+header .btn-primary {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+}
+header .btn-primary:hover {
+  background-color: var(--btn-hover);
+}
+header .btn-outline-light {
+  border: 1px solid var(--text-color);
+  color: var(--text-color);
+}
+header .btn-outline-light:hover {
+  background-color: var(--text-color);
+  color: var(--background-color);
+}
+
+/* Store Button */
+.store-btn {
+  background-color: var(--store-btn-color) !important;
+  color: var(--text-color) ;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+.store-btn:hover {
+  background-color: var(--store-btn-hover);
+  transform: scale(1.05);
+}
+
+/* Section Styling */
+section {
+  padding: var(--section-padding) 20px;
+}
+section h2 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: var(--element-spacing);
+  color: var(--accent-color);
+}
+
+/* About Section */
+#about .row {
+  margin-top: var(--element-spacing);
+}
+#about img {
+  width: 80px;
+  margin-bottom: var(--element-spacing);
+}
+#about h4 {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+#about p {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* News Section */
+#news {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--element-spacing);
+}
+#news .card {
+  flex: 1 1 calc(33.333% - var(--element-spacing));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: var(--element-spacing);
+  background-color: var(--card-background);
+  border: none;
+  box-shadow: 0 4px 10px var(--card-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+#news .card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 15px var(--card-shadow);
+}
+#news .card-title {
+  font-size: 1.25rem;
+  color: var(--accent-color);
+}
+#news .btn {
+  margin-top: 10px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+}
+#news .btn:hover {
+  background-color: var(--btn-hover);
+}
+
+/* Forms and Login Specific */
+.card, .card-header, .card-body {
+  background-color: var(--card-background);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px var(--card-shadow);
+}
+.form-label {
+  color: var(--text-muted);
+}
+.form-control {
+  background-color: var(--input-background);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+}
+.form-control:focus {
+  border-color: var(--accent-color);
+  outline: none;
+  box-shadow: 0 0 5px var(--accent-color);
+}
+.text-light {
+  color: var(--text-color) !important;
+}
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Footer */
+footer {
+  background-color: var(--card-background) !important;
+  color: var(--text-muted);
+  padding: 20px 0;
+  text-align: center;
+  border-top: 1px solid var(--input-border);
+  margin-top: auto; /* Pushes footer to the bottom */
+}
+footer a {
+  color: var(--accent-color) !important;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+.mt-4 {
+  margin-top: 1.5rem;
+}
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+
+/* General Styles for Card */
+.card {
+  background-color: var(--card-background);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px var(--card-shadow); /* Add shadow for depth */
+}
+.card-header {
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--input-border);
+  text-align: center;
+  padding: 20px;
+}
+.card-header h2 {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 10px;
+}
+.card-header p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.card-body {
+  padding: 30px;
+  background-color: var(--card-background);
+  border-radius: 0 0 10px 10px;
+}
+
+/* Glow Effect for Lorekeeper Text */
+h2.glow {
+  font-size: 2.5rem;
+  color: var(--accent-color);
+  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+  margin-bottom: 10px;
+}
+
+.glow {
+  color: var(--accent-color) !important;
+  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+}
+
+
+/* Form Styles */
+.form-label {
+  color: var(--text-color) !important;
+  font-size: 1rem;
+}
+.form-control {
+  background-color: var(--input-background);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 5px;
+}
+.form-control:focus {
+  border-color: var(--accent-color);
+  outline: none;
+  box-shadow: 0 0 5px var(--accent-color);
+}
+.text-light {
+  color: var(--text-color) !important;
+}
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Enhanced Gradient Background for Mystic Look */
+.gradient-bg {
+  background: linear-gradient(135deg, #2b2b3b, #4a148c, #121212);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text-color);
+  padding: var(--section-padding) 0;
+}
+
+/* More Items Section Gradient */
+.more-items-bg {
+  background: linear-gradient(135deg, #4a148c, #1e1e2f);
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: var(--text-color);
+  padding: var(--section-padding) 0;
+}
+
+
+
+/* Card Styles */
+.subscription-card, .featured-card, .more-card {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--card-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.subscription-card:hover, .featured-card:hover, .more-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px var(--card-shadow);
+}
+
+
+
+
+/* Card Styling */
+.card {
+  background-color: var(--card-background);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px var(--card-shadow);
+}
+.card-header {
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--input-border);
+  text-align: center;
+  padding: 20px;
+}
+.card-header h2 {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 5px;
+}
+.card-header p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.card-body {
+  padding: 30px;
+}
+
+/* Form Elements */
+.form-label {
+  color: var(--text-color);
+  font-size: 1rem;
+}
+.form-control {
+  background-color: var(--input-background);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: 5px;
+}
+.form-control:focus {
+  border-color: var(--accent-color);
+  outline: none;
+  box-shadow: 0 0 5px var(--accent-color);
+}
+.form-check-label {
+  color: var(--text-muted);
+}
+
+/* Button Styling */
+.btn-primary {
+  background-color: var(--accent-color);
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+  background-color: var(--btn-hover);
+  transform: scale(1.05);
+}
