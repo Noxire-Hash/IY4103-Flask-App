@@ -21,10 +21,10 @@
           <li class="nav-item"><a class="nav-link" href="/store">Store</a></li>
           {% if session.get('user_id') %}
             <!-- User is logged in -->
-            {% if session.get('privilege_id') == 1 %}
+            {% if session.get('privilege_id') == 2 %}
               <li class="nav-item"><a class="nav-link" href="/vendor/dashboard">Vendor Dashboard</a></li>
-            {% elif session.get('privilege_id') == 2 %}
-              <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Admin Panel</a></li>
+            {% elif session.get('privilege_id') == 999 %}
+              <li class="nav-item"><a class="nav-link" href="/admin">Admin Panel</a></li>
             {% endif %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
