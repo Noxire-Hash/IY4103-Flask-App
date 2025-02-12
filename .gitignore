@@ -1,0 +1,29 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# SQLite database
+app.db
+
+# Environment variables
+.env
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# Other temporary files
+*.DS_Store
+
+# Ignore compiled files
+*.egg-info/
+dist/
+build/

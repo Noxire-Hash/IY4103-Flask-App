@@ -1,10 +1,12 @@
-{% extends "/nav_footer_template.html"%}
-
-{% block content %}
+{% extends "/nav_footer_template.html"%} {% block content %}
 <!-- Hero Section -->
 <header class="text-light text-center py-5">
-  <h1 class="display-4 section-header">Lorekeeper Marketplace</h1>
-  <p class="lead">Unlock adventures, monsters, maps, and tools to enhance your campaigns.</p>
+  <h1 class="display-4 section-header">
+    <a class="glow">Lorekeeper</a> Marketplace
+  </h1>
+  <p class="lead">
+    Unlock adventures, monsters, maps, and tools to enhance your campaigns.
+  </p>
   <a href="#items" class="btn btn-primary btn-lg">Browse All Items</a>
 </header>
 
@@ -72,10 +74,16 @@
       <!-- Adventure Card -->
       <div class="col-md-4">
         <div class="card featured-card">
-          <img src="{{ url_for('static', filename='images/adventure.png') }}" class="card-img-top" alt="Into the Abyss">
+          <img
+            src="{{ url_for('static', filename='images/adventure.png') }}"
+            class="card-img-top"
+            alt="Into the Abyss"
+          />
           <div class="card-body text-center">
             <h5 class="card-title">Into the Abyss</h5>
-            <p class="card-text">A thrilling adventure through ancient caverns.</p>
+            <p class="card-text">
+              A thrilling adventure through ancient caverns.
+            </p>
             <a href="#" class="btn btn-primary">Learn More</a>
           </div>
         </div>
@@ -83,10 +91,16 @@
       <!-- Monster Card -->
       <div class="col-md-4">
         <div class="card featured-card">
-          <img src="{{ url_for('static', filename='images/monster.png') }}" class="card-img-top" alt="Rhart the Trickster">
+          <img
+            src="{{ url_for('static', filename='images/monster.png') }}"
+            class="card-img-top"
+            alt="Rhart the Trickster"
+          />
           <div class="card-body text-center">
             <h5 class="card-title">Rhart the Trickster</h5>
-            <p class="card-text">A legendary shapeshifter for your campaigns.</p>
+            <p class="card-text">
+              A legendary shapeshifter for your campaigns.
+            </p>
             <a href="#" class="btn btn-primary">Learn More</a>
           </div>
         </div>
@@ -94,7 +108,11 @@
       <!-- Map Pack Card -->
       <div class="col-md-4">
         <div class="card featured-card">
-          <img src="{{ url_for('static', filename='images/map.png') }}" class="card-img-top" alt="Forgotten Caverns Map Pack">
+          <img
+            src="{{ url_for('static', filename='images/map.png') }}"
+            class="card-img-top"
+            alt="Forgotten Caverns Map Pack"
+          />
           <div class="card-body text-center">
             <h5 class="card-title">Forgotten Caverns Map Pack</h5>
             <p class="card-text">Five detailed maps for dungeon crawls.</p>

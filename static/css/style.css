@@ -1,7 +1,7 @@
 /* Root variables for consistent theming */
 :root {
   --background-color: #121212; /* Dark background */
-  --text-color: #e4e4e7; /* Light text */
+  --text-color: #E8EFFF; /* Light text */
   --text-muted: #a1a1b1; /* Muted text */
   --accent-color: #b198ed; /* Purple accent */
   --card-background: #1e1e2f; /* Card background */
@@ -44,6 +44,43 @@ body {
   color: var(--accent-color) !important;
 }
 
+/* Custom styles for the navbar */
+.navbar {
+  background-color: var(--card-background); /* Use your defined color */
+}
+
+.navbar-brand {
+  font-size: 1.5rem; /* Adjust brand size */
+}
+
+.navbar-toggler {
+  border-color: var(--input-border); /* Change the border color of the toggler */
+}
+
+
+
+.store {
+  color: var(--store-btn-color) !important;
+}
+
+.store:hover {
+  color: var(--store-btn-hover) !important;
+}
+
+
+/* Navbar Dropdown */
+.dropdown-menu {
+  background-color: var(--card-background);
+  border: 1px solid var(--input-border);
+}
+.dropdown-item {
+  color: var(--text-color);
+}
+.dropdown-item:hover {
+  background-color: var(--btn-hover);
+}
+
+
 /* Hero Section */
 header {
   text-align: center;
@@ -54,7 +91,6 @@ header h1 {
   color: var(--accent-color);
   font-size: 3.5rem;
   margin-bottom: var(--element-spacing);
-  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
 }
 header p {
   color: var(--text-muted);
@@ -223,8 +259,6 @@ footer a:hover {
   margin: 0 auto;
 }
 
-
-
 /* General Styles for Card */
 .card {
   background-color: var(--card-background);
@@ -256,18 +290,24 @@ footer a:hover {
 }
 
 /* Glow Effect for Lorekeeper Text */
-h2.glow {
-  font-size: 2.5rem;
-  color: var(--accent-color);
-  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
-  margin-bottom: 10px;
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
+  }
+  50% {
+    text-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color);
+  }
+  100% {
+    text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
+  }
 }
 
 .glow {
   color: var(--accent-color) !important;
-  text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+  text-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color) !important;
+  animation: glow 3s ease-in-out infinite;
+  text-decoration: none;
 }
-
 
 /* Form Styles */
 .form-label {
@@ -312,8 +352,6 @@ h2.glow {
   padding: var(--section-padding) 0;
 }
 
-
-
 /* Card Styles */
 .subscription-card, .featured-card, .more-card {
   background-color: var(--card-background);
@@ -325,9 +363,6 @@ h2.glow {
   transform: scale(1.05);
   box-shadow: 0 6px 15px var(--card-shadow);
 }
-
-
-
 
 /* Card Styling */
 .card {

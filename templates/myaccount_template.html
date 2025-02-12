@@ -1,12 +1,12 @@
-{% extends "nav_footer_template.html" %}
+{% extends "nav_footer_template.html" %} {% block title %}My Account -
+Lorekeeper{% endblock %} {% block content %}
 
-{% block title %}My Account - Lorekeeper{% endblock %}
-
-{% block content %}
 <div class="container mt-5">
   <!-- Header Section -->
   <div class="text-center mb-5">
-    <h1 class="fw-bold">Welcome back, <span id="username">[Username]</span>!</h1>
+    <h1 class="fw-bold">
+      Welcome back, <span id="username">[Username]</span>!
+    </h1>
     <p class="text-muted">Email: <span id="email">[email@example.com]</span></p>
     <p><span class="badge bg-primary">Privilege: [Admin/User/Vendor]</span></p>
   </div>
@@ -16,7 +16,9 @@
     <h3 class="border-bottom pb-2">Notifications</h3>
     <ul class="list-group shadow-sm">
       <li class="list-group-item">Your subscription is active.</li>
-      <li class="list-group-item">New feature: Manage Products is now available!</li>
+      <li class="list-group-item">
+        New feature: Manage Products is now available!
+      </li>
     </ul>
   </div>
 
@@ -26,8 +28,18 @@
     <div class="d-flex flex-wrap gap-3">
       <a href="/forums" class="btn btn-outline-primary">Forums</a>
       <a href="/store" class="btn btn-outline-primary">Store</a>
-      <a href="/vendor/manage" class="btn btn-outline-primary d-none" id="vendor-link">Manage Products</a>
-      <a href="/admin/dashboard" class="btn btn-outline-primary d-none" id="admin-link">Admin Dashboard</a>
+      <a
+        href="/vendor/manage"
+        class="btn btn-outline-primary d-none"
+        id="vendor-link"
+        >Manage Products</a
+      >
+      <a
+        href="/admin/dashboard"
+        class="btn btn-outline-primary d-none"
+        id="admin-link"
+        >Admin Dashboard</a
+      >
     </div>
   </div>
 
@@ -36,29 +48,58 @@
     <h3 class="border-bottom pb-2">Account Management</h3>
     <div class="mb-4">
       <label for="bio" class="form-label fw-bold">Bio:</label>
-      <textarea class="form-control shadow-sm" id="bio" rows="3">Share your adventures!</textarea>
+      <textarea class="form-control shadow-sm" id="bio" rows="3">
+Share your adventures!</textarea
+      >
       <button class="btn btn-primary mt-2">Save Bio</button>
     </div>
 
     <div class="mb-4">
       <label class="form-label fw-bold">Profile Picture:</label>
       <div class="d-flex gap-3 align-items-center">
-        <img src="/static/img/default-pfp.png" alt="Profile Picture" id="profile-pic-preview" class="rounded-circle border" width="100" height="100">
+        <img
+          src="/static/img/default-pfp.png"
+          alt="Profile Picture"
+          id="profile-pic-preview"
+          class="rounded-circle border"
+          width="100"
+          height="100"
+        />
         <button class="btn btn-primary">Change Picture</button>
       </div>
     </div>
 
     <div class="mb-4">
       <label class="form-label fw-bold">Change Email:</label>
-      <input type="email" class="form-control shadow-sm mb-2" id="new-email" placeholder="Enter new email">
+      <input
+        type="email"
+        class="form-control shadow-sm mb-2"
+        id="new-email"
+        placeholder="Enter new email"
+      />
       <button class="btn btn-primary">Update Email</button>
     </div>
 
     <div class="mb-4">
       <label class="form-label fw-bold">Change Password:</label>
-      <input type="password" class="form-control shadow-sm mb-2" id="current-password" placeholder="Current password">
-      <input type="password" class="form-control shadow-sm mb-2" id="new-password" placeholder="New password">
-      <input type="password" class="form-control shadow-sm" id="confirm-password" placeholder="Confirm new password">
+      <input
+        type="password"
+        class="form-control shadow-sm mb-2"
+        id="current-password"
+        placeholder="Current password"
+      />
+      <input
+        type="password"
+        class="form-control shadow-sm mb-2"
+        id="new-password"
+        placeholder="New password"
+      />
+      <input
+        type="password"
+        class="form-control shadow-sm"
+        id="confirm-password"
+        placeholder="Confirm new password"
+      />
       <button class="btn btn-primary mt-2">Update Password</button>
     </div>
   </div>
@@ -68,7 +109,9 @@
     <h3 class="border-bottom pb-2">Subscriptions & Purchases</h3>
     <div class="mb-4">
       <h5 class="fw-bold">Subscription</h5>
-      <p class="text-muted">Active Tier: <span id="subscription-tier">[Free/Standard/Pro]</span></p>
+      <p class="text-muted">
+        Active Tier: <span id="subscription-tier">[Free/Standard/Pro]</span>
+      </p>
     </div>
     <div>
       <h5 class="fw-bold">Purchases</h5>
@@ -82,7 +125,12 @@
   <!-- Help Section -->
   <div class="mt-5">
     <h3 class="border-bottom pb-2">Need Help?</h3>
-    <p>If you have any issues or questions, feel free to <a href="mailto:help@lorekeeper.com" class="text-primary">contact our support team</a>.</p>
+    <p>
+      If you have any issues or questions, feel free to
+      <a href="mailto:help@lorekeeper.com" class="text-primary"
+        >contact our support team</a
+      >.
+    </p>
   </div>
 </div>
 {% endblock %}
