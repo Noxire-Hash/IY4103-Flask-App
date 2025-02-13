@@ -1,0 +1,79 @@
+{% extends "nav_footer_template.html" %} {% block content %}
+<div class="container mt-5">
+  <!-- Ticket Information -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2>Ticket #{{ ticket.id }}</h2>
+      <span
+        class="badge {% if ticket.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}"
+      >
+        {{ ticket.status }}
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-12">
+          <h4>Ticket Details</h4>
+          <p><strong>Category:</strong> {{ ticket.category }}</p>
+          <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+          <p>
+            <strong>Created:</strong> {{ ticket.created_at.strftime('%Y-%m-%d
+            %H:%M') }}
+          </p>
+          <p><strong>Message:</strong></p>
+          <div class="p-3 bg-dark rounded mb-3">{{ ticket.message }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Responses -->
+  {% if ticket.responses %}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Responses</h3>
+    </div>
+    <div class="card-body">
+      {% for response in ticket.responses %}
+      <div
+        class="mb-3 p-3 {% if response.is_user %}bg-dark{% else %}bg-secondary{% endif %} rounded"
+      >
+        <p>
+          <strong>{{ 'You' if response.is_user else 'Moderator' }}</strong> - {{
+          response.created_at.strftime('%Y-%m-%d %H:%M') }}
+        </p>
+        <p>{{ response.response }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Reply Form -->
+  {% if ticket.status != 'Closed' %}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Reply to Ticket</h3>
+    </div>
+    <div class="card-body">
+      <form
+        method="POST"
+        action="{{ url_for('user_reply_ticket', ticket_id=ticket.id) }}"
+      >
+        <div class="mb-3">
+          <label for="response" class="form-label">Your Reply</label>
+          <textarea
+            class="form-control"
+            id="response"
+            name="response"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Reply</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

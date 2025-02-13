@@ -1,17 +1,19 @@
-import datetime
+from datetime import timedelta
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import os
 from flask import Flask, send_from_directory, send_file, request, redirect, url_for, flash, render_template, session, make_response
-from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS
+from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS, SupportTicket, SupportTicketResponse, TICKET_CATEGORIES, TICKET_STATUS
 from helper import find_user_from_id, json_interpreter
 
-
+# App setup
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 migrate = Migrate(app, db)
 db.init_app(app)
+
+# Basic page routes
 
 
 @app.route('/')
@@ -40,6 +42,8 @@ def news():
 def about():
     return render_template("about.html")
 
+# Auth routes
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -60,7 +64,7 @@ def register():
         # Add user to the database
         try:
             user = User(username=username, email=email,
-                        password=password, privilege_id=1)
+                        password=password, privilege_id=999)
             db.session.add(user)
             db.session.commit()
             flash("Registration successful! Please log in.", "success")
@@ -103,8 +107,8 @@ def send():
 @app.route("/test_db")
 def test_db():
     try:
-        test_user = User(username="testuser", email="test@test.com",
-                         password="1234", privilege_id=1)
+        test_user = User.query.filter_by(username="testuser", email="test@test.com",
+                                         password="1234", privilege_id=1).first()
         db.session.add(test_user)
         db.session.commit()
         print("User added successfully.")
@@ -121,6 +125,8 @@ def test_flash():
     flash("This is a warning message!", "warning")
     flash("This is an error message!", "danger")
     return redirect(url_for("home"))
+
+# Admin routes
 
 
 @app.route("/admin", methods=["GET", "POST"])
@@ -209,6 +215,14 @@ def get_user_data():
         return {"error": "User not logged in"}, 401
 
 
+@app.route("/get_username_from_id/<int:user_id>")
+def get_username_from_id(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    return user.username
+
+# Cookie management
+
+
 @app.route("/setCookie", methods=["POST", "GET"])
 def setCookie():
     user_id = session.get("user_id")
@@ -225,6 +239,19 @@ def getCookie():
     session["username"] = user.username
     session["privilege_id"] = user.privilege_id
     flash("Login successful!", "success")
+
+
+@app.errorhandler(404)
+def err_404():
+    render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def err_500():
+    render_template("500.html"), 500
+
+
+# Vendor routes
 
 
 @app.route("/vendor/dashboard", methods=["GET", "POST"])
@@ -310,6 +337,172 @@ def delete_item(item_id):
         flash(f"Error deleting item: {e}", "danger")
 
     return redirect(url_for("vendor_dashboard"))
+
+
+@app.route("/test_error")
+def test_error():
+    raise Exception("This is a test error!")
+
+# Support ticket routes
+
+
+@app.route("/support", methods=["GET", "POST"])
+def support():
+    if not session.get("user_id"):
+        flash("Please log in to submit a support ticket.", "warning")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        category = request.form.get("category")
+        subject = request.form.get("subject")
+        message = request.form.get("message")
+
+        if not all([category, subject, message]):
+            flash("Please fill in all fields.", "danger")
+            return redirect(url_for("support"))
+
+        try:
+            ticket = SupportTicket(
+                user_id=session["user_id"],
+                category=category,
+                subject=subject,
+                message=message
+            )
+            db.session.add(ticket)
+            db.session.commit()
+            flash("Your support ticket has been submitted successfully!", "success")
+            return redirect(url_for("support"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error submitting ticket: {e}", "danger")
+            return redirect(url_for("support"))
+
+    # Get user's tickets for display
+    tickets = SupportTicket.query.filter_by(user_id=session["user_id"]).order_by(
+        SupportTicket.created_at.desc()).all()
+    return render_template("support.html", tickets=tickets, categories=TICKET_CATEGORIES)
+
+
+def reply_ticket():
+    if not session.get("user_id"):
+        flash("Please log in to reply a support ticket", "warning")
+        return redirect(url_for("login"))
+    return render_template("user_reply_ticket.html")
+
+
+@app.route("/support/reply_ticket/<int:ticket_id>", methods=["GET", "POST"])
+def user_reply_ticket(ticket_id):
+    if not session.get("user_id"):
+        flash("Please log in to reply to a support ticket", "warning")
+        return redirect(url_for("login"))
+
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+
+    # Check if the ticket belongs to the user
+    if ticket.user_id != session.get("user_id"):
+        flash("You don't have permission to view this ticket", "danger")
+        return redirect(url_for("support"))
+
+    if request.method == "POST":
+        response = request.form.get("response")
+        if response:
+            try:
+                ticket_response = SupportTicketResponse(
+                    ticket_id=ticket.id,
+                    responder_id=session["user_id"],
+                    response=response,
+                    is_user=True  # Use boolean instead of 1
+                )
+                db.session.add(ticket_response)
+                db.session.commit()
+                flash("Reply sent successfully!", "success")
+            except Exception as e:
+                db.session.rollback()
+                flash(f"Error sending reply: {e}", "danger")
+
+    # Get responses using the relationship
+    responses = ticket.responses.all()
+
+    return render_template("user_reply_ticket.html", ticket=ticket, responses=responses)
+
+
+# Moderator routes
+@app.route("/moderator/dashboard", methods=["GET", "POST"])
+def moderator_dashboard():
+    tickets = SupportTicket.query.all()
+    return render_template("moderator_dashboard.html", tickets=tickets, get_username_from_id=get_username_from_id)
+
+
+@app.route("/moderator/view_ticket/<int:ticket_id>", methods=["GET"])
+def view_ticket(ticket_id):
+    if session.get("privilege_id") < 998:
+        flash("Access denied! Moderators only.", "danger")
+        return redirect(url_for("home"))
+
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+    user = User.query.get(ticket.user_id)
+    purchases = Purchase.query.filter_by(user_id=ticket.user_id).all()
+
+    # Get responses and convert to list
+    responses = ticket.responses.all()  # This uses the relationship we defined
+
+    return render_template(
+        "moderator_view_ticket.html",
+        ticket=ticket,
+        user=user,
+        purchases=purchases,
+        responses=responses,  # Pass responses separately
+        get_username_from_id=get_username_from_id,
+        TICKET_STATUS=TICKET_STATUS
+    )
+
+
+@app.route("/moderator/respond/<int:ticket_id>", methods=["POST"])
+def moderator_respond(ticket_id):
+    if session.get("privilege_id") < 998:
+        flash("Access denied! Moderators only.", "danger")
+        return redirect(url_for("home"))
+
+    ticket = SupportTicket.query.get_or_404(ticket_id)
+    response = request.form.get("response")
+    new_status = request.form.get("status")
+
+    if response:
+        try:
+            # Create the response
+            ticket_response = SupportTicketResponse(
+                ticket_id=ticket.id,
+                responder_id=session["user_id"],
+                response=response,
+                is_user=False  # This is a moderator response
+            )
+
+            # Update ticket status
+            ticket.status = new_status
+
+            db.session.add(ticket_response)
+            db.session.commit()
+            flash("Response sent successfully!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error sending response: {e}", "danger")
+
+    return redirect(url_for('view_ticket', ticket_id=ticket_id))
+
+# Session management
+
+
+@app.before_request
+def make_session_permanent():
+    if session.get("user_id"):
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(minutes=5)
+    else:
+        try:
+            getCookie()
+
+        except:
+            print("No cookies found")
 
 
 if __name__ == '__main__':

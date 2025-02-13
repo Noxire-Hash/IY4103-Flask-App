@@ -1,0 +1,82 @@
+{% extends "nav_footer_template.html" %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Ticket Information -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Ticket #{{ ticket.id }}</h2>
+            <span class="badge {% if ticket.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}">
+                {{ ticket.status }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Ticket Details</h4>
+                    <p><strong>Category:</strong> {{ ticket.category }}</p>
+                    <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+                    <p><strong>Created:</strong> {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p><strong>Initial Message:</strong></p>
+                    <div class="p-3 bg-dark rounded">
+                        {{ ticket.message }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4>User Information</h4>
+                    <p><strong>Username:</strong> {{ get_username_from_id(ticket.user_id) }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Account Created:</strong> {{ user.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversation History -->
+    {% if responses %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Conversation History</h3>
+        </div>
+        <div class="card-body">
+            {% for response in responses %}
+            <div class="mb-3 p-3 {% if response.is_user %}bg-dark{% else %}bg-secondary{% endif %} rounded">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ get_username_from_id(response.responder_id) }}</strong>
+                    <small>{{ response.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+                <p class="mt-2">{{ response.response }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Moderator Response Form -->
+    {% if ticket.status != 'Closed' %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Respond to Ticket</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('moderator_respond', ticket_id=ticket.id) }}">
+                <div class="mb-3">
+                    <label for="response" class="form-label">Your Response</label>
+                    <textarea class="form-control" id="response" name="response" rows="4" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Update Status</label>
+                    <select class="form-select" id="status" name="status">
+                        {% for status in TICKET_STATUS %}
+                        <option value="{{ status }}" {% if ticket.status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Response</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

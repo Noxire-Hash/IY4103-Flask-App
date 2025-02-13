@@ -3,6 +3,17 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 ITEM_STATUS = ["Active", "Pending", "Inactive", "Deleted"]
+TICKET_CATEGORIES = [
+    "Game Problem",
+    "Technical Issue",
+    "Purchase Problem",
+    "Account Problem",
+    "Report User",
+    "Feedback",
+    "Billing Issue",
+    "Other"
+]
+TICKET_STATUS = ["Open", "In Progress", "Closed"]
 
 
 class Privilege(db.Model):
@@ -80,3 +91,35 @@ class DndCharacter(db.Model):
     bio = db.Column(db.String(300))
     skills = db.Column(db.Integer)
     picture = db.Column(db.Integer)
+
+
+class SupportTicket(db.Model):
+    __tablename__ = 'support_tickets'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='Open')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship to responses
+    responses = db.relationship(
+        'SupportTicketResponse', back_populates='ticket', lazy='dynamic')
+    user = db.relationship('User', backref='tickets')
+
+
+class SupportTicketResponse(db.Model):
+    __tablename__ = 'support_ticket_responses'
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.Integer, db.ForeignKey(
+        'support_tickets.id'), nullable=False)
+    responder_id = db.Column(
+        db.Integer, db.ForeignKey('users.id'), nullable=False)
+    response = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_user = db.Column(db.Boolean, default=False)
+
+    # Relationships
+    ticket = db.relationship('SupportTicket', back_populates='responses')
+    responder = db.relationship('User', backref='responses')

@@ -1,6 +1,6 @@
 # Adjust the import based on your app structure
 from app import app, db
-from models import Privilege
+from models import Privilege, User
 
 # Create a function to populate the privileges table
 
@@ -16,15 +16,20 @@ def populate_privileges():
                 id=2, name='Vendor', description='User with vendor access')
             promo_privilege = Privilege(
                 id=3, name='Promo Account', description='User with promotional access')
+            moderator_privilege = Privilege(
+                id=998, name='Moderator', description='User with moderator access, can delete posts and comments, and approve or reject vendor applications, look support tickets')
             admin_privilege = Privilege(
-                id=999, name='Admin', description='Administrator with full access')
+                id=999, name='Admin', description="Admins or Grand Wizards that can do anything")
+            lorekeeper_account = User(
+                id=1, username='LoreKeeper', email='lorekeeper@lorekeeper.com', password='lorekeeper', privilege_id=999)
 
             # Add privileges to the session
             db.session.add(user_privilege)
             db.session.add(vendor_privilege)
             db.session.add(promo_privilege)
+            db.session.add(moderator_privilege)
             db.session.add(admin_privilege)
-
+            db.session.add(lorekeeper_account)
             # Commit the session to save the privileges to the database
             db.session.commit()
             print("Privileges populated successfully.")
