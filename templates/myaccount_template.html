@@ -1,136 +1,164 @@
 {% extends "nav_footer_template.html" %} {% block title %}My Account -
 Lorekeeper{% endblock %} {% block content %}
 
-<div class="container mt-5">
-  <!-- Header Section -->
-  <div class="text-center mb-5">
-    <h1 class="fw-bold">
-      Welcome back, <span id="username">[Username]</span>!
-    </h1>
-    <p class="text-muted">Email: <span id="email">[email@example.com]</span></p>
-    <p><span class="badge bg-primary">Privilege: [Admin/User/Vendor]</span></p>
-  </div>
+<div id="wrapper">
+  <div class="container mt-5">
+    <!-- Header Section with Avatar -->
+    <div class="card mb-5">
+      <div class="card-body text-center">
+        <!-- Profile Picture Section -->
 
-  <!-- Notifications Section -->
-  <div class="mb-5">
-    <h3 class="border-bottom pb-2">Notifications</h3>
-    <ul class="list-group shadow-sm">
-      <li class="list-group-item">Your subscription is active.</li>
-      <li class="list-group-item">
-        New feature: Manage Products is now available!
-      </li>
-    </ul>
-  </div>
-
-  <!-- Quick Access Section -->
-  <div class="mb-5">
-    <h3 class="border-bottom pb-2">Quick Access</h3>
-    <div class="d-flex flex-wrap gap-3">
-      <a href="/forums" class="btn btn-outline-primary">Forums</a>
-      <a href="/store" class="btn btn-outline-primary">Store</a>
-      <a
-        href="/vendor/manage"
-        class="btn btn-outline-primary d-none"
-        id="vendor-link"
-        >Manage Products</a
-      >
-      <a
-        href="/admin/dashboard"
-        class="btn btn-outline-primary d-none"
-        id="admin-link"
-        >Admin Dashboard</a
-      >
-    </div>
-  </div>
-
-  <!-- Account Management Section -->
-  <div class="mb-5">
-    <h3 class="border-bottom pb-2">Account Management</h3>
-    <div class="mb-4">
-      <label for="bio" class="form-label fw-bold">Bio:</label>
-      <textarea class="form-control shadow-sm" id="bio" rows="3">
-Share your adventures!</textarea
-      >
-      <button class="btn btn-primary mt-2">Save Bio</button>
-    </div>
-
-    <div class="mb-4">
-      <label class="form-label fw-bold">Profile Picture:</label>
-      <div class="d-flex gap-3 align-items-center">
-        <img
-          src="/static/img/default-pfp.png"
-          alt="Profile Picture"
-          id="profile-pic-preview"
-          class="rounded-circle border"
-          width="100"
-          height="100"
-        />
-        <button class="btn btn-primary">Change Picture</button>
+        <!-- User Info -->
+        <h2 class="mb-2">Welcome back, <span id="username" class="glow">[Username]</span>!</h2>
+        <p class="text-muted mb-2">Email: <span id="email">[email@example.com]</span></p>
+        <span class="badge bg-primary">Privilege: [Admin/User/Vendor]</span>
       </div>
     </div>
 
-    <div class="mb-4">
-      <label class="form-label fw-bold">Change Email:</label>
-      <input
-        type="email"
-        class="form-control shadow-sm mb-2"
-        id="new-email"
-        placeholder="Enter new email"
-      />
-      <button class="btn btn-primary">Update Email</button>
-    </div>
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col-md-4">
+        <!-- Quick Access Panel -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title h5 mb-0">Quick Access</h3>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a href="/store" class="btn btn-outline-primary">Store</a>
+              <a href="/support" class="btn btn-outline-primary">Support</a>
+              <a
+                href="/vendor/dashboard"
+                class="btn btn-outline-primary d-none"
+                id="vendor-link"
+                >Manage Products</a
+              >
+              <a
+                href="/admin"
+                class="btn btn-outline-primary d-none"
+                id="admin-link"
+                >Admin Dashboard</a
+              >
+              <a
+                href="/moderator/dashboard"
+                class="btn btn-outline-primary d-none"
+                id="moderator_link"
+                >
+              </a>
+            </div>
+          </div>
+        </div>
 
-    <div class="mb-4">
-      <label class="form-label fw-bold">Change Password:</label>
-      <input
-        type="password"
-        class="form-control shadow-sm mb-2"
-        id="current-password"
-        placeholder="Current password"
-      />
-      <input
-        type="password"
-        class="form-control shadow-sm mb-2"
-        id="new-password"
-        placeholder="New password"
-      />
-      <input
-        type="password"
-        class="form-control shadow-sm"
-        id="confirm-password"
-        placeholder="Confirm new password"
-      />
-      <button class="btn btn-primary mt-2">Update Password</button>
-    </div>
-  </div>
+        <!-- Subscription Status -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title h5 mb-0">Subscription Status</h3>
+          </div>
+          <div class="card-body">
+            <h6 class="fw-bold">Current Plan:</h6>
+            <p class="mb-3">
+              <span id="subscription-tier" class="badge bg-secondary">[Free/Premium/Exclusive]</span>
+            </p>
+            <a href="/store#subscriptions" class="btn btn-primary btn-sm">Upgrade Plan</a>
+          </div>
+        </div>
+      </div>
 
-  <!-- Subscriptions & Purchases Section -->
-  <div class="mb-5">
-    <h3 class="border-bottom pb-2">Subscriptions & Purchases</h3>
-    <div class="mb-4">
-      <h5 class="fw-bold">Subscription</h5>
-      <p class="text-muted">
-        Active Tier: <span id="subscription-tier">[Free/Standard/Pro]</span>
-      </p>
-    </div>
-    <div>
-      <h5 class="fw-bold">Purchases</h5>
-      <ul class="list-group shadow-sm">
-        <li class="list-group-item">Adventure Pack #1</li>
-        <li class="list-group-item">Legendary Monster: Raharr</li>
-      </ul>
-    </div>
-  </div>
+      <!-- Right Column -->
+      <div class="col-md-8">
+        <!-- Account Management -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title h5 mb-0">Account Management</h3>
+          </div>
+          <div class="card-body">
+            <!-- Bio -->
+            <div class="mb-4">
+              <label for="bio" class="form-label">Bio</label>
+              <textarea class="form-control mb-2" id="bio" rows="3">Share your adventures!</textarea>
+              <button class="btn btn-primary btn-sm">Save Bio</button>
+            </div>
 
-  <!-- Help Section -->
-  <div class="mt-5">
-    <h3 class="border-bottom pb-2">Need Help?</h3>
-    <p>
-      If you have any issues or questions, feel free to
-      <a href="/support" class="text-primary"
-        >contact our support team</a
-      >.
-    </p>
+            <hr>
+
+            <!-- Email Change -->
+            <div class="mb-4">
+              <label for="new-email" class="form-label">Change Email</label>
+              <input
+                type="email"
+                class="form-control mb-2"
+                id="new-email"
+                placeholder="Enter new email"
+              />
+              <button class="btn btn-primary btn-sm">Update Email</button>
+            </div>
+
+            <hr>
+
+            <!-- Password Change -->
+            <div class="mb-4">
+              <label class="form-label">Change Password</label>
+              <div class="mb-2">
+                <input
+                  type="password"
+                  class="form-control mb-2"
+                  id="current-password"
+                  placeholder="Current password"
+                />
+                <input
+                  type="password"
+                  class="form-control mb-2"
+                  id="new-password"
+                  placeholder="New password"
+                />
+                <input
+                  type="password"
+                  class="form-control mb-2"
+                  id="confirm-password"
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <button class="btn btn-primary btn-sm">Update Password</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Purchase History -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title h5 mb-0">Recent Purchases</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-dark table-hover">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2024-03-19</td>
+                    <td>Adventure Pack #1</td>
+                    <td>$19.99</td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>2024-03-18</td>
+                    <td>Legendary Monster: Raharr</td>
+                    <td>$4.99</td>
+                    <td><span class="badge bg-success">Completed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

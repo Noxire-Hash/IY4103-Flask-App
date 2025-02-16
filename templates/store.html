@@ -1,126 +1,184 @@
-{% extends "/nav_footer_template.html"%} {% block content %}
-<!-- Hero Section -->
-<header class="text-light text-center py-5">
-  <h1 class="display-4 section-header">
-    <a class="glow">Lorekeeper</a> Marketplace
-  </h1>
-  <p class="lead">
-    Unlock adventures, monsters, maps, and tools to enhance your campaigns.
-  </p>
-  <a href="#items" class="btn btn-primary btn-lg">Browse All Items</a>
-</header>
+{% extends "nav_footer_template.html" %}
+{% block content %}
+<div id="wrapper">
+  <!-- Hero Section -->
+  <header class="text-light text-center py-5">
+    <h1 class="display-4 section-header">
+      <a class="glow">Lorekeeper</a> Marketplace
+    </h1>
+    <p class="lead">
+      Unlock adventures, monsters, maps, and tools to enhance your campaigns.
+    </p>
 
-<!-- Subscription Plans Section -->
-<section id="subscriptions" class="py-5">
-  <div class="container">
-    <h2 class="text-center section-header mb-5">Subscription Plans</h2>
-    <div class="row g-4">
-      <!-- Free Plan -->
-      <div class="col-md-4">
-        <div class="card subscription-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Standard (Free)</h5>
-            <p class="card-text">Access free adventures, maps, and tools.</p>
-            <ul class="list-unstyled">
-              <li>✔ Basic adventures</li>
-              <li>✔ Free monsters and maps</li>
-              <li>✔ Limited tools</li>
-            </ul>
-            <p class="fw-bold mt-3">Included with all accounts</p>
-          </div>
-        </div>
-      </div>
-      <!-- Premium Plan -->
-      <div class="col-md-4">
-        <div class="card subscription-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Premium</h5>
-            <p class="card-text">Unlock all adventures, monsters, and tools.</p>
-            <ul class="list-unstyled">
-              <li>✔ Access to all content</li>
-              <li>✔ Exclusive maps and tools</li>
-              <li>✔ Priority support</li>
-            </ul>
-            <h6 class="fw-bold mt-3">$9.99/month or $99/year</h6>
-            <a href="#" class="btn btn-primary">Subscribe Now</a>
-          </div>
-        </div>
-      </div>
-      <!-- Exclusive Plan -->
-      <div class="col-md-4">
-        <div class="card subscription-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Exclusive</h5>
-            <p class="card-text">Enjoy rare, time-limited content and perks.</p>
-            <ul class="list-unstyled">
-              <li>✔ Early access to new releases</li>
-              <li>✔ Limited-edition items</li>
-              <li>✔ VIP events and perks</li>
-            </ul>
-            <h6 class="fw-bold mt-3">$19.99/month or $199/year</h6>
-            <a href="#" class="btn btn-primary">Subscribe Now</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    <!-- Search and Filter Bar -->
 
-<!-- Featured Items Section -->
-<section id="featured" class="py-5">
-  <div class="container">
-    <h2 class="text-center section-header mb-5">Featured Items</h2>
-    <div class="row g-4">
-      <!-- Adventure Card -->
-      <div class="col-md-4">
-        <div class="card featured-card">
-          <img
-            src="{{ url_for('static', filename='images/adventure.png') }}"
-            class="card-img-top"
-            alt="Into the Abyss"
-          />
-          <div class="card-body text-center">
-            <h5 class="card-title">Into the Abyss</h5>
-            <p class="card-text">
-              A thrilling adventure through ancient caverns.
-            </p>
-            <a href="#" class="btn btn-primary">Learn More</a>
+    <!-- Subscription Plans Section -->
+    <section id="subscriptions" class="py-5">
+      <div class="container">
+        <h2 class="text-center section-header mb-5">Subscription Plans</h2>
+        <div class="row g-4">
+          <!-- Free Plan -->
+          <div class="col-md-4">
+            <div class="card subscription-card">
+              <div class="card-body text-center">
+                <h5 class="card-title">Standard (Free)</h5>
+                <p class="card-text">Access free adventures, maps, and tools.</p>
+                <ul class="list-unstyled">
+                  <li>✔ Basic adventures</li>
+                  <li>✔ Free monsters and maps</li>
+                  <li>✔ Limited tools</li>
+                </ul>
+                <p class="fw-bold mt-3">Included with all accounts</p>
+              </div>
+            </div>
+          </div>
+          <!-- Premium Plan -->
+          <div class="col-md-4">
+            <div class="card subscription-card">
+              <div class="card-body text-center">
+                <h5 class="card-title">Premium</h5>
+                <p class="card-text">
+                  Unlock all adventures, monsters, and tools.
+                </p>
+                <ul class="list-unstyled">
+                  <li>✔ Access to all content</li>
+                  <li>✔ Exclusive maps and tools</li>
+                  <li>✔ Priority support</li>
+                </ul>
+                <h6 class="fw-bold mt-3">$9.99/month or $99/year</h6>
+                <a href="#" class="btn btn-primary">Subscribe Now</a>
+              </div>
+            </div>
+          </div>
+          <!-- Exclusive Plan -->
+          <div class="col-md-4">
+            <div class="card subscription-card">
+              <div class="card-body text-center">
+                <h5 class="card-title">Exclusive</h5>
+                <p class="card-text">
+                  Enjoy rare, time-limited content and perks.
+                </p>
+                <ul class="list-unstyled">
+                  <li>✔ Early access to new releases</li>
+                  <li>✔ Limited-edition items</li>
+                  <li>✔ VIP events and perks</li>
+                </ul>
+                <h6 class="fw-bold mt-3">$19.99/month or $199/year</h6>
+                <a href="#" class="btn btn-primary">Subscribe Now</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <!-- Monster Card -->
-      <div class="col-md-4">
-        <div class="card featured-card">
-          <img
-            src="{{ url_for('static', filename='images/monster.png') }}"
-            class="card-img-top"
-            alt="Rhart the Trickster"
-          />
-          <div class="card-body text-center">
-            <h5 class="card-title">Rhart the Trickster</h5>
-            <p class="card-text">
-              A legendary shapeshifter for your campaigns.
-            </p>
-            <a href="#" class="btn btn-primary">Learn More</a>
+    </section>
+
+    <!-- Featured Items Section -->
+    <section id="featured" class="py-4">
+      <div class="container">
+        <h2 class="text-center section-header mb-5">Featured Items</h2>
+        <div class="row g-4" id="featuredItemsContainer">
+
+
+          <div class="col-md-4">
+            <div class="card subscription-card">
+              <div class="card-body text-center">
+              <h5 class="card-title shimmer" id="featured-item-name-0">Loading...</h5>
+                <p class="card-text shimmer" id="featured-item-description-0">
+                  Loading...
+                </p>
+                <p class="card-text featured-item-vendor-name-0 shimmer" id="featured-item-vendor-name-0">Loading...</p>
+                <h6 class="fw-bold mt-3 shimmer" id="featured-item-price-0">Loading...</h6>
+                <a href="#" class="btn btn-primary shimmer" id="featured-item-btn-0">More Details</a>
+              </div>
+            </div>
+          </div>
+
+        <div class="col-md-4">
+          <div class="card subscription-card">
+            <div class="card-body text-center">
+              <h5 class="card-title shimmer" id="featured-item-name-1">Loading...</h5>
+              <p class="card-text shimmer" id="featured-item-description-1">
+                Loading...
+              </p>
+              <p class="card-text shimmer" id="featured-item-vendor-name-1">Loading...</p>
+              <h6 class="fw-bold mt-3 shimmer" id="featured-item-price-1">Loading...</h6>
+              <a href="#" class="btn btn-primary" id="featured-item-btn-1">More Details</a>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Map Pack Card -->
-      <div class="col-md-4">
-        <div class="card featured-card">
-          <img
-            src="{{ url_for('static', filename='images/map.png') }}"
-            class="card-img-top"
-            alt="Forgotten Caverns Map Pack"
-          />
-          <div class="card-body text-center">
-            <h5 class="card-title">Forgotten Caverns Map Pack</h5>
-            <p class="card-text">Five detailed maps for dungeon crawls.</p>
-            <a href="#" class="btn btn-primary">Learn More</a>
+
+        <div class="col-md-4">
+          <div class="card subscription-card">
+            <div class="card-body text-center">
+              <h5 class="card-title shimmer" id="featured-item-name-2">Loading...</h5>
+              <p class="card-text shimmer" id="featured-item-description-2">
+                Loading...
+              </p>
+              <p class="card-text shimmer" id="featured-item-vendor-name-2">Loading...</p>
+              <h6 class="fw-bold mt-3 shimmer" id="featured-item-price-2">Loading...</h6>
+              <a href="#" class="btn btn-primary" id="featured-item-btn-2">More Details</a>
+            </div>
           </div>
         </div>
+
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
+
+    <!-- All Items Section -->
+    <section id="all-items" class="py-5">
+      <div class="container">
+        <h2 class="text-center section-header mb-5">Browse All Items</h2>
+
+        <!-- Search and Filter Controls -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="searchInput"
+                placeholder="Search items..."
+              />
+              <button class="btn btn-primary" type="button" id="searchButton">
+                Search
+              </button>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="categoryFilter">
+              <option value="">All Categories</option>
+              <option value="Adventure">Adventure</option>
+              <option value="Monster">Monster</option>
+              <option value="Map">Map</option>
+              <option value="Tool">Tool</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="sortFilter">
+              <option value="newest">Newest First</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Items Container -->
+        <div class="row g-4" id="itemsContainer">
+          <!-- Items will be dynamically inserted here by JavaScript -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-4">
+          <nav aria-label="Page navigation">
+            <ul class="pagination" id="paginationContainer">
+              <!-- Pagination will be dynamically inserted here by JavaScript -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+  </header>
+</div>
 {% endblock %}

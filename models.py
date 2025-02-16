@@ -53,11 +53,21 @@ class Item(db.Model):
     price = db.Column(db.Float, nullable=False)
     vendor_id = db.Column(db.Integer, db.ForeignKey(
         'vendors.id'), nullable=False)
+    reviews = db.relationship('ReviewOfItem', backref='item', lazy=True)
     category = db.Column(db.String(64), nullable=False)
     tags = db.Column(db.String(256))
     sales = db.Column(db.Integer, default=0)
     status = db.Column(db.String(64), default="Active")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ReviewOfItem(db.Model):
+    __tablename__ = 'reviews_of_items'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    review = db.Column(db.Text)
 
 
 class Purchase(db.Model):

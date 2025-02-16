@@ -2,6 +2,10 @@ from models import User
 import json
 
 
+def get_username_from_id(user_id):
+    return find_user_from_id(user_id=user_id, form_json=False)["username"]
+
+
 def find_user_from_id(user_id, form_json=True):
     """Find a user by their ID and return their data as a dictionary or JSON string.
 

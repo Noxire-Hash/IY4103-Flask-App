@@ -1,7 +1,7 @@
+import os
 from datetime import timedelta
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-import os
 from flask import Flask, send_from_directory, send_file, request, redirect, url_for, flash, render_template, session, make_response
 from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS, SupportTicket, SupportTicketResponse, TICKET_CATEGORIES, TICKET_STATUS
 from helper import find_user_from_id, json_interpreter
@@ -31,6 +31,11 @@ def home():
 @app.route("/store")
 def store():
     return render_template("store.html")
+
+
+@app.route("/item_preview")
+def item_preview():
+    return render_template("item_preview.html")
 
 
 @app.route("/news")
@@ -215,6 +220,11 @@ def get_user_data():
         return {"error": "User not logged in"}, 401
 
 
+@app.route("/get_item_data_from_id/<int:item_id>")
+def get_item_data(item_id):
+    pass
+
+
 @app.route("/get_username_from_id/<int:user_id>")
 def get_username_from_id(user_id):
     user = User.query.filter_by(id=user_id).first()
@@ -241,14 +251,36 @@ def getCookie():
     flash("Login successful!", "success")
 
 
+@app.route("/get_items", methods=["POST", "GET"])
+def get_items():
+    # May god forgive me for what about to do
+    items = Item.query.all()
+    item_dict = {}
+    for item in items:
+        vendor_name = get_username_from_id(item.vendor_id)
+        item_dict[item.id] = {
+            "name": item.name,
+            "description": item.description,
+            "price": item.price,
+            "vendor_id": item.vendor_id,
+            "vendor_name": vendor_name,
+            "category": item.category,
+            "tags": item.tags,
+            "sales": item.sales,
+            "status": item.status,
+            "created_at": str(item.created_at)
+        }
+    return json_interpreter(item_dict)
+
+
 @app.errorhandler(404)
-def err_404():
-    render_template("404.html"), 404
+def err_404(error):
+    return render_template("404.html"), 404
 
 
 @app.errorhandler(500)
 def err_500():
-    render_template("500.html"), 500
+    return render_template("500.html")
 
 
 # Vendor routes

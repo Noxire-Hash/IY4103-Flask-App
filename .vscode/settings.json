@@ -1,3 +1,11 @@
 {
-  "cSpell.words": ["backref", "Lorekeeper", "myaccount", "strftime", "urandom"]
+  "cSpell.words": [
+    "backref",
+    "Lorekeeper",
+    "myaccount",
+    "Reviewof",
+    "strftime",
+    "urandom"
+  ],
+  "python.REPL.enableREPLSmartSend": false
 }

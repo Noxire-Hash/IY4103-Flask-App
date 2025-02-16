@@ -1,0 +1,143 @@
+{% extends "nav_footer_template.html" %}
+{% block content %}
+<div id="wrapper">
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Left Column: Item Details -->
+            <div class="col-lg-8">
+                <!-- Main Item Card -->
+                <div class="card mb-4">
+                    <!-- Placeholder/Image Area -->
+                    <div class="item-preview-placeholder shimmer">
+                        <div class="placeholder-content">
+                            <i class="fas fa-dice-d20 fa-3x"></i>
+                            <p>Preview Coming Soon</p>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h1 class="card-title item-title mb-2">Loading...</h1>
+                                <p class="text-muted mb-2">By <a href="#" class="vendor-name">Loading...</a></p>
+                            </div>
+                            <div class="text-end">
+                                <h3 class="item-price mb-2">$0.00</h3>
+                                <span class="badge bg-success sales-count">0 sales</span>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="item-tags mb-3">
+                            <span class="badge bg-secondary shimmer">Loading...</span>
+                        </div>
+
+                        <!-- Description -->
+                        <h5>Description</h5>
+                        <p class="item-description">Loading...</p>
+
+                        <!-- Purchase Button -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary purchase-btn" disabled>
+                                <i class="fas fa-shopping-cart me-2"></i>Purchase Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ratings and Reviews Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="h5 mb-0">Ratings & Reviews</h3>
+                            <div class="rating-summary">
+                                <span class="average-rating">0.0</span>
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-count">(0 reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Review Form -->
+                        <form id="reviewForm" class="mb-4">
+                            <div class="mb-3">
+                                <label class="form-label">Your Rating</label>
+                                <div class="rating-input">
+                                    <i class="fas fa-star" data-rating="1"></i>
+                                    <i class="fas fa-star" data-rating="2"></i>
+                                    <i class="fas fa-star" data-rating="3"></i>
+                                    <i class="fas fa-star" data-rating="4"></i>
+                                    <i class="fas fa-star" data-rating="5"></i>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewText" class="form-label">Your Review</label>
+                                <textarea class="form-control" id="reviewText" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+
+                        <!-- Reviews List -->
+                        <div id="reviewsList">
+                            <!-- Reviews will be loaded here -->
+                            <div class="review-placeholder shimmer mb-3">
+                                <div class="placeholder-line"></div>
+                                <div class="placeholder-line"></div>
+                                <div class="placeholder-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Additional Info -->
+            <div class="col-lg-4">
+                <!-- Vendor Info Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">About the Vendor</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="vendor-info">
+                            <h4 class="vendor-name mb-2">Loading...</h4>
+                            <p class="vendor-stats mb-3">
+                                <span class="badge bg-primary me-2">
+                                    <i class="fas fa-scroll me-1"></i>
+                                    <span class="total-items">0</span> items
+                                </span>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-star me-1"></i>
+                                    <span class="vendor-rating">0.0</span>
+                                </span>
+                            </p>
+                            <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Similar Items Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="h5 mb-0">Similar Items</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="similar-items-list">
+                            <!-- Similar items will be loaded here -->
+                            <div class="similar-item-placeholder shimmer mb-3">
+                                <div class="placeholder-line"></div>
+                                <div class="placeholder-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

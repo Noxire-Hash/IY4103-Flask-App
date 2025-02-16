@@ -18,6 +18,7 @@
 /* General Reset */
 body {
   margin: 0;
+  padding: 0;
   font-family: 'Roboto', sans-serif;
   background: linear-gradient(135deg, #121212, #1a1a2e, #121212);
   background-size: cover;
@@ -28,6 +29,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh; /* Ensures footer stays at the bottom */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* Navbar */
@@ -57,8 +59,6 @@ body {
   border-color: var(--input-border); /* Change the border color of the toggler */
 }
 
-
-
 .store {
   color: var(--store-btn-color) !important;
 }
@@ -66,7 +66,6 @@ body {
 .store:hover {
   color: var(--store-btn-hover) !important;
 }
-
 
 /* Navbar Dropdown */
 .dropdown-menu {
@@ -80,11 +79,13 @@ body {
   background-color: var(--btn-hover);
 }
 
-
 /* Hero Section */
 header {
   text-align: center;
-  padding: var(--section-padding) 20px;
+  padding: 4rem 0;
+  margin-bottom: 0;
+  position: relative;
+  width: 100%;
 }
 header h1 {
   font-family: 'Cinzel', serif;
@@ -138,7 +139,8 @@ header .btn-outline-light:hover {
 
 /* Section Styling */
 section {
-  padding: var(--section-padding) 20px;
+  padding: 4rem 0;
+  position: relative;
 }
 section h2 {
   font-size: 2.5rem;
@@ -235,6 +237,10 @@ footer {
   text-align: center;
   border-top: 1px solid var(--input-border);
   margin-top: auto; /* Pushes footer to the bottom */
+  flex-shrink: 0;
+  position: relative;
+  bottom: 0;
+  width: 100%;
 }
 footer a {
   color: var(--accent-color) !important;
@@ -255,8 +261,11 @@ footer a:hover {
   margin-bottom: 1.5rem;
 }
 .container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 15px;
+  box-sizing: border-box;
 }
 
 /* General Styles for Card */
@@ -266,6 +275,8 @@ footer a:hover {
   border: none;
   border-radius: 10px;
   box-shadow: 0 4px 10px var(--card-shadow); /* Add shadow for depth */
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 .card-header {
   background-color: var(--card-background);
@@ -422,4 +433,334 @@ footer a:hover {
 .btn-primary:hover {
   background-color: var(--btn-hover);
   transform: scale(1.05);
+}
+
+/* Store Page Specific Styles */
+
+/* Search and Filter Controls */
+.store-controls {
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.store-controls .form-control,
+.store-controls .form-select {
+    background-color: var(--input-background);
+    border: 1px solid var(--input-border);
+    color: var(--text-color);
+}
+
+.store-controls .form-control:focus,
+.store-controls .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(177, 152, 237, 0.25);
+}
+
+/* Item Cards */
+.item-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.item-card .card {
+    background-color: var(--card-background);
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.item-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.item-card .card-body {
+    padding: 1.5rem;
+}
+
+.item-card .card-title {
+    color: var(--accent-color);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.item-card .price {
+    font-size: 1.5rem;
+    color: var(--store-btn-color);
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
+.item-card .badge {
+    background-color: var(--accent-color);
+    padding: 0.5em 1em;
+    font-size: 0.8rem;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 2rem;
+}
+
+.pagination .page-link {
+    background-color: var(--card-background);
+    border-color: var(--input-border);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* Featured Items Section */
+#featured {
+    background: linear-gradient(135deg, var(--card-background), var(--background-color));
+    padding: 4rem 0;
+    margin: 0;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.featured-card {
+    border: 2px solid var(--accent-color);
+    transform: scale(1.05);
+}
+
+/* Sort and Filter Dropdowns */
+#sortFilter,
+#categoryFilter {
+    background-color: var(--input-background);
+    color: var(--text-color);
+    border: 1px solid var(--input-border);
+    padding: 0.5rem;
+}
+
+/* Add to Cart Button */
+.add-to-cart {
+    background-color: var(--store-btn-color);
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: var(--store-btn-hover);
+    transform: scale(1.05);
+}
+
+/* Subscription Cards */
+.subscription-card {
+    background-color: var(--card-background);
+    border: 2px solid var(--input-border); /* Thicker border */
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.subscription-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.subscription-card .card-body {
+    padding: 1.5rem;
+    border-radius: 0; /* Remove inner border radius */
+}
+
+.subscription-card .card-title {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.subscription-card ul li {
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+}
+
+/* Search Bar Enhancement */
+#searchInput {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#searchButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* General improvements */
+main {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Improved button styling */
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Fix for any potential wrapper issues */
+#wrapper {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
+/* Profile Picture Styling */
+.profile-picture-container {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-color);
+    padding: 3px;
+    background-color: var(--card-background);
+}
+
+.change-picture-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.change-picture-btn:hover {
+    background-color: var(--btn-hover);
+    transform: scale(1.1);
+}
+
+/* Account Page Header */
+.card-body h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.card-body .badge {
+    font-size: 0.9rem;
+    padding: 0.5em 1em;
+}
+
+/* Item Preview Styles */
+.item-preview-placeholder {
+    background: var(--card-background);
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+}
+
+.placeholder-content {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Shimmer Effect */
+.shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--card-background) 0%,
+        var(--input-background) 50%,
+        var(--card-background) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Placeholder Lines */
+.placeholder-line {
+    height: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    background: var(--input-background);
+}
+
+/* Rating Stars */
+.rating-input {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.rating-input .fas.fa-star {
+    transition: color 0.2s;
+}
+
+.rating-input .fas.fa-star:hover,
+.rating-input .fas.fa-star.active {
+    color: var(--accent-color);
+}
+
+/* Reviews */
+.review {
+    border-bottom: 1px solid var(--input-border);
+    padding: 1rem 0;
+}
+
+.review:last-child {
+    border-bottom: none;
+}
+
+/* Similar Items */
+.similar-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.similar-item:last-child {
+    border-bottom: none;
 }
