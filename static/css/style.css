@@ -136,6 +136,12 @@ header .btn-outline-light:hover {
   background-color: var(--store-btn-hover);
   transform: scale(1.05);
 }
+.store-color {
+  background-color: var(--store-btn-color) !important;
+}
+.store-color:hover {
+  background-color: var(--store-btn-hover) !important;
+}
 
 /* Section Styling */
 section {

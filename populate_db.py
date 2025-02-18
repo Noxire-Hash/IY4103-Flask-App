@@ -21,7 +21,7 @@ def populate_privileges():
             admin_privilege = Privilege(
                 id=999, name='Admin', description="Admins or Grand Wizards that can do anything")
             lorekeeper_account = User(
-                id=1, username='LoreKeeper', email='lorekeeper@lorekeeper.com', password='lorekeeper', privilege_id=999)
+                id=1, username='LoreKeeper', email='lorekeeper@lorekeeper.com', password='lorekeeper', privilege_id=999, balance=999999)
 
             # Add privileges to the session
             db.session.add(user_privilege)

@@ -3,13 +3,22 @@ from datetime import timedelta
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, send_from_directory, send_file, request, redirect, url_for, flash, render_template, session, make_response
-from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS, SupportTicket, SupportTicketResponse, TICKET_CATEGORIES, TICKET_STATUS
+from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS, SupportTicket, SupportTicketResponse, TICKET_CATEGORIES, TICKET_STATUS, SystemTransactionHandler, Receipt, CashReceipt, SYSTEM_ID
 from helper import find_user_from_id, json_interpreter
 
 # App setup
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.secret_key = os.urandom(24)
+app.config.update(
+    SESSION_COOKIE_SECURE=False,  # Set to True in production
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=timedelta(minutes=60),
+    SESSION_REFRESH_EACH_REQUEST=True
+)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = True
 migrate = Migrate(app, db)
 db.init_app(app)
 
@@ -18,14 +27,16 @@ db.init_app(app)
 
 @app.route('/')
 def home():
-    if session.get("user_id") == None:
-        try:
-            getCookie()
-            print("Should work")
-        except:
-            print("No cookies found")
-    print(session.get("user_id"))
-    return render_template("index.html")
+    try:
+        if session.get("user_id") is None:
+            try:
+                getCookie()
+            except Exception as e:
+                print(f"No cookies found: {e}")
+        return render_template("index.html")
+    except OSError as e:
+        session.clear()
+        return render_template("index.html")
 
 
 @app.route("/store")
@@ -33,9 +44,32 @@ def store():
     return render_template("store.html")
 
 
-@app.route("/item_preview")
-def item_preview():
-    return render_template("item_preview.html")
+@app.route("/store/item/<int:item_id>")
+def item_preview(item_id):
+    try:
+        # Get item data
+        item = Item.query.get_or_404(item_id)
+
+        # Get vendor data
+        vendor = User.query.get(item.vendor_id)
+
+        # Get similar items (same category)
+        similar_items = Item.query.filter(
+            Item.category == item.category,
+            Item.id != item.id
+        ).limit(3).all()
+
+        return render_template(
+            "item_preview.html",
+            item=item,
+            vendor=vendor,
+            similar_items=similar_items
+        )
+
+    except Exception as e:
+        print(f"Error in item_preview: {e}")
+        flash("Error loading item details", "danger")
+        return redirect(url_for("store"))
 
 
 @app.route("/news")
@@ -46,6 +80,11 @@ def news():
 @app.route("/about")
 def about():
     return render_template("about.html")
+
+
+@app.route("/lore")
+def lore():
+    return render_template("lore.html")
 
 # Auth routes
 
@@ -211,18 +250,50 @@ def update_user(user_id):
 
 @app.route("/get_user_data", methods=["POST"])
 def get_user_data():
-    user_id = session.get("user_id")
-    if user_id:
-        print(find_user_from_id(user_id))
-        print(type(find_user_from_id(user_id)))
-        return find_user_from_id(user_id), 200
-    else:
+    try:
+        user_id = session.get("user_id")
+        if user_id:
+            user = User.query.get(user_id)
+            if user:
+                user_data = {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "privilege_id": user.privilege_id,
+                    "created_at": user.created_at.strftime('%Y-%m-%d')
+                }
+                return user_data, 200
+            return {"error": "User not found"}, 404
         return {"error": "User not logged in"}, 401
+    except Exception as e:
+        print(f"Error in get_user_data: {e}")
+        return {"error": "Server error"}, 500
 
 
 @app.route("/get_item_data_from_id/<int:item_id>")
 def get_item_data(item_id):
-    pass
+    try:
+        item = Item.query.get(item_id)
+        if item:
+            vendor = User.query.get(item.vendor_id)
+            item_data = {
+                "id": item.id,
+                "name": item.name,
+                "description": item.description,
+                "price": float(item.price),
+                "vendor_id": item.vendor_id,
+                "vendor_name": vendor.username if vendor else "Unknown",
+                "category": item.category,
+                "tags": item.tags,
+                "sales": item.sales,
+                "status": item.status,
+                "created_at": item.created_at.strftime('%Y-%m-%d')
+            }
+            return item_data, 200
+        return {"error": "Item not found"}, 404
+    except Exception as e:
+        print(f"Error in get_item_data: {e}")
+        return {"error": "Server error"}, 500
 
 
 @app.route("/get_username_from_id/<int:user_id>")
@@ -243,12 +314,19 @@ def setCookie():
 
 @app.route("/getCookie", methods=["POST", "GET"])
 def getCookie():
-    user_id = request.cookies.get("user_id")
-    user = User.query.filter_by(id=user_id).first()
-    session["user_id"] = user.id
-    session["username"] = user.username
-    session["privilege_id"] = user.privilege_id
-    flash("Login successful!", "success")
+    try:
+        user_id = request.cookies.get("user_id")
+        if user_id is not None:
+            user = User.query.filter_by(id=user_id).first()
+            if user:
+                session["user_id"] = user.id
+                session["username"] = user.username
+                session["privilege_id"] = user.privilege_id
+                flash("Login successful!", "success")
+    except Exception as e:
+        print(f"Error getting cookie: {e}")
+        session.clear()
+    return redirect(url_for("home"))
 
 
 @app.route("/get_items", methods=["POST", "GET"])
@@ -288,17 +366,24 @@ def err_500():
 
 @app.route("/vendor/dashboard", methods=["GET", "POST"])
 def vendor_dashboard():
-    items = Item.query.all()
-    current_user_id = session.get("user_id")
+    try:
+        # Check if user is logged in
+        if not session.get("user_id"):
+            flash("Please log in to access vendor dashboard", "warning")
+            return redirect(url_for("login"))
 
-    # Debug prints
-    print(f"Current user ID: {current_user_id}")
-    print("Items in database:")
-    for item in items:
-        print(
-            f"Item ID: {item.id}, Name: {item.name}, Vendor ID: {item.vendor_id}")
+        # Get vendor's items
+        vendor_items = Item.query.filter_by(
+            vendor_id=session.get("user_id")).all()
 
-    return render_template("vendor_dashboard.html", items=items)
+        return render_template(
+            "vendor_dashboard.html",
+            items=vendor_items,
+            ITEM_STATUS=ITEM_STATUS
+        )
+    except Exception as e:
+        flash("Error accessing vendor dashboard", "danger")
+        return redirect(url_for("home"))
 
 
 @app.route("/vendor/add_product", methods=["GET", "POST"])
@@ -369,6 +454,46 @@ def delete_item(item_id):
         flash(f"Error deleting item: {e}", "danger")
 
     return redirect(url_for("vendor_dashboard"))
+
+
+@app.route("/vendor/edit_item/<int:item_id>", methods=["GET", "POST"])
+def edit_item(item_id):
+    try:
+        if not session.get("user_id"):
+            flash("Please log in first!", "danger")
+            return redirect(url_for("login"))
+
+        item = Item.query.get_or_404(item_id)
+
+        # Check if the logged-in user is the vendor of this item
+        if item.vendor_id != session.get("user_id"):
+            flash("You don't have permission to edit this item!", "danger")
+            return redirect(url_for("vendor_dashboard"))
+
+        if request.method == "POST":
+            try:
+                # Update item details
+                item.name = request.form.get("product_name")
+                item.description = request.form.get("product_description")
+                item.price = float(request.form.get("product_price"))
+                item.category = request.form.get("product_category")
+                item.tags = request.form.get("product_tags")
+                item.status = request.form.get("product_status")
+
+                db.session.commit()
+                flash("Item updated successfully!", "success")
+                return redirect(url_for("vendor_dashboard"))
+            except ValueError:
+                flash("Invalid price format!", "danger")
+            except Exception:
+                db.session.rollback()
+                flash("Error updating item", "danger")
+
+        return render_template("vendor_item_edit.html", item=item, ITEM_STATUS=ITEM_STATUS)
+
+    except Exception:
+        flash("Error accessing item", "danger")
+        return redirect(url_for("vendor_dashboard"))
 
 
 @app.route("/test_error")
@@ -525,16 +650,85 @@ def moderator_respond(ticket_id):
 
 
 @app.before_request
-def make_session_permanent():
-    if session.get("user_id"):
-        session.permanent = True
-        app.permanent_session_lifetime = timedelta(minutes=5)
-    else:
-        try:
+def before_request():
+    try:
+        if session.get("user_id"):
+            session.permanent = True
+        else:
             getCookie()
+    except Exception:
+        session.clear()
 
-        except:
-            print("No cookies found")
+
+@app.route("/deposit", methods=["POST"])
+def deposit_funds():
+    try:
+        amount = float(request.form.get("amount"))
+        user_id = session.get("user_id")
+
+        # Create and cash the receipt
+        receipt = CashReceipt(
+            amount=amount,
+            buyer_id=SYSTEM_ID,  # System is paying
+            seller_id=user_id,   # User is receiving
+            transaction_type="DEPOSIT"
+        )
+
+        success, result = receipt.create()
+        if not success:
+            flash(f"Error creating deposit: {result}", "danger")
+            return redirect(url_for("account"))
+
+        success, message = receipt.cash()
+        if success:
+            flash("Deposit successful!", "success")
+        else:
+            flash(f"Deposit failed: {message}", "danger")
+
+        return redirect(url_for("account"))
+
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("account"))
+
+
+@app.route("/transfer", methods=["POST"])
+def transfer_funds():
+    try:
+        amount = float(request.form.get("amount"))
+        receiver_id = int(request.form.get("receiver_id"))
+        sender_id = session.get("user_id")
+
+        # Create and cash the receipt
+        receipt = CashReceipt(
+            amount=amount,
+            buyer_id=sender_id,    # Sender is paying
+            seller_id=receiver_id,  # Receiver is getting paid
+            transaction_type="TRANSFER"
+        )
+
+        success, result = receipt.create()
+        if not success:
+            flash(f"Error creating transfer: {result}", "danger")
+            return redirect(url_for("account"))
+
+        success, message = receipt.cash()
+        if success:
+            flash("Transfer successful!", "success")
+        else:
+            flash(f"Transfer failed: {message}", "danger")
+
+        return redirect(url_for("account"))
+
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("account"))
+
+
+# Add this route to serve static files
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 
 if __name__ == '__main__':

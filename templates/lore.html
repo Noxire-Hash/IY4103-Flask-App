@@ -1,0 +1,136 @@
+{% extends "nav_footer_template.html" %}
+
+{% block content %}
+<style>
+    /* Adventure Map Styling */
+    .adventure-card {
+        background: linear-gradient(145deg, #1e1e2f, #29293d);
+        color: #E8EFFF;
+        border: 2px solid #b198ed;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .adventure-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 6px 15px rgba(177, 152, 237, 0.5);
+    }
+
+    .adventure-card .card-header {
+        background-color: #b198ed;
+        color: #121212;
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    .glow-text {
+        color: #b198ed;
+        text-shadow: 0 0 10px #b198ed, 0 0 20px #9b84d6;
+    }
+
+    .pathway {
+        font-style: italic;
+        color: #a1a1b1;
+    }
+
+    .gradient-bg {
+        background: linear-gradient(135deg, #2b2b3b, #4a148c, #121212);
+        padding: 2rem;
+        border-radius: 10px;
+    }
+</style>
+
+<main class="container mt-5">
+    <header class="text-center">
+        <h1 class="glow-text">📜 The Grand Map of LoreKeeper</h1>
+        <p class="text-muted">Journey through the Realms of Knowledge, Trade, Oaths, Creation, and Legend.</p>
+    </header>
+
+    <section class="gradient-bg text-center">
+        <h2>🌍 The Eternal Archive - The Heart of Knowledge</h2>
+        <p>Deep in the center of existence, a <span class="glow-text">floating island of golden scrolls</span> and
+            endless halls holds the collective wisdom of all time.</p>
+        <p>From this sacred place, pathways lead to the Five Great Realms, where knowledge, power, and adventure await.
+        </p>
+    </section>
+
+    <div class="text-center mt-5">
+        <h2 class="glow-text">🗺 Choose Your Path:</h2>
+        <p class="text-muted">Which realm will you explore first?</p>
+    </div>
+
+    <div class="row mt-4">
+        <!-- The Realm of Scrolls -->
+        <div class="col-lg-6 mb-4">
+            <div class="card adventure-card">
+                <div class="card-header">📖 The Realm of Scrolls</div>
+                <div class="card-body">
+                    <p><i>"Where words become legends, and legends become eternal."</i></p>
+                    <p>A grand **library-city**, where floating scrolls whisper forgotten secrets and scholars record
+                        history.</p>
+                    <p class="pathway">📜 <b>Pathway:</b> A bridge of floating books leads to its gates.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Realm of the Bazaar -->
+        <div class="col-lg-6 mb-4">
+            <div class="card adventure-card">
+                <div class="card-header">💰 The Realm of the Bazaar</div>
+                <div class="card-body">
+                    <p><i>"Fortune favors the bold, and the bazaar never sleeps."</i></p>
+                    <p>A **sprawling trade city** of golden markets, where relics and secrets are exchanged for gold.
+                    </p>
+                    <p class="pathway">💰 <b>Pathway:</b> A shimmering golden road leads travelers to wealth—or ruin.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Realm of Oaths -->
+        <div class="col-lg-6 mb-4">
+            <div class="card adventure-card">
+                <div class="card-header">🛡 The Realm of Oaths</div>
+                <div class="card-body">
+                    <p><i>"Bound by words, sealed in honor. Those who break the pact shall face the Reckoning."</i></p>
+                    <p>A sacred city where **justice is carved into stone**, and oaths are either honored or broken.</p>
+                    <p class="pathway">⚖ <b>Pathway:</b> A stone bridge lined with eternal flames.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Realm of the Silent Architects -->
+        <div class="col-lg-6 mb-4">
+            <div class="card adventure-card">
+                <div class="card-header">🔮 The Realm of the Silent Architects</div>
+                <div class="card-body">
+                    <p><i>"They do not speak, yet their hands shape the world."</i></p>
+                    <p>A celestial forge where **the fabric of reality is woven** and the unseen architects maintain
+                        balance.</p>
+                    <p class="pathway">⚙ <b>Pathway:</b> A glowing rift in space, shifting endlessly.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Realm of Legends -->
+        <div class="col-lg-12 mb-4">
+            <div class="card adventure-card">
+                <div class="card-header">🔥 The Realm of Legends</div>
+                <div class="card-body">
+                    <p><i>"Heroes are not born. They are forged in the fires of legend."</i></p>
+                    <p>A grand **coliseum where champions rise**, and their names are etched into history.</p>
+                    <p class="pathway">🔥 <b>Pathway:</b> A staircase of fire leading to glory—or oblivion.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="text-center mt-5">
+        <h2 class="glow-text">🔥 The Living World of LoreKeeper</h2>
+        <p>Every path leads to <span class="glow-text">a new story</span>, every choice shapes <span
+                class="glow-text">the Archive’s history</span>.</p>
+        <p>Which realm will **YOU** carve your legend in?</p>
+    </section>
+</main>
+{% endblock %}

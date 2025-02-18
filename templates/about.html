@@ -1,48 +1,404 @@
-{% extends "/nav_footer_template.html" %}
-
+{% extends "nav_footer_template.html" %}
 {% block content %}
-<div class="container py-5">
-  <h1 class="text-center mb-4">About Lorekeeper</h1>
-  <div class="row">
-    <div class="col-md-6">
-      <h2>Our Mission</h2>
-      <p>
-        Lorekeeper is your ultimate companion for preserving, sharing, and enhancing your tabletop role-playing game adventures. 
-        Whether you're a Dungeon Master crafting worlds or a player bringing a character to life, 
-        our tools are designed to elevate your game and connect you with the community.
-      </p>
+<div class="container mt-5">
+  <!-- Header Section -->
+  <div class="text-center mb-5">
+    <h1 class="display-4 glow">LoreKeeper</h1>
+    <p class="lead text-white">Version 0.8.5-P</p>
+    <p class="text-muted">Where Legends Meet Innovation</p>
+  </div>
+
+  <!-- Quick Info Cards -->
+  <div class="row mb-5">
+    <div class="col-md-4 mb-4">
+      <div class="card bg-dark text-white h-100">
+        <div class="card-body text-center">
+          <h3 class="card-title glow">About Us</h3>
+          <p>LoreKeeper is a revolutionary marketplace for tabletop gaming content, where creators and players come
+            together in a mythical realm of endless possibilities.</p>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6 text-center">
-      <img src="{{ url_for('static', filename='images/about-us.png') }}" class="img-fluid rounded" alt="Lorekeeper Mission">
+    <div class="col-md-4 mb-4">
+      <div class="card bg-dark text-white h-100">
+        <div class="card-body text-center">
+          <h3 class="card-title glow">Our Mission</h3>
+          <p>To create the ultimate platform where game masters and content creators can share their work in a secure,
+            engaging, and fun environment.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card bg-dark text-white h-100">
+        <div class="card-body text-center">
+          <h3 class="card-title glow">Current Status</h3>
+          <p class="mb-2">Version: 0.8.5-P</p>
+          <small class="text-muted">Preview Stage - Testing New Features</small>
+        </div>
+      </div>
     </div>
   </div>
-  <hr class="my-5">
-  <div class="row">
-    <div class="col-md-6 text-center">
-      <img src="{{ url_for('static', filename='images/community.png') }}" class="img-fluid rounded" alt="Community">
-    </div>
-    <div class="col-md-6">
-      <h2>Our Vision</h2>
-      <p>
-        We believe that every story deserves to be told. With Lorekeeper, we aim to build a platform that empowers players and storytellers alike to collaborate, 
-        share, and inspire one another. Our vision is to make tabletop gaming more accessible, engaging, and connected than ever before.
-      </p>
-    </div>
+
+<!-- AW Explanation Card -->
+<div class="card bg-dark text-white mb-5">
+  <div class="card-header">
+    <h2 class="glow">Archivist's Writs (AW)</h2>
   </div>
-  <hr class="my-5">
-  <div class="row text-center">
-    <div class="col-md-4">
-      <h3>Character Creation</h3>
-      <p>Craft and customize unique characters for your campaigns.</p>
-    </div>
-    <div class="col-md-4">
-      <h3>Campaign Management</h3>
-      <p>Organize your quests and track your progress with ease.</p>
-    </div>
-    <div class="col-md-4">
-      <h3>Community Collaboration</h3>
-      <p>Share your stories, creations, and experiences with others.</p>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-lg-8">
+        <p class="lead mb-4">The official currency of the Eternal Archive</p>
+
+        <p>The Archivist's Writs (AW) serve as a sacred shield, protecting both Seekers and Merchants within our realm.
+          For Seekers, AW ensures your worldly currency is safely converted and stored, preventing unauthorized charges
+          and protecting against fraudulent vendors. Your purchases are guaranteed by the Archive itself, with every
+          transaction traceable and secure.</p>
+
+        <p>For our trusted Merchants, AW provides protection against chargeback fraud and payment disputes, ensuring
+          their creations are fairly compensated. This system allows us to maintain swift and secure transactions while
+          protecting the interests of all who trade within the Archive.</p>
+
+        <p>Think of AW as a mystical escrow, blessed by the LoreKeeper itself - where every transaction is verified,
+          secured, and protected by the Archive's ancient magics.</p>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card bg-dark border-primary">
+          <div class="card-body">
+            <h4 class="text-primary text-center mb-3">Exchange Rate</h4>
+            <p class="text-center mb-4">10 AW = £1</p>
+
+            <h5 class="text-primary mb-2">Protected Features:</h5>
+            <ul class="mb-0">
+              <li>Secure Currency Conversion</li>
+              <li>Transaction Tracking</li>
+              <li>Fraud Prevention</li>
+              <li>Dispute Resolution</li>
+              <li>Archive's Guarantee</li>
+              <li>Every transaction will be on-hold for 15 days</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- User Progression Card -->
+<div class="card bg-dark text-white mb-5">
+  <div class="card-header">
+    <h2 class="glow">Paths of the Archive</h2>
+  </div>
+  <div class="card-body">
+    <!-- Seeker's Path -->
+    <div class="mb-5">
+      <h3 class="text-primary mb-4">The Seeker's Path</h3>
+      <div class="progression-path p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div class="text-center p-2">
+            <h5 class="text-muted">Lost Soul</h5>
+            <small>New Arrival</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="text-info">Wanderer</h5>
+            <small>Active Member</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="text-primary">Chronicler</h5>
+            <small>Established</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="text-warning">Sage</h5>
+            <small>Revered</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="glow">Elder</h5>
+            <small>Legendary</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rank Benefits -->
+      <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+          <div class="card bg-dark border-info h-100">
+            <div class="card-body">
+              <h5 class="text-info mb-3">Wanderer Benefits</h5>
+              <ul>
+                <li>Basic support access</li>
+                <li>Community forum access</li>
+                <li>Review privileges</li>
+                <li>Wishlist feature</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card bg-dark border-primary h-100">
+            <div class="card-body">
+              <h5 class="text-primary mb-3">Chronicler Benefits</h5>
+              <ul>
+                <li>Priority support</li>
+                <li>Early access to sales</li>
+                <li>Vendor application eligible</li>
+                <li>Special event access</li>
+                <li>Extended refund window</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card bg-dark border-warning h-100">
+            <div class="card-body">
+              <h5 class="text-warning mb-3">Sage/Elder Benefits</h5>
+              <ul>
+                <li>VIP support channel</li>
+                <li>Preview access to features</li>
+                <li>Exclusive monthly rewards</li>
+                <li>Special profile badge</li>
+                <li>Community event priority</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Merchant's Path -->
+    <div>
+      <h3 class="text-primary mb-4">The Merchant's Path</h3>
+      <div class="progression-path p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div class="text-center p-2">
+            <h5 class="text-info">Street Peddler</h5>
+            <small>New Vendor</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="text-primary">Bazaar Trader</h5>
+            <small>Established</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="text-warning">Guild Merchant</h5>
+            <small>Distinguished</small>
+          </div>
+          <span>➜</span>
+          <div class="text-center p-2">
+            <h5 class="glow">The Gilded Baron</h5>
+            <small>Elite</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendor Benefits -->
+      <div class="row mt-4">
+        <div class="col-md-3 mb-3">
+          <div class="card bg-dark border-info h-100">
+            <div class="card-body">
+              <h5 class="text-info mb-3">Street Peddler</h5>
+              <ul>
+                <li>Basic vendor dashboard</li>
+                <li>Extended cashout (30 days)</li>
+                <li>Basic analytics</li>
+                <li>10% transaction fee</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card bg-dark border-primary h-100">
+            <div class="card-body">
+              <h5 class="text-primary mb-3">Bazaar Trader</h5>
+              <ul>
+                <li>Enhanced analytics</li>
+                <li>Standart cashout (10 days)</li>
+                <li>Priority vendor support</li>
+                <li>8% transaction fee</li>
+                <li>Custom store banner</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card bg-dark border-warning h-100">
+            <div class="card-body">
+              <h5 class="text-warning mb-3">Guild Merchant</h5>
+              <ul>
+                <li>Advanced analytics</li>
+                <li>Quick cashout (7 days)</li>
+                <li>VIP vendor support</li>
+                <li>6% transaction fee</li>
+                <li>Featured store placement</li>
+                <li>Custom store theme</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <div class="card bg-dark border-success h-100">
+            <div class="card-body">
+              <h5 class="glow mb-3">The Gilded Baron</h5>
+              <ul>
+                <li>Full analytics suite</li>
+                <li>Mighty cashout(3 days)</li>
+                <li>Direct support line</li>
+                <li>5% transaction fee</li>
+                <li>Homepage features</li>
+                <li>Early feature access</li>
+                <li>Custom store domain</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Version System Explanation -->
+  <div class="card bg-dark text-white mb-5">
+    <div class="card-header">
+      <h2 class="glow">Version System</h2>
+    </div>
+    <div class="card-body">
+      <p>Our version numbers follow the format: MAJOR.UPDATE.PATCH-STAGE</p>
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h5 class="text-primary">Number Format:</h5>
+          <ul>
+            <li><strong>Major:</strong> Significant platform changes</li>
+            <li><strong>Update:</strong> New features and improvements</li>
+            <li><strong>Patch:</strong> Bug fixes and minor updates</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <h5 class="text-primary">Stage Indicators:</h5>
+          <ul>
+            <li><strong>P (Preview):</strong> Exclusive testing version</li>
+            <li><strong>L (Later):</strong> Near preview stage</li>
+            <li><strong>E (Early):</strong> Early development</li>
+            <li><strong>C (Current):</strong> Production version</li>
+          </ul>
+        </div>
+        <p>For API request please open a ticket</p>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<style>
+  .progression-path {
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--card-background), var(--input-background));
+  }
+
+  .border-info {
+    border: 1px solid #0dcaf0;
+  }
+
+  .border-primary {
+    border: 1px solid var(--accent-color);
+  }
+
+  .border-warning {
+    border: 1px solid #ffc107;
+  }
+
+  .border-success {
+    border: 1px solid #198754;
+  }
+
+  .card {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+</style>
+
+      <!-- Our Lore -->
+      <h4 class="text-primary mb-3">The Living World of LoreKeeper</h4>
+      <p>While our platform serves as a marketplace, it's wrapped in rich lore where users are part of the Eternal
+        Archive. <a href="/lore" class="text-primary" data-bs-toggle="modal" data-bs-target="#loreModal">Read our full lore
+          ➜</a></p>
+    </div>
+  </div>
+
+  <!-- Platform Features -->
+  <div class="card bg-dark text-white mb-5">
+    <div class="card-header">
+      <h2 class="glow">Platform Features</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card bg-dark border-primary h-100">
+            <div class="card-body">
+              <h5 class="text-primary">🛍️ Marketplace</h5>
+              <ul>
+                <li>Secure transactions</li>
+                <li>Content discovery</li>
+                <li>Review system</li>
+                <li>Wishlist feature</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card bg-dark border-primary h-100">
+            <div class="card-body">
+              <h5 class="text-primary">🛡️ Security</h5>
+              <ul>
+                <li>Secure payments</li>
+                <li>Content protection</li>
+                <li>Anti-fraud measures</li>
+                <li>Data encryption</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card bg-dark border-primary h-100">
+            <div class="card-body">
+              <h5 class="text-primary">💎 Creator Tools</h5>
+              <ul>
+                <li>Content management</li>
+                <li>Analytics dashboard</li>
+                <li>Marketing tools</li>
+                <li>Support system</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .card {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+
+  .progression-path {
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--card-background), var(--input-background));
+  }
+
+  .border-primary {
+    border: 1px solid var(--accent-color);
+  }
+</style>
 {% endblock %}

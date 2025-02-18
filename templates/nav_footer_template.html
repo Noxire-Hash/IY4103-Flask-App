@@ -16,60 +16,70 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container">
         <a class="navbar-brand glow" href="/">LoreKeeper</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
+            <!-- Store Link -->
             <li class="nav-item">
               <a class="nav-link store" href="/store">Store</a>
             </li>
+
+            <!-- Info Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                Info
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/news">News</a></li>
+                <li><a class="dropdown-item" href="/about">About</a></li>
+              </ul>
+            </li>
+
             {% if session.get('user_id') %}
-            <!-- User is logged in -->
-            {% if session.get('privilege_id') == 2 or
-            session.get('privilege_id') == 999 %}
-            <li class="nav-item">
-              <a class="nav-link" href="/vendor/dashboard">Vendor Dashboard</a>
-            </li>
-            {% endif %} {% if session.get('privilege_id') == 999 %}
-            <li class="nav-item">
-              <a class="nav-link" href="/admin">Admin Dashboard</a>
-            </li>
-            {% endif %} {% if session.get('privilege_id') >= 998 %}
-            <li class="nav-item">
-              <a class="nav-link" href="/moderator/dashboard"
-                >Moderator Dashboard</a
-              >
+            <!-- Vendor Section -->
+            {% if session.get('privilege_id') == 2 or session.get('privilege_id') == 999 %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                Vendor
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/vendor/dashboard">Dashboard</a></li>
+              </ul>
             </li>
             {% endif %}
+
+            <!-- Combined Admin/Mod Section -->
+            {% if session.get('privilege_id') >= 998 %}
             <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                Management
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="/moderator/dashboard">Moderation Dashboard</a></li>
+                {% if session.get('privilege_id') == 999 %}
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
+                {% endif %}
+              </ul>
+            </li>
+            {% endif %}
+
+            <!-- User Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 {{ session['username'] }}
               </a>
-              <ul
-                class="dropdown-menu dropdown-menu-dark"
-                aria-labelledby="navbarDropdown"
-              >
+              <ul class="dropdown-menu dropdown-menu-dark">
                 <li><a class="dropdown-item" href="/account">My Account</a></li>
-                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                <li><a class="dropdown-item" href="/support">Support</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
               </ul>
             </li>
             {% else %}
-            <!-- Guest links -->
             <li class="nav-item">
               <a class="nav-link" href="/login">Login</a>
             </li>
@@ -81,7 +91,6 @@
         </div>
       </div>
     </nav>
-
     <!-- Flash Messages -->
     <div class="container mt-4 alert-container">
       {% with messages = get_flashed_messages(with_categories=true) %} {% if

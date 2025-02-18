@@ -62,7 +62,32 @@ Lorekeeper{% endblock %} {% block content %}
             <a href="/store#subscriptions" class="btn btn-primary btn-sm">Upgrade Plan</a>
           </div>
         </div>
+
+        <!-- Balance Section -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title h5 mb-0">Balance</h3>
+          </div>
+          <div class="card-body">
+            <h6 class="fw-bold">Current Balance:</h6>
+            <p class="mb-3">
+              <span id="balance" class="badge bg-secondary">[1000 AW]</span>
+            </p>
+            <h6 class="fw-bold">Pending Balance:</h6>
+            <p class="mb-3">
+              <span id="pending-balance" class="badge bg-secondary">[1000 AW]</span>
+            </p>
+            <a href="/store#subscriptions" class="btn btn-primary btn-sm">Withdraw</a>
+          </div>
+        </div>
+
+
+
+
       </div>
+
+
+
 
       <!-- Right Column -->
       <div class="col-md-8">

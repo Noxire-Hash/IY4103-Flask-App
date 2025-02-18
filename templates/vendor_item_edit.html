@@ -1,0 +1,79 @@
+{% extends "nav_footer_template.html" %} {% block title %}Vendor Dashboard -
+Lorekeeper{% endblock %} {% block content %}
+<div class="container mt-5">
+  <!-- Header Section -->
+  <div class="text-center mb-5">
+    <h1 class="fw-bold">Item Editor</h1>
+    <p class="text-muted">Manage and edit your items here!</p>
+  </div>
+
+  <!-- Add New Product Form -->
+  <div class="card mb-5">
+    <div class="card-header">
+      <h3>Edit {{ item.name }}</h3>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('edit_item', item_id=item.id) }}" method="POST">
+        <div class="mb-3">
+          <label for="product-name" class="form-label">Product Name</label>
+          <input type="text" class="form-control" id="product-name" name="product_name" value="{{item.name}}" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="product-description" class="form-label">Description</label>
+          <textarea class="form-control" id="product-description" name="product_description" rows="3"
+            value="{{item.description}}" required>{{item.description}}</textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="product-price" class="form-label">Price (£)</label>
+            <input type="number" class="form-control" id="product-price" name="product_price" step="0.01" min="0"
+              value="{{item.price}}" required />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="product-category" class="form-label">Category</label>
+            <select class="form-select" id="product-category" name="product_category" required>
+              <option value="">Select a category</option>
+              <option value="adventure" {% if item.category=='adventure' %}selected{% endif %}>Adventure Pack</option>
+              <option value="monster" {% if item.category=='monster' %}selected{% endif %}>Monster Pack</option>
+              <option value="map" {% if item.category=='map' %}selected{% endif %}>Map Pack</option>
+              <option value="tool" {% if item.category=='tool' %}selected{% endif %}>Game Tool</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="product-status" class="form-label">Status</label>
+            <select class="form-select" id="product-status" name="product_status"placeholder="Change the status of your item" required>
+              <option value="Active" class="text-success" data-bs-toggle="tooltip" title="Item is visible and can be purchased">
+                Active</option>
+              <option value="Pending" class="text-warning" data-bs-toggle="tooltip"
+                title="Item is visible but cannot be purchased">Pending</option>
+              <option value="Hidden" class="text-danger" data-bs-toggle="tooltip"
+                title="Warning: Item will not be visible to customers">Hidden</option>
+              <option value="Archived" class="text-danger fw-bold" data-bs-toggle="tooltip"
+                title="Warning: Item will be archived and cannot be recovered">Archived</option>
+            </select>
+            <small class="form-text mt-1 text-white">
+              <span class="text-success">● Active:</span> Available for purchase<br>
+              <span class="text-warning">● Pending:</span> Visible but not purchasable<br>
+              <span class="text-danger">● Hidden:</span> Not visible in store<br>
+              <span class="text-danger">● Archived:</span> Permanently removed
+            </small>
+          </div>
+
+        </div>
+
+        <div class="mb-3">
+          <label for="product-tags" class="form-label" >Tags (comma-separated)</label>
+          <input type="text" class="form-control" id="product-tags" name="product_tags"
+            value="{{item.tags}}" />
+        </div>
+        <button type="submit" class="btn btn-primary">Commit Changes</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
