@@ -175,9 +175,11 @@ $(document).ready(function() {
         type: "GET",
         url: `/get_item_data_from_id/${itemId}`,
         success: function(response) {
+            console.log("🎯 Item data received:", response);
             updateItemPreview(response);
         },
         error: function(error) {
+            console.error("❌ Error loading item data:", error);
             triggerFlash("Error loading item details", "danger");
         }
     });

@@ -144,8 +144,5 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- jQuery first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Then your script -->
-<script src="{{ url_for('static', filename='scripts/index.js', _external=True) }}"></script>
+{{ super() }}  <!-- This will include scripts from parent template -->
 {% endblock %}

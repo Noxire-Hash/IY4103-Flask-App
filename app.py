@@ -2,12 +2,15 @@ import os
 from datetime import timedelta
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, send_from_directory, send_file, request, redirect, url_for, flash, render_template, session, make_response
+from flask import Flask, send_from_directory, send_file, request, redirect, url_for, flash, render_template, session, make_response, jsonify
 from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS, SupportTicket, SupportTicketResponse, TICKET_CATEGORIES, TICKET_STATUS, SystemTransactionHandler, Receipt, CashReceipt, SYSTEM_ID
 from helper import find_user_from_id, json_interpreter
 
 # App setup
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__,
+            static_url_path='/static',  # Change this line
+            static_folder='static'
+            )
 app.secret_key = os.urandom(24)
 app.config.update(
     SESSION_COOKIE_SECURE=False,  # Set to True in production
@@ -21,6 +24,14 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = True
 migrate = Migrate(app, db)
 db.init_app(app)
+
+# Add this to debug static file serving
+
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
 # Basic page routes
 
@@ -271,29 +282,24 @@ def get_user_data():
 
 
 @app.route("/get_item_data_from_id/<int:item_id>")
-def get_item_data(item_id):
+def get_item_data_from_id(item_id):
     try:
-        item = Item.query.get(item_id)
-        if item:
-            vendor = User.query.get(item.vendor_id)
-            item_data = {
-                "id": item.id,
-                "name": item.name,
-                "description": item.description,
-                "price": float(item.price),
-                "vendor_id": item.vendor_id,
-                "vendor_name": vendor.username if vendor else "Unknown",
-                "category": item.category,
-                "tags": item.tags,
-                "sales": item.sales,
-                "status": item.status,
-                "created_at": item.created_at.strftime('%Y-%m-%d')
-            }
-            return item_data, 200
-        return {"error": "Item not found"}, 404
+        item = Item.query.get_or_404(item_id)
+        vendor = User.query.get(item.vendor_id)
+
+        item_data = {
+            "name": item.name,
+            "description": item.description,
+            "price": item.price,
+            "vendor_name": vendor.username,
+            "sales": item.sales,
+            "tags": item.tags,
+            "status": item.status
+        }
+
+        return jsonify(item_data)
     except Exception as e:
-        print(f"Error in get_item_data: {e}")
-        return {"error": "Server error"}, 500
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route("/get_username_from_id/<int:user_id>")
@@ -725,10 +731,22 @@ def transfer_funds():
         return redirect(url_for("account"))
 
 
-# Add this route to serve static files
-@app.route('/static/<path:path>')
-def send_static(path):
-    return send_from_directory('static', path)
+@app.route('/check_static')
+def check_static():
+    import os
+    static_path = os.path.join(app.static_folder, 'scripts', 'index.js')
+    exists = os.path.exists(static_path)
+    return f"Static file exists: {exists}, Path: {static_path}"
+
+
+# Add this to ensure static files are served with correct paths
+app.config['APPLICATION_ROOT'] = '/'
+
+
+# Add a route specifically for JavaScript files
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory('static/scripts', filename)
 
 
 if __name__ == '__main__':
