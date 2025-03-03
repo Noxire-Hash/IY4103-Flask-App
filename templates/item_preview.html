@@ -38,9 +38,11 @@
 
                         <!-- Purchase Button -->
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary purchase-btn store-color" disabled>
-                                <i class="fas fa-shopping-cart me-2"></i>Purchase Now
-                            </button>
+                            <!-- Debug print -->
+                            <!-- {{ item.id }} -->
+                            <a href="{{ url_for('checkout', item_id=item.id) }}" class="btn btn-primary purchase-btn store-color">
+                                <i class="fas fa-shopping-cart me-2"></i>Purchase Now (ID: {{ item.id }})
+                            </a>
                         </div>
                     </div>
                 </div>

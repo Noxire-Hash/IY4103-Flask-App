@@ -1,0 +1,89 @@
+{% extends "nav_footer_template.html" %}
+{% block title %}Deposit to Arcade Wallet{% endblock %}
+
+{% block content %}
+<div class="container checkout-container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card checkout-card">
+                <div class="card-header">
+                    <h2 class="text-center">Deposit to Arcade Wallet</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/deposit" method="post" id="payment-form">
+                        <div class="form-group mb-3">
+                            <label for="aw-amount" class="form-label">Enter Amount (AW)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="aw-amount" name="aw-amount" min="10" value="100" required>
+                                <span class="input-group-text">AW</span>
+                            </div>
+                            <div class="form-text text-light">1 pound = 10 AW</div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="pounds-amount" class="form-label">Cost in Pounds</label>
+                            <div class="input-group">
+                                <span class="input-group-text">£</span>
+                                <input type="text" class="form-control" id="pounds-amount" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="card-name" class="form-label">Name on Card</label>
+                            <input type="text" class="form-control" id="card-name" name="card-name" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="card-number" class="form-label">Card Number</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="card-number" name="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <span class="input-group-text">
+                                    <i class="fa fa-credit-card"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="card-expiry" class="form-label">Expiration Date</label>
+                                    <input type="text" class="form-control" id="card-expiry" name="card-expiry" placeholder="MM/YY" maxlength="5" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="card-cvc" class="form-label">CVC</label>
+                                    <input type="text" class="form-control" id="card-cvc" name="card-cvc" placeholder="123" maxlength="4" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="card-zip" class="form-label">Zip Code</label>
+                            <input type="text" class="form-control" id="card-zip" name="card-zip" placeholder="12345" maxlength="10" required>
+                        </div>
+
+                        <div class="order-summary mb-4">
+                            <h4>Order Summary</h4>
+                            <div class="d-flex justify-content-between">
+                                <span>Amount:</span>
+                                <span id="summary-amount">100 AW</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Price:</span>
+                                <span id="summary-price">£10.00</span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Complete Purchase</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

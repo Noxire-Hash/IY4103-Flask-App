@@ -6,7 +6,8 @@ $(document).ready(function() {
     ACCOUNT: "/account",
     STORE: "/store",
     VENDOR_DASHBOARD: "/vendor_dashboard",
-    ITEM_PREVIEW: "/store/item"
+    ITEM_PREVIEW: "/store/item",
+    CHECKOUT_DEPOSIT: "/checkout/deposit"
   };
 
   // Event Listeners
@@ -35,6 +36,9 @@ $(document).ready(function() {
         break;
       case PATHS.VENDOR_DASHBOARD:
         fillVendorData();
+        break;
+      case PATHS.CHECKOUT_DEPOSIT:
+        handleCheckoutDeposit();
         break;
     }
 
@@ -121,7 +125,7 @@ $(document).ready(function() {
         // Show/hide privilege-specific links
         switch(privId) {
           case 999: // Admin
-            $("#admin-link, #vendor-link").removeClass("d-none");
+            $("#admin-link, #vendor-link").removeClass("d-none");can 
             break;
           case 998: // Moderator
             $("#moderator-link, #vendor-link").removeClass("d-none");
@@ -130,6 +134,14 @@ $(document).ready(function() {
             $("#vendor-link").removeClass("d-none");
             break;
         }
+       // Update user fields
+        $("#username").text(userData.username);
+        $("#email").text(userData.email);
+        $("#privilege").text(userData.privilege_id);
+        $("#sub-tier").text("Exclusive");
+        $("#balance").text("1000");
+        $("#pending-balance").text("0");
+
       })
       .catch(function(error) {
         console.error("Error processing user data:", error);
@@ -155,19 +167,14 @@ $(document).ready(function() {
   }
 
   function updateFeaturedItem(index, item, itemId) {
-    const formattedPrice = new Intl.NumberFormat('en-GB', {
-      style: 'currency',
-      currency: 'GBP'
-    }).format(item.price);
-
-    // Update item elements and remove shimmer
+    // Update featured items with new currency format
     $(`#featured-item-name-${index}`).text(item.name).removeClass('shimmer');
-    $(`#featured-item-price-${index}`).text(formattedPrice).removeClass('shimmer');
+    $(`#featured-item-price-${index}`).html(formatCurrency(item.price)).removeClass('shimmer');
     $(`#featured-item-description-${index}`).text(item.description).removeClass('shimmer');
     $(`#featured-item-vendor-name-${index}`).text(item.vendor_name).removeClass('shimmer');
     $(`#featured-item-btn-${index}`)
-      .attr('href', `/store/item/${itemId}`)
-      .removeClass('shimmer');
+        .attr('href', `/store/item/${itemId}`)
+        .removeClass('shimmer');
   }
 
   function handleItemPreview(itemId) {
@@ -185,15 +192,16 @@ $(document).ready(function() {
     });
   }
 
+  function formatCurrency(amount) {
+    // Format with 2 decimal places and add AW with glow effect
+    return `<span class="price-amount">${Number(amount).toFixed(2)}</span> <span class="currency-aw">AW</span>`;
+  }
+
   function updateItemPreview(itemData) {
     try {
-        // Update content and remove shimmer
         $('.item-title').text(itemData.name).removeClass('shimmer');
         $('.vendor-name').text(itemData.vendor_name).removeClass('shimmer');
-        $('.item-price').text(new Intl.NumberFormat('en-GB', {
-            style: 'currency',
-            currency: 'GBP'
-        }).format(itemData.price)).removeClass('shimmer');
+        $('.item-price').html(formatCurrency(itemData.price)).removeClass('shimmer');
         $('.sales-count').text(`${itemData.sales} sales`).removeClass('shimmer');
         $('.item-description').text(itemData.description).removeClass('shimmer');
 
@@ -206,8 +214,7 @@ $(document).ready(function() {
             $('.item-tags').html(tagsHtml).removeClass('shimmer');
         }
 
-        // Enable purchase button
-        $('.purchase-btn').prop('disabled', false);
+        $('.purchase-btn').removeClass('shimmer');
     } catch (error) {
         triggerFlash("Error updating item details", "danger");
     }
@@ -216,6 +223,28 @@ $(document).ready(function() {
   function fillVendorData() {
     // Add vendor dashboard specific code here
     console.log("Vendor dashboard loaded");
+  }
+
+  function handleCheckoutDeposit() {
+    const awInput = $("#aw-amount");
+    const poundsInput = $("#pounds-amount");
+    const summaryAmount = $("#summary-amount");
+    const summaryPrice = $("#summary-price");
+
+    function updatePounds() {
+      const awValue = parseInt(awInput.val()) || 0;
+      const poundsValue = awValue / 10;
+      poundsInput.val(poundsValue.toFixed(2));
+      summaryAmount.text(awValue + " AW");
+      summaryPrice.text("£" + poundsValue.toFixed(2));
+      if(awValue <= 10){
+        awInput.val(10);
+        updatePounds();
+      }
+    }
+    updatePounds();
+    awInput.on("input", updatePounds);
+    console.log("Checkout deposit loaded");
   }
 });
 

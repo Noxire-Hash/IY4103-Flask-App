@@ -1,23 +1,49 @@
 import os
 from datetime import timedelta
+
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, send_from_directory, send_file, request, redirect, url_for, flash, render_template, session, make_response, jsonify
-from models import User, Privilege, Vendor, Purchase, Item, Subscription, db, ITEM_STATUS, SupportTicket, SupportTicketResponse, TICKET_CATEGORIES, TICKET_STATUS, SystemTransactionHandler, Receipt, CashReceipt, SYSTEM_ID
-from helper import find_user_from_id, json_interpreter
+
+from helper import json_interpreter
+from models import (
+    ITEM_STATUS,
+    SYSTEM_ID,
+    TICKET_CATEGORIES,
+    TICKET_STATUS,
+    CashReceipt,
+    Item,
+    Privilege,
+    Purchase,
+    SupportTicket,
+    SupportTicketResponse,
+    User,
+    db,
+)
 
 # App setup
-app = Flask(__name__,
-            static_url_path='/static',  # Change this line
-            static_folder='static'
-            )
+app = Flask(
+    __name__,
+    static_url_path="/static",  # Change this line
+    static_folder="static",
+)
 app.secret_key = os.urandom(24)
 app.config.update(
     SESSION_COOKIE_SECURE=False,  # Set to True in production
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SAMESITE="Lax",
     PERMANENT_SESSION_LIFETIME=timedelta(minutes=60),
-    SESSION_REFRESH_EACH_REQUEST=True
+    SESSION_REFRESH_EACH_REQUEST=True,
 )
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SESSION_TYPE"] = "filesystem"
@@ -25,18 +51,17 @@ app.config["SESSION_PERMANENT"] = True
 migrate = Migrate(app, db)
 db.init_app(app)
 
-# Add this to debug static file serving
-
 
 @app.after_request
 def add_header(response):
-    response.headers['Cache-Control'] = 'no-store'
+    response.headers["Cache-Control"] = "no-store"
     return response
+
 
 # Basic page routes
 
 
-@app.route('/')
+@app.route("/")
 def home():
     try:
         if session.get("user_id") is None:
@@ -45,7 +70,7 @@ def home():
             except Exception as e:
                 print(f"No cookies found: {e}")
         return render_template("index.html")
-    except OSError as e:
+    except OSError:
         session.clear()
         return render_template("index.html")
 
@@ -57,24 +82,22 @@ def store():
 
 @app.route("/store/item/<int:item_id>")
 def item_preview(item_id):
+    if not session.get("user_id"):
+        flash("Please log in to view items", "warning")
+        return redirect(url_for("login"))
+
     try:
         # Get item data
         item = Item.query.get_or_404(item_id)
-
-        # Get vendor data
-        vendor = User.query.get(item.vendor_id)
-
-        # Get similar items (same category)
-        similar_items = Item.query.filter(
-            Item.category == item.category,
-            Item.id != item.id
-        ).limit(3).all()
+        vendor = User.query.get_or_404(
+            item.vendor_id
+        )  # Use get_or_404 to ensure vendor exists
 
         return render_template(
             "item_preview.html",
             item=item,
             vendor=vendor,
-            similar_items=similar_items
+            similar_items=[],  # Simplified for now
         )
 
     except Exception as e:
@@ -97,6 +120,7 @@ def about():
 def lore():
     return render_template("lore.html")
 
+
 # Auth routes
 
 
@@ -118,8 +142,9 @@ def register():
 
         # Add user to the database
         try:
-            user = User(username=username, email=email,
-                        password=password, privilege_id=999)
+            user = User(
+                username=username, email=email, password=password, privilege_id=999
+            )
             db.session.add(user)
             db.session.commit()
             flash("Registration successful! Please log in.", "success")
@@ -162,8 +187,9 @@ def send():
 @app.route("/test_db")
 def test_db():
     try:
-        test_user = User.query.filter_by(username="testuser", email="test@test.com",
-                                         password="1234", privilege_id=1).first()
+        test_user = User.query.filter_by(
+            username="testuser", email="test@test.com", password="1234", privilege_id=1
+        ).first()
         db.session.add(test_user)
         db.session.commit()
         print("User added successfully.")
@@ -180,6 +206,7 @@ def test_flash():
     flash("This is a warning message!", "warning")
     flash("This is an error message!", "danger")
     return redirect(url_for("home"))
+
 
 # Admin routes
 
@@ -208,8 +235,12 @@ def admin_dashboard():
             flash("A user with this email already exists.", "danger")
         else:
             try:
-                new_user = User(username=username, email=email,
-                                password=password, privilege_id=privilege_id)
+                new_user = User(
+                    username=username,
+                    email=email,
+                    password=password,
+                    privilege_id=privilege_id,
+                )
                 db.session.add(new_user)
                 db.session.commit()
                 flash(f"User {username} created successfully!", "success")
@@ -271,7 +302,7 @@ def get_user_data():
                     "username": user.username,
                     "email": user.email,
                     "privilege_id": user.privilege_id,
-                    "created_at": user.created_at.strftime('%Y-%m-%d')
+                    "created_at": user.created_at.strftime("%Y-%m-%d"),
                 }
                 return user_data, 200
             return {"error": "User not found"}, 404
@@ -288,13 +319,14 @@ def get_item_data_from_id(item_id):
         vendor = User.query.get(item.vendor_id)
 
         item_data = {
+            "id": item.id,
             "name": item.name,
             "description": item.description,
             "price": item.price,
             "vendor_name": vendor.username,
             "sales": item.sales,
             "tags": item.tags,
-            "status": item.status
+            "status": item.status,
         }
 
         return jsonify(item_data)
@@ -306,6 +338,7 @@ def get_item_data_from_id(item_id):
 def get_username_from_id(user_id):
     user = User.query.filter_by(id=user_id).first()
     return user.username
+
 
 # Cookie management
 
@@ -352,7 +385,7 @@ def get_items():
             "tags": item.tags,
             "sales": item.sales,
             "status": item.status,
-            "created_at": str(item.created_at)
+            "created_at": str(item.created_at),
         }
     return json_interpreter(item_dict)
 
@@ -383,11 +416,9 @@ def vendor_dashboard():
             vendor_id=session.get("user_id")).all()
 
         return render_template(
-            "vendor_dashboard.html",
-            items=vendor_items,
-            ITEM_STATUS=ITEM_STATUS
+            "vendor_dashboard.html", items=vendor_items, ITEM_STATUS=ITEM_STATUS
         )
-    except Exception as e:
+    except Exception:
         flash("Error accessing vendor dashboard", "danger")
         return redirect(url_for("home"))
 
@@ -414,7 +445,7 @@ def add_product():
                 price=float(price),
                 category=category,
                 tags=tags,
-                vendor_id=vendor_id
+                vendor_id=vendor_id,
             )
             db.session.add(new_item)
             db.session.commit()
@@ -495,7 +526,9 @@ def edit_item(item_id):
                 db.session.rollback()
                 flash("Error updating item", "danger")
 
-        return render_template("vendor_item_edit.html", item=item, ITEM_STATUS=ITEM_STATUS)
+        return render_template(
+            "vendor_item_edit.html", item=item, ITEM_STATUS=ITEM_STATUS
+        )
 
     except Exception:
         flash("Error accessing item", "danger")
@@ -505,6 +538,7 @@ def edit_item(item_id):
 @app.route("/test_error")
 def test_error():
     raise Exception("This is a test error!")
+
 
 # Support ticket routes
 
@@ -529,7 +563,7 @@ def support():
                 user_id=session["user_id"],
                 category=category,
                 subject=subject,
-                message=message
+                message=message,
             )
             db.session.add(ticket)
             db.session.commit()
@@ -541,9 +575,14 @@ def support():
             return redirect(url_for("support"))
 
     # Get user's tickets for display
-    tickets = SupportTicket.query.filter_by(user_id=session["user_id"]).order_by(
-        SupportTicket.created_at.desc()).all()
-    return render_template("support.html", tickets=tickets, categories=TICKET_CATEGORIES)
+    tickets = (
+        SupportTicket.query.filter_by(user_id=session["user_id"])
+        .order_by(SupportTicket.created_at.desc())
+        .all()
+    )
+    return render_template(
+        "support.html", tickets=tickets, categories=TICKET_CATEGORIES
+    )
 
 
 def reply_ticket():
@@ -574,7 +613,7 @@ def user_reply_ticket(ticket_id):
                     ticket_id=ticket.id,
                     responder_id=session["user_id"],
                     response=response,
-                    is_user=True  # Use boolean instead of 1
+                    is_user=True,  # Use boolean instead of 1
                 )
                 db.session.add(ticket_response)
                 db.session.commit()
@@ -593,7 +632,11 @@ def user_reply_ticket(ticket_id):
 @app.route("/moderator/dashboard", methods=["GET", "POST"])
 def moderator_dashboard():
     tickets = SupportTicket.query.all()
-    return render_template("moderator_dashboard.html", tickets=tickets, get_username_from_id=get_username_from_id)
+    return render_template(
+        "moderator_dashboard.html",
+        tickets=tickets,
+        get_username_from_id=get_username_from_id,
+    )
 
 
 @app.route("/moderator/view_ticket/<int:ticket_id>", methods=["GET"])
@@ -616,7 +659,7 @@ def view_ticket(ticket_id):
         purchases=purchases,
         responses=responses,  # Pass responses separately
         get_username_from_id=get_username_from_id,
-        TICKET_STATUS=TICKET_STATUS
+        TICKET_STATUS=TICKET_STATUS,
     )
 
 
@@ -637,7 +680,7 @@ def moderator_respond(ticket_id):
                 ticket_id=ticket.id,
                 responder_id=session["user_id"],
                 response=response,
-                is_user=False  # This is a moderator response
+                is_user=False,  # This is a moderator response
             )
 
             # Update ticket status
@@ -650,7 +693,8 @@ def moderator_respond(ticket_id):
             db.session.rollback()
             flash(f"Error sending response: {e}", "danger")
 
-    return redirect(url_for('view_ticket', ticket_id=ticket_id))
+    return redirect(url_for("view_ticket", ticket_id=ticket_id))
+
 
 # Session management
 
@@ -676,8 +720,8 @@ def deposit_funds():
         receipt = CashReceipt(
             amount=amount,
             buyer_id=SYSTEM_ID,  # System is paying
-            seller_id=user_id,   # User is receiving
-            transaction_type="DEPOSIT"
+            seller_id=user_id,  # User is receiving
+            transaction_type="DEPOSIT",
         )
 
         success, result = receipt.create()
@@ -708,9 +752,9 @@ def transfer_funds():
         # Create and cash the receipt
         receipt = CashReceipt(
             amount=amount,
-            buyer_id=sender_id,    # Sender is paying
+            buyer_id=sender_id,  # Sender is paying
             seller_id=receiver_id,  # Receiver is getting paid
-            transaction_type="TRANSFER"
+            transaction_type="TRANSFER",
         )
 
         success, result = receipt.create()
@@ -731,23 +775,86 @@ def transfer_funds():
         return redirect(url_for("account"))
 
 
-@app.route('/check_static')
+@app.route("/check_static")
 def check_static():
     import os
-    static_path = os.path.join(app.static_folder, 'scripts', 'index.js')
+
+    static_path = os.path.join(app.static_folder, "scripts", "index.js")
     exists = os.path.exists(static_path)
     return f"Static file exists: {exists}, Path: {static_path}"
 
 
 # Add this to ensure static files are served with correct paths
-app.config['APPLICATION_ROOT'] = '/'
+app.config["APPLICATION_ROOT"] = "/"
 
 
 # Add a route specifically for JavaScript files
-@app.route('/js/<path:filename>')
+@app.route("/js/<path:filename>")
 def serve_js(filename):
-    return send_from_directory('static/scripts', filename)
+    return send_from_directory("static/scripts", filename)
 
 
-if __name__ == '__main__':
+@app.route("/checkout/<int:item_id>")
+def checkout(item_id):
+    print(f"Debug: Checkout called with item_id: {item_id}")  # Debug print
+    print(f"Debug: User ID: {session.get('user_id')}")  # Debug print
+
+    if not session.get("user_id"):
+        flash("Please log in to continue", "warning")
+        return redirect(url_for("login"))
+
+    try:
+        user = User.query.get_or_404(session.get("user_id"))
+        item = Item.query.get_or_404(item_id)
+        vendor = User.query.get_or_404(item.vendor_id)
+
+        print(f"Debug: Found item: {item.name}")  # Debug print
+        print(f"Debug: Found vendor: {vendor.username}")  # Debug print
+
+        return render_template("checkout.html", user=user, item=item, vendor=vendor)
+    except Exception as e:
+        print(f"Debug: Error in checkout: {e}")  # Debug print
+        flash("Error loading checkout", "danger")
+        return redirect(url_for("store"))
+
+
+@app.route("/process_payment", methods=["POST"])
+def process_payment():
+    try:
+        item_id = request.form.get("item_id")
+        item = Item.query.get_or_404(item_id)
+
+        # Create receipt
+        receipt = CashReceipt(
+            amount=item.price,
+            buyer_id=session.get("user_id"),
+            seller_id=item.vendor_id,
+            transaction_type="PURCHASE",
+        )
+
+        # Try to process the payment
+        success, result = receipt.create()
+        if not success:
+            flash(f"Error creating receipt: {result}", "danger")
+            return redirect(url_for("checkout", item_id=item_id))
+
+        success, message = receipt.cash()
+        if success:
+            flash("Purchase successful!", "success")
+            return redirect(url_for("account"))
+        else:
+            flash(f"Purchase failed: {message}", "danger")
+            return redirect(url_for("checkout", item_id=item_id))
+
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("store"))
+
+
+@app.route("/checkout/deposit", methods=["GET", "POST"])
+def deposit():
+    return render_template("checkout_deposit.html")
+
+
+if __name__ == "__main__":
     app.run(debug=True)

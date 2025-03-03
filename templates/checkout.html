@@ -1,0 +1,168 @@
+{% extends "nav_footer_template.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card checkout-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-scroll me-2"></i>Confirm Purchase</h2>
+                </div>
+                <div class="card-body">
+                    {% if item and item.price %}
+                    <!-- Item Details -->
+                    <div class="mb-4 item-details">
+                        <div class="d-flex align-items-center">
+                            <div class="item-preview-placeholder me-4">
+                                <i class="fas fa-dice-d20 fa-3x"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-2">{{ item.name }}</h4>
+                                <p class="text-muted mb-2">By {{ vendor.username }}</p>
+                                <h3 class="price mb-0">
+                                    <span class="price-amount">{{ "%.2f"|format(item.price or 0) }}</span>
+                                    <span class="currency-aw">AW</span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balance Info -->
+                    <div class="balance-info mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Your Balance</span>
+                            <span class="h4 mb-0">
+                                <span class="price-amount">{{ "%.2f"|format(user.balance or 0) }}</span>
+                                <span class="currency-aw">AW</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Summary -->
+                    <div class="purchase-summary mb-4">
+                        <div class="summary-item">
+                            <span>Item Price</span>
+                            <span>
+                                <span class="price-amount">{{ "%.2f"|format(item.price or 0) }}</span>
+                                <span class="currency-aw">AW</span>
+                            </span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Processing Fee</span>
+                            <span>0.00 <span class="currency-aw">AW</span></span>
+                        </div>
+                        <hr>
+                        <div class="summary-total">
+                            <span>Total</span>
+                            <span>
+                                <span class="price-amount">{{ "%.2f"|format(item.price or 0) }}</span>
+                                <span class="currency-aw">AW</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Button -->
+                    <form method="POST" action="{{ url_for('process_payment') }}">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="submit" class="btn store-color w-100">
+                            <i class="fas fa-scroll me-2"></i>Confirm Purchase
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Invalid item price. Please try again.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.checkout-card {
+    background-color: var(--card-background);
+    border: 1px solid var(--input-border);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-card .card-header {
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--input-border);
+    padding: 1.5rem;
+}
+
+.item-details {
+    background-color: var(--input-background);
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.item-preview-placeholder {
+    width: 100px;
+    height: 100px;
+    background: var(--card-background);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.balance-info {
+    background-color: var(--input-background);
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.purchase-summary {
+    background-color: var(--input-background);
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.currency-aw {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.price {
+    color: var(--accent-color);
+}
+
+hr {
+    border-color: var(--input-border);
+    margin: 1rem 0;
+}
+
+.btn.store-color {
+    background-color: var(--store-btn-color);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn.store-color:hover {
+    background-color: var(--store-btn-hover);
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

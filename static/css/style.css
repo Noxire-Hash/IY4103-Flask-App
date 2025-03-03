@@ -1,3 +1,6 @@
+/* Add at the top of your CSS file */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* Root variables for consistent theming */
 :root {
   --background-color: #121212; /* Dark background */
@@ -13,13 +16,15 @@
   --card-shadow: rgba(0, 0, 0, 0.5); /* Subtle card shadow */
   --section-padding: 60px; /* Consistent section spacing */
   --element-spacing: 20px; /* Spacing between smaller elements */
+  --heading-font: 'Cinzel', serif;
+  --body-font: 'Inter', sans-serif;
 }
 
 /* General Reset */
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--body-font);
   background: linear-gradient(135deg, #121212, #1a1a2e, #121212);
   background-size: cover;
   background-repeat: no-repeat;
@@ -41,6 +46,7 @@ body {
 .navbar-brand, .nav-link {
   color: var(--text-color) !important;
   transition: color 0.2s ease-in-out;
+  font-family: var(--body-font);
 }
 .nav-link:hover {
   color: var(--accent-color) !important;
@@ -53,6 +59,7 @@ body {
 
 .navbar-brand {
   font-size: 1.5rem; /* Adjust brand size */
+  font-family: var(--heading-font);
 }
 
 .navbar-toggler {
@@ -88,7 +95,7 @@ header {
   width: 100%;
 }
 header h1 {
-  font-family: 'Cinzel', serif;
+  font-family: var(--heading-font);
   color: var(--accent-color);
   font-size: 3.5rem;
   margin-bottom: var(--element-spacing);
@@ -153,6 +160,7 @@ section h2 {
   text-align: center;
   margin-bottom: var(--element-spacing);
   color: var(--accent-color);
+  font-family: var(--heading-font);
 }
 
 /* About Section */
@@ -167,6 +175,7 @@ section h2 {
   color: var(--text-color);
   font-size: 1.5rem;
   margin-bottom: 10px;
+  font-family: var(--heading-font);
 }
 #about p {
   color: var(--text-muted);
@@ -197,6 +206,7 @@ section h2 {
 #news .card-title {
   font-size: 1.25rem;
   color: var(--accent-color);
+  font-family: var(--heading-font);
 }
 #news .btn {
   margin-top: 10px;
@@ -222,6 +232,7 @@ section h2 {
   background-color: var(--input-background);
   border: 1px solid var(--input-border);
   color: var(--text-color);
+  font-family: var(--body-font);
 }
 .form-control:focus {
   border-color: var(--accent-color);
@@ -294,6 +305,7 @@ footer a:hover {
   font-size: 2rem;
   color: var(--accent-color);
   margin-bottom: 10px;
+  font-family: var(--heading-font);
 }
 .card-header p {
   font-size: 1rem;
@@ -324,6 +336,7 @@ footer a:hover {
   text-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color) !important;
   animation: glow 3s ease-in-out infinite;
   text-decoration: none;
+  font-family: var(--heading-font);
 }
 
 /* Form Styles */
@@ -337,6 +350,7 @@ footer a:hover {
   color: var(--text-color);
   padding: 10px;
   border-radius: 5px;
+  font-family: var(--body-font);
 }
 .form-control:focus {
   border-color: var(--accent-color);
@@ -399,6 +413,7 @@ footer a:hover {
   font-size: 2rem;
   color: var(--accent-color);
   margin-bottom: 5px;
+  font-family: var(--heading-font);
 }
 .card-header p {
   font-size: 1rem;
@@ -420,6 +435,7 @@ footer a:hover {
   color: var(--text-color);
   padding: 10px;
   border-radius: 5px;
+  font-family: var(--body-font);
 }
 .form-control:focus {
   border-color: var(--accent-color);
@@ -625,6 +641,7 @@ main {
     border-radius: 8px;
     padding: 0.5rem 1.5rem;
     transition: all 0.3s ease;
+    font-family: var(--body-font);
 }
 
 .btn:hover {
@@ -769,4 +786,103 @@ main {
 
 .similar-item:last-child {
     border-bottom: none;
+}
+
+/* Price Styling */
+.price-amount {
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: 1.1em;
+    font-family: var(--heading-font);
+}
+
+.currency-aw {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-weight: bold;
+    margin-left: 5px;
+    font-size: 0.9em;
+    letter-spacing: 0.05em;
+}
+
+/* For larger price displays */
+h3 .price-amount {
+    font-size: 1.4em;
+}
+
+h3 .currency-aw {
+    font-size: 1.1em;
+}
+
+/* Checkout Deposit Styles */
+.checkout-container {
+    padding: 40px 0;
+    margin-top: 30px;
+}
+
+.checkout-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.checkout-card .card-header {
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--input-border);
+}
+
+.checkout-card .card-header h2 {
+    color: var(--accent-color);
+    font-size: 2rem;
+    margin-bottom: 0;
+}
+
+.checkout-card .order-summary {
+    background-color: var(--input-background);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.checkout-card .order-summary h4 {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.checkout-card .order-summary .d-flex {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.checkout-card .order-summary .d-flex:last-child {
+    margin-bottom: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--input-border);
+}
+
+.checkout-card .btn-primary {
+    background-color: var(--store-btn-color);
+    border-color: var(--store-btn-color);
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 1rem;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.checkout-card .btn-primary:hover {
+    background-color: var(--store-btn-hover);
+    border-color: var(--store-btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-card .form-text {
+    color: var(--text-muted) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
 }

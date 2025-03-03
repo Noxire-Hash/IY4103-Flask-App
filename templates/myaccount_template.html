@@ -9,9 +9,9 @@ Lorekeeper{% endblock %} {% block content %}
         <!-- Profile Picture Section -->
 
         <!-- User Info -->
-        <h2 class="mb-2">Welcome back, <span id="username" class="glow">[Username]</span>!</h2>
+        <h2 class="mb-2">Welcome back, <span id="username" class="glow">[Username]</span></h2>
         <p class="text-muted mb-2">Email: <span id="email">[email@example.com]</span></p>
-        <span class="badge bg-primary">Privilege: [Admin/User/Vendor]</span>
+        <span class="badge bg-primary">Privilege: <span id="privilege">[Admin/User/Vendor]</span></span>
       </div>
     </div>
 
@@ -27,6 +27,7 @@ Lorekeeper{% endblock %} {% block content %}
             <div class="d-grid gap-2">
               <a href="/store" class="btn btn-outline-primary">Store</a>
               <a href="/support" class="btn btn-outline-primary">Support</a>
+              <a href="/checkout/deposit" class="btn btn-outline-primary">Deposit</a>
               <a
                 href="/vendor/dashboard"
                 class="btn btn-outline-primary d-none"
@@ -57,7 +58,7 @@ Lorekeeper{% endblock %} {% block content %}
           <div class="card-body">
             <h6 class="fw-bold">Current Plan:</h6>
             <p class="mb-3">
-              <span id="subscription-tier" class="badge bg-secondary">[Free/Premium/Exclusive]</span>
+              <span id="sub-tier" class="badge bg-secondary">[Free/Premium/Exclusive]</span>
             </p>
             <a href="/store#subscriptions" class="btn btn-primary btn-sm">Upgrade Plan</a>
           </div>
@@ -71,12 +72,13 @@ Lorekeeper{% endblock %} {% block content %}
           <div class="card-body">
             <h6 class="fw-bold">Current Balance:</h6>
             <p class="mb-3">
-              <span id="balance" class="badge bg-secondary">[1000 AW]</span>
+              <span id="balance-field" class="badge bg-secondary"><span id="balance">100</span><span id="currency-code"> AW</span></span>
             </p>
             <h6 class="fw-bold">Pending Balance:</h6>
             <p class="mb-3">
-              <span id="pending-balance" class="badge bg-secondary">[1000 AW]</span>
+              <span id="pending-balance-field" class="badge bg-secondary"><span id="pending-balance">1000</span><span id="currency-code"> AW</span></span>
             </p>
+            <a href="/checkout/deposit" class="btn btn-primary btn-sm">Deposit</a>
             <a href="/store#subscriptions" class="btn btn-primary btn-sm">Withdraw</a>
           </div>
         </div>
