@@ -125,7 +125,7 @@ $(document).ready(function() {
         // Show/hide privilege-specific links
         switch(privId) {
           case 999: // Admin
-            $("#admin-link, #vendor-link").removeClass("d-none");can 
+            $("#admin-link, #vendor-link").removeClass("d-none");
             break;
           case 998: // Moderator
             $("#moderator-link, #vendor-link").removeClass("d-none");
