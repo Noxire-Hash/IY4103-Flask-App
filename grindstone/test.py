@@ -1,4 +1,4 @@
-from main import GameManager, fetch_tool_data
+from main import GameManager, Utils
 
 
 def test_game_initialization():
@@ -10,9 +10,9 @@ def test_game_initialization():
     return game
 
 
-def test_biome_loading(game):
+def test_biome_loading(game, desired_biome_id="biom_dark_woods"):
     """Test loading a biome"""
-    biome_id = "biom_dark_woods"
+    biome_id = desired_biome_id
     game.load_biom(biome_id)
     if game.biome:
         print(f"Successfully loaded biome: {game.biome.name}")
@@ -22,13 +22,15 @@ def test_biome_loading(game):
     return game
 
 
-def test_entity_harvesting(game):
+def test_entity_harvesting(game, test_entity_id="entity_level1_tree"):
     """Test harvesting an entity"""
-    entity_id = "entity_level1_tree"
-
-    player_tool_type = "woodcutting_tool"
+    entity_id = test_entity_id
+    crr_biom = game.biome
+    entity_data = Utils.fetch_entity_data(crr_biom.id, test_entity_id)
+    print(f"Entity data is {entity_data}")
+    player_tool_type = entity_data["req_tool_type"]
     player_tool_id = game.player.equipment[player_tool_type + "_id"]
-    tool = fetch_tool_data(player_tool_type, player_tool_id)
+    tool = Utils.fetch_tool_data(player_tool_type, player_tool_id)
 
     print(f"Player is using: {tool['name']} with {tool['damage']} damage")
 
@@ -60,7 +62,16 @@ def run_tests():
     game = test_biome_loading(game)
     print("\n----- Entity Harvesting Test -----")
     test_entity_harvesting(game)
-
+    print("\n----- Biome Change Test -----")
+    test_biome_loading(game, "biom_rocky_mountains")
+    print("\n----- Entity Harvesting Test -----")
+    test_entity_harvesting(game, "entity_level1_rock")
+    print("\n----- Stamp Creation Test -----")
+    game.set_current_action("harvest", "biom_rocky_mountains", "entity_level1_rock")
+    game.create_stamp()
+    print("\n----- Stamp Fetching Test -----")
+    stamps = game.fetch_stamps()
+    print(f"Stamps: {stamps}")
     print("\n===== TESTS COMPLETED =====")
 
 

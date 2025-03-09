@@ -15,6 +15,7 @@ from flask import (
 )
 from flask_migrate import Migrate
 
+import grindstone.main as grindstone
 from helper import json_interpreter
 from models import (
     ITEM_STATUS,
@@ -412,8 +413,7 @@ def vendor_dashboard():
             return redirect(url_for("login"))
 
         # Get vendor's items
-        vendor_items = Item.query.filter_by(
-            vendor_id=session.get("user_id")).all()
+        vendor_items = Item.query.filter_by(vendor_id=session.get("user_id")).all()
 
         return render_template(
             "vendor_dashboard.html", items=vendor_items, ITEM_STATUS=ITEM_STATUS
@@ -854,6 +854,25 @@ def process_payment():
 @app.route("/checkout/deposit", methods=["GET", "POST"])
 def deposit():
     return render_template("checkout_deposit.html")
+
+
+@app.route("/debug")
+def debug():
+    return render_template("debug.html")
+
+
+@app.route("/api/game_data")
+def get_game_data():
+    game_data = {
+        "biomes": grindstone.BIOM_DATA,
+        "equipment": {
+            "starter_kit": grindstone.STARTER_KIT,
+            "debug_kit": grindstone._DEBUG_KIT,
+        },
+        "tools": grindstone.TOOL_DATA,
+        "inventory": grindstone.LOAD_INV_DATA,
+    }
+    return jsonify(game_data)
 
 
 if __name__ == "__main__":
