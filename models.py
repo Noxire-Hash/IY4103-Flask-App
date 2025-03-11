@@ -1,7 +1,6 @@
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
-import uuid
-import time
 
 db = SQLAlchemy()
 ITEM_STATUS = ["Active", "Pending", "Hidden", "Archived"]
@@ -15,63 +14,62 @@ TICKET_CATEGORIES = [
     "Billing Issue",
     "API Request",
     "Become Merchant",
-    "Other"
+    "Other",
 ]
 TICKET_STATUS = ["Open", "In Progress", "Closed"]
 PURCHASE_STATUS = ["Pending", "Completed", "Cancelled"]
 TRANSACTION_TYPES = [
-    "DEPOSIT",      # User adding money to system
-    "WITHDRAWAL",   # User withdrawing money from system
-    "TRANSFER",     # User to user transfer
-    "PURCHASE",     # Store purchase
-    "REFUND"        # Refund from purchase
+    "DEPOSIT",  # User adding money to system
+    "WITHDRAWAL",  # User withdrawing money from system
+    "TRANSFER",  # User to user transfer
+    "PURCHASE",  # Store purchase
+    "REFUND",  # Refund from purchase
 ]
 SYSTEM_ID = 0  # Special ID for system transactions
 
 
 class Privilege(db.Model):
-    __tablename__ = 'privileges'
+    __tablename__ = "privileges"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False, unique=True)
     description = db.Column(db.String(256))
 
 
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
-    privilege_id = db.Column(
-        db.Integer, db.ForeignKey('privileges.id'), default=1)
+    privilege_id = db.Column(db.Integer, db.ForeignKey("privileges.id"), default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    purchases = db.relationship('Purchase', backref='user', lazy=True)
-    subscriptions = db.relationship('Subscription', backref='user', lazy=True)
-    receipts = db.relationship('Receipt', backref='user', lazy=True)
+    purchases = db.relationship("Purchase", backref="user", lazy=True)
+    subscriptions = db.relationship("Subscription", backref="user", lazy=True)
+    receipts = db.relationship("Receipt", backref="user", lazy=True)
     balance = db.Column(db.Float, default=0)
     pending_balance = db.Column(db.Float, default=0)
 
 
 class Vendor(db.Model):
-    __tablename__ = 'vendors'
-    id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                   primary_key=True)  # Vendor is also a User
+    __tablename__ = "vendors"
+    id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), primary_key=True
+    )  # Vendor is also a User
     name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
-    items = db.relationship('Item', backref='vendor', lazy=True)
+    items = db.relationship("Item", backref="vendor", lazy=True)
     balance = db.Column(db.Float, default=0)
     pending_balance = db.Column(db.Float, default=0)
 
 
 class Item(db.Model):
-    __tablename__ = 'items'
+    __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.Text)
     price = db.Column(db.Float, nullable=False)
-    vendor_id = db.Column(db.Integer, db.ForeignKey(
-        'vendors.id'), nullable=False)
-    reviews = db.relationship('ReviewOfItem', backref='item', lazy=True)
+    vendor_id = db.Column(db.Integer, db.ForeignKey("vendors.id"), nullable=False)
+    reviews = db.relationship("ReviewOfItem", backref="item", lazy=True)
     category = db.Column(db.String(64), nullable=False)
     tags = db.Column(db.String(256))
     sales = db.Column(db.Integer, default=0)
@@ -80,32 +78,32 @@ class Item(db.Model):
 
 
 class ReviewOfItem(db.Model):
-    __tablename__ = 'reviews_of_items'
+    __tablename__ = "reviews_of_items"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     review = db.Column(db.Text)
 
 
 class Purchase(db.Model):
-    __tablename__ = 'purchases'
+    __tablename__ = "purchases"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
-    vendor_id = db.Column(db.Integer, db.ForeignKey(
-        'vendors.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
+    vendor_id = db.Column(db.Integer, db.ForeignKey("vendors.id"), nullable=False)
     quantity = db.Column(db.Integer, default=1)
     purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
     total_price = db.Column(db.Float, nullable=False)
 
 
 class Subscription(db.Model):
-    __tablename__ = 'subscriptions'
+    __tablename__ = "subscriptions"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     subscription_type = db.Column(
-        db.String(64), nullable=False)  # E.g., "Basic", "Premium"
+        db.String(64), nullable=False
+    )  # E.g., "Basic", "Premium"
     end_date = db.Column(db.DateTime, nullable=True)
     # start_date = db.Column(db.DateTime, default=datetime.utcnow)
     # Null if perpetual or inactive
@@ -114,7 +112,7 @@ class Subscription(db.Model):
 class DndCharacter(db.Model):
     __tablename__ = "dnd_characters"
     id = db.Column(db.Integer, primary_key=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     race = db.Column(db.String(300))
     bio = db.Column(db.String(300))
     skills = db.Column(db.Integer)
@@ -122,58 +120,59 @@ class DndCharacter(db.Model):
 
 
 class SupportTicket(db.Model):
-    __tablename__ = 'support_tickets'
+    __tablename__ = "support_tickets"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     category = db.Column(db.String(100), nullable=False)
     subject = db.Column(db.String(100), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='Open')
+    status = db.Column(db.String(20), default="Open")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationship to responses
     responses = db.relationship(
-        'SupportTicketResponse', back_populates='ticket', lazy='dynamic')
-    user = db.relationship('User', backref='tickets')
+        "SupportTicketResponse", back_populates="ticket", lazy="dynamic"
+    )
+    user = db.relationship("User", backref="tickets")
 
 
 class SupportTicketResponse(db.Model):
-    __tablename__ = 'support_ticket_responses'
+    __tablename__ = "support_ticket_responses"
     id = db.Column(db.Integer, primary_key=True)
-    ticket_id = db.Column(db.Integer, db.ForeignKey(
-        'support_tickets.id'), nullable=False)
-    responder_id = db.Column(
-        db.Integer, db.ForeignKey('users.id'), nullable=False)
+    ticket_id = db.Column(
+        db.Integer, db.ForeignKey("support_tickets.id"), nullable=False
+    )
+    responder_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     response = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_user = db.Column(db.Boolean, default=False)
-    ticket = db.relationship('SupportTicket', back_populates='responses')
-    responder = db.relationship('User', backref='responses')
+    ticket = db.relationship("SupportTicket", back_populates="responses")
+    responder = db.relationship("User", backref="responses")
 
 
 class Receipt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    buyer_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    seller_id = db.Column(db.Integer, db.ForeignKey(
-        'vendors.id'), nullable=False)
+    buyer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey("vendors.id"), nullable=False)
     # Nullable for system transactions
-    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=True)
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=True)
     quantity = db.Column(db.Integer, default=1)
     purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
     total_price = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(64), default="Pending")
     transaction_type = db.Column(
-        db.String(64), nullable=True)  # For system transactions
+        db.String(64), nullable=True
+    )  # For system transactions
 
 
 class SystemTransaction(db.Model):
-    __tablename__ = 'system_transactions'
+    __tablename__ = "system_transactions"
     id = db.Column(db.Integer, primary_key=True)
     transaction_type = db.Column(db.String(64), nullable=False)
-    sender_id = db.Column(
-        db.Integer, db.ForeignKey('users.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), nullable=True)  # Null for deposits
+    sender_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    receiver_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=True
+    )  # Null for deposits
     amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(64), default="Pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -310,7 +309,7 @@ class CashReceipt:
                 seller_id=self.seller_id,
                 total_price=self.amount,
                 transaction_type=self.transaction_type,
-                status="Pending"
+                status="Pending",
             )
             db.session.add(receipt)
             db.session.commit()

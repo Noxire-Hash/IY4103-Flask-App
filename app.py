@@ -16,7 +16,6 @@ from flask import (
 from flask_migrate import Migrate
 
 import grindstone.main as grindstone
-from helper import json_interpreter
 from models import (
     ITEM_STATUS,
     SYSTEM_ID,
@@ -31,6 +30,7 @@ from models import (
     User,
     db,
 )
+from utils import Logger
 
 # App setup
 app = Flask(
@@ -50,6 +50,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = True
 migrate = Migrate(app, db)
+logger = Logger()
 db.init_app(app)
 
 
@@ -388,7 +389,7 @@ def get_items():
             "status": item.status,
             "created_at": str(item.created_at),
         }
-    return json_interpreter(item_dict)
+    return jsonify(item_dict)
 
 
 @app.errorhandler(404)
