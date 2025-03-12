@@ -18,10 +18,9 @@ from flask_migrate import Migrate
 import grindstone.main as grindstone
 from models import (
     ITEM_STATUS,
-    SYSTEM_ID,
+    PAYMENT_PROVIDERS,
     TICKET_CATEGORIES,
     TICKET_STATUS,
-    CashReceipt,
     Item,
     Privilege,
     Purchase,
@@ -30,7 +29,7 @@ from models import (
     User,
     db,
 )
-from utils import Logger
+from utils import Logger, SystemTransactionHandler
 
 # App setup
 app = Flask(
@@ -717,20 +716,21 @@ def deposit_funds():
         amount = float(request.form.get("amount"))
         user_id = session.get("user_id")
 
-        # Create and cash the receipt
-        receipt = CashReceipt(
+        if not user_id:
+            flash("Please log in to make a deposit", "warning")
+            return redirect(url_for("login"))
+
+        # Use the new SystemTransactionHandler
+        success, message, receipt_id = SystemTransactionHandler.create_and_process(
             amount=amount,
-            buyer_id=SYSTEM_ID,  # System is paying
-            seller_id=user_id,  # User is receiving
+            sender_id=PAYMENT_PROVIDERS[
+                "SHOPIFY"
+            ],  # Using Shopify as default payment provider
+            receiver_id=user_id,
             transaction_type="DEPOSIT",
+            logger=logger,
         )
 
-        success, result = receipt.create()
-        if not success:
-            flash(f"Error creating deposit: {result}", "danger")
-            return redirect(url_for("account"))
-
-        success, message = receipt.cash()
         if success:
             flash("Deposit successful!", "success")
         else:
@@ -750,20 +750,19 @@ def transfer_funds():
         receiver_id = int(request.form.get("receiver_id"))
         sender_id = session.get("user_id")
 
-        # Create and cash the receipt
-        receipt = CashReceipt(
+        if not sender_id:
+            flash("Please log in to make a transfer", "warning")
+            return redirect(url_for("login"))
+
+        # Use the new SystemTransactionHandler
+        success, message, receipt_id = SystemTransactionHandler.create_and_process(
             amount=amount,
-            buyer_id=sender_id,  # Sender is paying
-            seller_id=receiver_id,  # Receiver is getting paid
+            sender_id=sender_id,
+            receiver_id=receiver_id,
             transaction_type="TRANSFER",
+            logger=logger,
         )
 
-        success, result = receipt.create()
-        if not success:
-            flash(f"Error creating transfer: {result}", "danger")
-            return redirect(url_for("account"))
-
-        success, message = receipt.cash()
         if success:
             flash("Transfer successful!", "success")
         else:
@@ -823,23 +822,28 @@ def checkout(item_id):
 def process_payment():
     try:
         item_id = request.form.get("item_id")
-        item = Item.query.get_or_404(item_id)
+        if not item_id:
+            flash("No item specified", "danger")
+            return redirect(url_for("store"))
 
-        # Create receipt
-        receipt = CashReceipt(
+        item = Item.query.get_or_404(item_id)
+        user_id = session.get("user_id")
+
+        if not user_id:
+            flash("Please log in to make a purchase", "warning")
+            return redirect(url_for("login"))
+
+        # Use the new SystemTransactionHandler
+        success, message, receipt_id = SystemTransactionHandler.create_and_process(
             amount=item.price,
-            buyer_id=session.get("user_id"),
-            seller_id=item.vendor_id,
+            sender_id=user_id,
+            receiver_id=item.vendor_id,
             transaction_type="PURCHASE",
+            item_id=item.id,
+            quantity=1,
+            logger=logger,
         )
 
-        # Try to process the payment
-        success, result = receipt.create()
-        if not success:
-            flash(f"Error creating receipt: {result}", "danger")
-            return redirect(url_for("checkout", item_id=item_id))
-
-        success, message = receipt.cash()
         if success:
             flash("Purchase successful!", "success")
             return redirect(url_for("account"))

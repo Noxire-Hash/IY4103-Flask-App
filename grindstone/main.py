@@ -181,10 +181,10 @@ class Utils:
             if tool["id"] == tool_id:
                 return tool
 
-        logger.error(
-            logger.GAME,
-            f"No tool found with ID: {tool_id} in category: {tool_category}",
-        )
+            logger.error(
+                logger.GAME,
+                f"No tool found with ID: {tool_id} in category: {tool_category}",
+            )
         return None
 
     @staticmethod
