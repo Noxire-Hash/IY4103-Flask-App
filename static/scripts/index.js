@@ -8,6 +8,7 @@ $(document).ready(function () {
     VENDOR_DASHBOARD: "/vendor_dashboard",
     ITEM_PREVIEW: "/store/item",
     CHECKOUT_DEPOSIT: "/checkout/deposit",
+    ADMIN_DASHBOARD: "/admin",
   };
 
   // Event Listeners
@@ -39,6 +40,9 @@ $(document).ready(function () {
         break;
       case PATHS.CHECKOUT_DEPOSIT:
         handleCheckoutDeposit();
+        break;
+      case PATHS.ADMIN_DASHBOARD:
+        handleAdminDashboard();
         break;
     }
 
@@ -288,4 +292,87 @@ $(document).ready(function () {
     initializePaymentButtons();
     console.log("Checkout deposit loaded");
   }
+
+  // Admin Dashboard Functions
+  function handleAdminDashboard() {
+    // Handle sender type changes in transaction form
+    $("#sender_type").on("change", function () {
+      const senderUserDiv = $("#senderUserDiv");
+      const paymentProviderDiv = $("#paymentProviderDiv");
+      const systemDiv = $("#systemDiv");
+      if ($(this).val() === "payment_provider") {
+        senderUserDiv.hide();
+        systemDiv.hide();
+        paymentProviderDiv.show();
+      } else if ($(this).val() === "system") {
+        senderUserDiv.hide();
+        paymentProviderDiv.hide();
+        systemDiv.show();
+      } else {
+        systremDiv.hide();
+        paymentProviderDiv.hide();
+        senderUserDiv.show();
+      }
+    });
+
+    // Handle privilege changes
+    $(".privilege-select").on("change", function () {
+      const userId = $(this).data("userId");
+      const privilegeId = $(this).val();
+      const select = $(this);
+
+      $.ajax({
+        url: "/admin/update_user/" + userId,
+        method: "POST",
+        data: { privilege_id: privilegeId },
+        success: function (data) {
+          if (data.success) {
+            triggerFlash("Privilege updated successfully", "success");
+          } else {
+            triggerFlash("Error updating privilege", "danger");
+            select.val(select.data("originalValue"));
+          }
+        },
+        error: function (error) {
+          console.error("Error updating privilege:", error);
+          triggerFlash("Error updating privilege", "danger");
+          select.val(select.data("originalValue"));
+        },
+      });
+    });
+
+    // Handle edit user button clicks
+    $(".edit-user").on("click", function () {
+      const userId = $(this).data("userId");
+      let otp = "";
+      $(".resetPassword").on("click", function () {
+        console.log("Reset password clicked");
+        otp = Math.random().toString(36).substr(2, 8);
+      });
+
+      $.ajax({
+        url: "/admin/get_user/" + userId,
+        method: "GET",
+        success: function (data) {
+          $("#edit_user_id").val(data.id);
+          $("#edit_username").val(data.username);
+          $("#edit_email").val(data.email);
+          $("#edit_balance").val(data.balance);
+          $("#edit_password").val(otp);
+        },
+        error: function (error) {
+          console.error("Error fetching user data:", error);
+          triggerFlash("Error loading user data", "danger");
+        },
+      });
+    });
+
+    // Initialize tooltips if they exist
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
+    console.log("Admin dashboard initialized");
+  }
+
+
+
 });

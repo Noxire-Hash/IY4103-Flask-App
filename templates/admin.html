@@ -1,80 +1,244 @@
 {% extends "nav_footer_template.html" %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center text-primary">Admin Dashboard</h2>
-  <p class="text-center text-muted">Manage users and their privileges</p>
+<div class="container mt-5 admin-dashboard">
+    <h2 class="text-center" style="color: var(--accent-color);">Admin Dashboard</h2>
 
-  <!-- Create User Form -->
-  <div class="card my-4">
-    <div class="card-body">
-      <h5 class="card-title">Create New User</h5>
-      <form method="POST" action="{{ url_for('admin_dashboard') }}">
-        <div class="mb-3">
-          <label for="username" class="form-label">Username</label>
-          <input type="text" class="form-control" id="username" name="username" required>
+    <!-- Add JavaScript for handling sender type selection -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const senderType = document.getElementById('sender_type');
+            const senderUserDiv = document.getElementById('senderUserDiv');
+            const systemDiv = document.getElementById('systemDiv');
+            const paymentProviderDiv = document.getElementById('paymentProviderDiv');
+
+            senderType.addEventListener('change', function() {
+                // Hide all sender options first
+                senderUserDiv.style.display = 'none';
+                systemDiv.style.display = 'none';
+                paymentProviderDiv.style.display = 'none';
+
+                // Show the appropriate div based on selection
+                switch(this.value) {
+                    case 'user':
+                        senderUserDiv.style.display = 'block';
+                        break;
+                    case 'system':
+                        systemDiv.style.display = 'block';
+                        break;
+                    case 'payment_provider':
+                        paymentProviderDiv.style.display = 'block';
+                        break;
+                }
+            });
+
+            // Trigger change event to set initial state
+            senderType.dispatchEvent(new Event('change'));
+        });
+    </script>
+
+    <!-- Tabs for different sections -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab">User Management</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="transactions-tab" data-bs-toggle="tab" href="#transactions" role="tab">Create Transaction</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabContent">
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel">
+            <!-- Create User Form -->
+            <div class="admin-card">
+                <div class="card-body admin-form">
+                    <h5 class="card-title">Create New User</h5>
+                    <form method="POST" action="{{ url_for('admin_dashboard') }}">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="privilege_id" class="form-label">Privilege</label>
+                                <select class="form-select" id="privilege_id" name="privilege_id">
+                                    {% for privilege in privileges %}
+                                    <option value="{{ privilege.id }}">{{ privilege.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="balance" class="form-label">Initial Balance</label>
+                                <input type="number" class="form-control" id="balance" name="balance" value="0">
+                            </div>
+                        </div>
+                        <button type="submit" name="create_user" class="admin-btn admin-btn-primary">Create User</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+                <table class="table admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Balance</th>
+                            <th>Privilege</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.balance }} AW</td>
+                            <td>
+                                <select class="privilege-select" data-user-id="{{ user.id }}">
+                                    {% for privilege in privileges %}
+                                    <option value="{{ privilege.id }}" {% if privilege.id == user.privilege_id %}selected{% endif %}>
+                                        {{ privilege.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <button class="admin-btn admin-btn-primary edit-user" data-bs-toggle="modal"
+                                        data-bs-target="#editUserModal" data-user-id="{{ user.id }}">
+                                    Edit
+                                </button>
+                                <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" class="d-inline">
+                                    <button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" required>
+
+        <!-- Transactions Tab -->
+        <div class="tab-pane fade" id="transactions" role="tabpanel">
+            <div class="admin-card">
+                <div class="card-body">
+                    <h5 class="card-title">Create Transaction</h5>
+                    <form id="createTransactionForm" method="POST" action="{{ url_for('admin_create_transaction') }}" class="admin-form">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="transaction_type" class="form-label">Transaction Type</label>
+                                <select class="form-select" id="transaction_type" name="transaction_type" required>
+                                    <option value="DEPOSIT">Deposit</option>
+                                    <option value="TRANSFER">Transfer</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="sender_type" class="form-label">Sender Type</label>
+                                <select class="form-select" id="sender_type" name="sender_type">
+                                    <option value="user">User</option>
+                                    <option value="system">System</option>
+                                    <option value="payment_provider">Payment Provider</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3" id="senderUserDiv">
+                                <label for="sender_id" class="form-label">Sender</label>
+                                <select class="form-select" id="sender_id" name="sender_id">
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.balance }} AW)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3" id="systemDiv" style="display: none;">
+                                <label for="system_id" class="form-label">System</label>
+                                <select class="form-select" id="system_id" name="system_id">
+                                    <option value="-999">SYSTEM</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3" id="paymentProviderDiv" style="display: none;">
+                                <label for="payment_provider" class="form-label">Payment Provider</label>
+                                <select class="form-select" id="payment_provider" name="payment_provider">
+                                    <option value="-1">Shopify</option>
+                                    <option value="-2">Apple Pay</option>
+                                    <option value="-3">Google Pay</option>
+                                    <option value="-4">PayPal</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="receiver_id" class="form-label">Receiver</label>
+                                <select class="form-select" id="receiver_id" name="receiver_id" required>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.balance }} AW)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="admin-btn admin-btn-primary">Create Transaction</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="mb-3">
-          <label for="privilege_id" class="form-label">Privilege</label>
-          <select class="form-select" id="privilege_id" name="privilege_id">
-            {% for privilege in privileges %}
-            <option value="{{ privilege.id }}">{{ privilege.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <button type="submit" name="create_user" class="btn btn-primary">Create User</button>
-        <button type="button" name="get_userdata" class="btn btn-primary" id="get_userdata">Get Current User Data</button>
-      </form>
     </div>
-  </div>
-
-  <!-- Users Table -->
-  <table class="table table-dark table-striped">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Privilege</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.email }}</td>
-        <td>
-          <form method="POST" action="{{ url_for('update_user', user_id=user.id) }}" class="d-inline">
-            <select name="privilege_id" class="form-select form-select-sm d-inline w-auto">
-              {% for privilege in privileges %}
-              <option value="{{ privilege.id }}" {% if privilege.id == user.privilege_id %}selected{% endif %}>
-                {{ privilege.name }}
-              </option>
-              {% endfor %}
-            </select>
-            <input type="hidden" name="username" value="{{ user.username }}">
-            <input type="hidden" name="email" value="{{ user.email }}">
-            <button type="submit" class="btn btn-sm btn-primary">Update</button>
-          </form>
-        </td>
-        <td>
-          <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" class="d-inline">
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
 </div>
+
+<!-- Edit User Modal -->
+<div class="modal fade admin-modal" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm" method="POST" class="admin-form">
+                    <input type="hidden" id="edit_user_id" name="user_id">
+                    <div class="mb-3">
+                        <label for="edit_username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="edit_username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_balance" class="form-label">Balance</label>
+                        <input type="number" class="form-control" id="edit_balance" name="balance" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_password" class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control" id="edit_password" name="password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="resetPassword" class="admin-btn" form="resetPassword" id="resetPassword">Generate OTP</button>
+                <button type="submit" form="editUserForm" class="admin-btn admin-btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
+

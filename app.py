@@ -19,6 +19,7 @@ import grindstone.main as grindstone
 from models import (
     ITEM_STATUS,
     PAYMENT_PROVIDERS,
+    SYSTEM_ID,
     TICKET_CATEGORIES,
     TICKET_STATUS,
     Item,
@@ -29,7 +30,8 @@ from models import (
     User,
     db,
 )
-from utils import Logger, SystemTransactionHandler
+from utils import Logger
+from utils import SystemTransactionHandler as sth
 
 # App setup
 app = Flask(
@@ -272,23 +274,115 @@ def delete_user(user_id):
 
 
 @app.route("/admin/update_user/<int:user_id>", methods=["POST"])
-def update_user(user_id):
-    # Restrict access to admin users
+def admin_update_user(user_id):
     if session.get("privilege_id") != 999:
-        flash("Access denied! Admins only.", "danger")
-        return redirect(url_for("home"))
+        return jsonify({"error": "Access denied"}), 403
 
     try:
-        user = User.query.get(user_id)
-        user.username = request.form.get("username")
-        user.email = request.form.get("email")
-        user.privilege_id = request.form.get("privilege_id")
+        user = User.query.get_or_404(user_id)
+
+        # Update basic info if provided
+        if "username" in request.form:
+            user.username = request.form.get("username")
+        if "email" in request.form:
+            user.email = request.form.get("email")
+        if "privilege_id" in request.form:
+            user.privilege_id = request.form.get("privilege_id")
+
+        # Update password if provided and not empty
+        new_password = request.form.get("password")
+        if new_password:
+            user.password = new_password
+
+        # Update balance if provided
+        if "balance" in request.form:
+            new_balance = float(request.form.get("balance"))
+            if new_balance != user.balance:
+                # Create a system transaction to adjust the balance
+                difference = new_balance - float(user.balance)
+                if difference > 0:
+                    # Add funds
+                    sth.create_and_process(
+                        amount=difference,
+                        sender_id=SYSTEM_ID,
+                        receiver_id=user.id,
+                        transaction_type="ADMIN_ADJUSTMENT",
+                        logger=logger,
+                    )
+                else:
+                    # Remove funds
+                    sth.create_and_process(
+                        amount=abs(difference),
+                        sender_id=user.id,
+                        receiver_id=SYSTEM_ID,
+                        transaction_type="ADMIN_ADJUSTMENT",
+                        logger=logger,
+                    )
+
         db.session.commit()
-        flash(f"User {user.username} updated successfully.", "success")
+        return jsonify({"success": True})
     except Exception as e:
         db.session.rollback()
-        flash(f"Error updating user: {e}", "danger")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/admin/create_transaction", methods=["POST"])
+def admin_create_transaction():
+    if session.get("privilege_id") != 999:
+        flash("Access denied! Admins only.", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+    try:
+        amount = float(request.form.get("amount"))
+        transaction_type = request.form.get("transaction_type")
+        sender_type = request.form.get("sender_type")
+        receiver_id = int(request.form.get("receiver_id"))
+
+        # Determine sender_id based on sender_type
+        if sender_type == "payment_provider":
+            sender_id = int(request.form.get("payment_provider"))
+        elif sender_type == "system":
+            sender_id = int(request.form.get("system_id", SYSTEM_ID))
+        else:
+            sender_id = int(request.form.get("sender_id"))
+
+        success, message, receipt_id = sth.create_and_process(
+            amount=amount,
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            transaction_type=transaction_type,
+            logger=logger,
+        )
+
+        if success:
+            flash("Transaction created successfully!", "success")
+        else:
+            flash(f"Transaction failed: {message}", "danger")
+
+    except Exception as e:
+        flash(f"Error creating transaction: {str(e)}", "danger")
+
     return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/get_user/<int:user_id>")
+def admin_get_user(user_id):
+    if session.get("privilege_id") != 999:
+        return jsonify({"error": "Access denied"}), 403
+
+    try:
+        user = User.query.get_or_404(user_id)
+        return jsonify(
+            {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "balance": int(user.balance),
+                "privilege_id": user.privilege_id,
+            }
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/get_user_data", methods=["POST"])
@@ -721,7 +815,7 @@ def deposit_funds():
             return redirect(url_for("login"))
 
         # Use the new SystemTransactionHandler
-        success, message, receipt_id = SystemTransactionHandler.create_and_process(
+        success, message, receipt_id = sth.create_and_process(
             amount=amount,
             sender_id=PAYMENT_PROVIDERS[
                 "SHOPIFY"
@@ -755,7 +849,7 @@ def transfer_funds():
             return redirect(url_for("login"))
 
         # Use the new SystemTransactionHandler
-        success, message, receipt_id = SystemTransactionHandler.create_and_process(
+        success, message, receipt_id = sth.create_and_process(
             amount=amount,
             sender_id=sender_id,
             receiver_id=receiver_id,
@@ -834,7 +928,7 @@ def process_payment():
             return redirect(url_for("login"))
 
         # Use the new SystemTransactionHandler
-        success, message, receipt_id = SystemTransactionHandler.create_and_process(
+        success, message, receipt_id = sth.create_and_process(
             amount=item.price,
             sender_id=user_id,
             receiver_id=item.vendor_id,

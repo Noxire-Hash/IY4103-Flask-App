@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -9,7 +9,10 @@
       rel="stylesheet"
     />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link
+      href="{{ url_for('static', filename='css/style.css') }}"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <!-- Navbar -->
@@ -25,7 +28,12 @@
 
             <!-- Info Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
                 Info
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
@@ -36,13 +44,23 @@
 
             {% if session.get('user_id') %}
             <!-- Vendor Section -->
-            {% if session.get('privilege_id') == 2 or session.get('privilege_id') == 999 %}
+            {% if session.get('privilege_id') == 2 or
+            session.get('privilege_id') == 999 %}
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
                 Vendor
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
-                <li><a class="dropdown-item" href="/vendor/dashboard">Dashboard</a></li>
+                <li>
+                  <a class="dropdown-item" href="/vendor/dashboard"
+                    >Dashboard</a
+                  >
+                </li>
               </ul>
             </li>
             {% endif %}
@@ -50,16 +68,27 @@
             <!-- Combined Admin/Mod Section -->
             {% if session.get('privilege_id') >= 998 %}
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
                 Management
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
-                <li><a class="dropdown-item" href="/moderator/dashboard">Moderation Dashboard</a></li>
+                <li>
+                  <a class="dropdown-item" href="/moderator/dashboard"
+                    >Moderation Dashboard</a
+                  >
+                </li>
                 {% if session.get('privilege_id') == 999 %}
                 <li>
-                  <hr class="dropdown-divider">
+                  <hr class="dropdown-divider" />
                 </li>
-                <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
+                <li>
+                  <a class="dropdown-item" href="/admin">Admin Dashboard</a>
+                </li>
                 {% endif %}
               </ul>
             </li>
@@ -67,16 +96,23 @@
 
             <!-- User Dropdown -->
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
                 {{ session['username'] }}
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
                 <li><a class="dropdown-item" href="/account">My Account</a></li>
                 <li><a class="dropdown-item" href="/support">Support</a></li>
                 <li>
-                  <hr class="dropdown-divider">
+                  <hr class="dropdown-divider" />
                 </li>
-                <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                <li>
+                  <a class="dropdown-item text-danger" href="/logout">Logout</a>
+                </li>
               </ul>
             </li>
             {% else %}
@@ -124,7 +160,7 @@
     {% block scripts %}
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Your scripts -->
+    <!-- index.js -->
     <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
     {% endblock %}
   </body>

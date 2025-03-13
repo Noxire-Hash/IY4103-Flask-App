@@ -441,18 +441,21 @@ class SystemTransactionHandler:
         db.session.begin_nested()
 
         try:
-            # For payment provider transactions, only check receiver
+            # For payment provider transactions and system, only check receiver
             if receipt.sender_id < 0:
                 sender = None
-                if receipt.sender_id not in [v for v in PAYMENT_PROVIDERS.values()]:
+                # Allow both payment providers and system ID
+                if receipt.sender_id != SYSTEM_ID and receipt.sender_id not in [
+                    v for v in PAYMENT_PROVIDERS.values()
+                ]:
                     db.session.rollback()
                     if self.logger:
                         self.logger.error(
                             self.logger.SYSTEM,
-                            "Invalid payment provider",
+                            "Invalid payment provider or system ID",
                             {
                                 "receipt_id": self.receipt_id,
-                                "provider_id": receipt.sender_id,
+                                "sender_id": receipt.sender_id,
                             },
                         )
                     return False, self.STATUS_MESSAGES[
