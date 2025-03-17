@@ -62,8 +62,8 @@ class User(db.Model):
     receipts = db.relationship("Receipt", backref="user", lazy=True)
 
     # Balance fields
-    balance = db.Column(db.Float, default=0)
-    pending_balance = db.Column(db.Float, default=0)
+    balance = db.Column(db.Integer, default=0)
+    pending_balance = db.Column(db.Integer, default=0)
 
 
 class Vendor(db.Model):
@@ -214,6 +214,7 @@ class SystemTransaction(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     # For payment verification
     reference_code = db.Column(db.String(128), unique=True)
+    notes = db.Column(db.Text, nullable=True)
 
 
 class TransactionLog(db.Model):

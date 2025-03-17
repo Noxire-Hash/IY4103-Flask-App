@@ -18,7 +18,6 @@ from flask_migrate import Migrate
 import grindstone.main as grindstone
 from models import (
     ITEM_STATUS,
-    PAYMENT_PROVIDERS,
     SYSTEM_ID,
     TICKET_CATEGORIES,
     TICKET_STATUS,
@@ -27,6 +26,7 @@ from models import (
     Purchase,
     SupportTicket,
     SupportTicketResponse,
+    SystemTransaction,
     User,
     db,
 )
@@ -183,8 +183,64 @@ def login():
 
 
 @app.route("/account", methods=["GET", "POST"])
-def send():
-    return render_template("myaccount_template.html")
+def account():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    user = User.query.get(session.get("user_id"))
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+
+    # Get recent purchases
+    purchases = (
+        Purchase.query.filter_by(user_id=user.id)
+        .order_by(Purchase.purchase_date.desc())
+        .limit(5)
+        .all()
+    )
+
+    # Load item data for each purchase
+    for purchase in purchases:
+        purchase.item_name = (
+            Item.query.get(purchase.item_id).name if purchase.item_id else "N/A"
+        )
+        purchase.item_status = (
+            "Completed"  # Or get from the actual status field if available
+        )
+
+    # Get recent transactions
+    transactions = (
+        SystemTransaction.query.filter(
+            (SystemTransaction.sender_id == user.id)
+            | (SystemTransaction.receiver_id == user.id)
+        )
+        .order_by(SystemTransaction.created_at.desc())
+        .limit(10)
+        .all()
+    )
+
+    # For each transaction, manually get the sender and receiver usernames
+    for transaction in transactions:
+        # Get sender username if it's a user (not a system or payment provider)
+        if transaction.sender_id > 0:
+            sender = User.query.get(transaction.sender_id)
+            transaction.sender_name = sender.username if sender else "Unknown"
+        else:
+            transaction.sender_name = (
+                "System" if transaction.sender_id == SYSTEM_ID else "Payment Provider"
+            )
+
+        # Get receiver username
+        receiver = User.query.get(transaction.receiver_id)
+        transaction.receiver_name = receiver.username if receiver else "Unknown"
+
+    return render_template(
+        "myaccount_template.html",
+        purchases=purchases,
+        transactions=transactions,
+        user=user,
+    )
 
 
 @app.route("/test_db")
@@ -398,6 +454,9 @@ def get_user_data():
                     "email": user.email,
                     "privilege_id": user.privilege_id,
                     "created_at": user.created_at.strftime("%Y-%m-%d"),
+                    "balance": user.balance,
+                    "pending_balance": user.pending_balance,
+                    "subscriptions": user.subscriptions,
                 }
                 return user_data, 200
             return {"error": "User not found"}, 404
@@ -804,37 +863,78 @@ def before_request():
         session.clear()
 
 
-@app.route("/deposit", methods=["POST"])
+@app.route("/deposit", methods=["GET", "POST"])
 def deposit_funds():
-    try:
-        amount = float(request.form.get("amount"))
-        user_id = session.get("user_id")
+    if request.method == "POST":
+        if request.is_json:
+            data = request.get_json()
+            amount = float(data.get("amount", 0))
+            payment_provider = data.get("payment_provider")
 
-        if not user_id:
-            flash("Please log in to make a deposit", "warning")
-            return redirect(url_for("login"))
+            if not session.get("user_id"):
+                return jsonify(
+                    {"success": False, "message": "Please log in to make a deposit"}
+                )
 
-        # Use the new SystemTransactionHandler
-        success, message, receipt_id = sth.create_and_process(
-            amount=amount,
-            sender_id=PAYMENT_PROVIDERS[
-                "SHOPIFY"
-            ],  # Using Shopify as default payment provider
-            receiver_id=user_id,
-            transaction_type="DEPOSIT",
-            logger=logger,
-        )
+            if amount < 10:
+                return jsonify(
+                    {"success": False, "message": "Minimum deposit amount is 10 AW"}
+                )
 
-        if success:
-            flash("Deposit successful!", "success")
+            try:
+                # Create and process transaction using SystemTransactionHandler
+                success, message, receipt_id = sth.create_and_process(
+                    amount=amount,
+                    sender_id=payment_provider,
+                    receiver_id=session["user_id"],
+                    transaction_type="DEPOSIT",
+                    logger=logger,
+                )
+
+                if success:
+                    return jsonify(
+                        {
+                            "success": True,
+                            "message": "Deposit successful!",
+                            "redirect_url": url_for("account"),
+                        }
+                    )
+                else:
+                    return jsonify({"success": False, "message": message})
+
+            except Exception as e:
+                return jsonify({"success": False, "message": str(e)})
         else:
-            flash(f"Deposit failed: {message}", "danger")
+            # Handle form-based submission
+            amount = float(request.form.get("amount", 0))
+            payment_provider = request.form.get("payment_provider")
 
-        return redirect(url_for("account"))
+            if amount < 10:
+                flash("Minimum deposit amount is 10 AW", "error")
+                return redirect(url_for("deposit"))
 
-    except Exception as e:
-        flash(f"Error: {str(e)}", "danger")
-        return redirect(url_for("account"))
+            try:
+                # Create and process transaction using SystemTransactionHandler
+                success, message, receipt_id = sth.create_and_process(
+                    amount=amount,
+                    sender_id=payment_provider,
+                    receiver_id=session["user_id"],
+                    transaction_type="DEPOSIT",
+                    logger=logger,
+                )
+
+                if success:
+                    flash("Deposit successful!", "success")
+                    return redirect(url_for("account"))
+                else:
+                    flash(f"Deposit failed: {message}", "danger")
+                    return redirect(url_for("deposit"))
+
+            except Exception as e:
+                flash(str(e), "error")
+                return redirect(url_for("deposit"))
+
+    return render_template("checkout_deposit.html")
 
 
 @app.route("/transfer", methods=["POST"])
@@ -972,6 +1072,78 @@ def get_game_data():
         "inventory": grindstone.LOAD_INV_DATA,
     }
     return jsonify(game_data)
+
+
+@app.route("/account/transactions", methods=["GET"])
+def transaction_history():
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    user = User.query.get(session.get("user_id"))
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+
+    # Get all transactions for this user
+    transactions = (
+        SystemTransaction.query.filter(
+            (SystemTransaction.sender_id == user.id)
+            | (SystemTransaction.receiver_id == user.id)
+        )
+        .order_by(SystemTransaction.created_at.desc())
+        .all()
+    )
+
+    # Calculate transaction statistics
+    total_spent = 0
+    total_received = 0
+
+    for transaction in transactions:
+        # For each transaction, manually get the sender and receiver usernames
+        if transaction.sender_id > 0:
+            sender = User.query.get(transaction.sender_id)
+            transaction.sender_name = sender.username if sender else "Unknown"
+        else:
+            transaction.sender_name = (
+                "System" if transaction.sender_id == SYSTEM_ID else "Payment Provider"
+            )
+
+        # Get receiver username
+        receiver = User.query.get(transaction.receiver_id)
+        transaction.receiver_name = receiver.username if receiver else "Unknown"
+
+        # Calculate totals
+        if transaction.sender_id == user.id:
+            total_spent += transaction.amount
+        if transaction.receiver_id == user.id:
+            total_received += transaction.amount
+
+        # Add default notes if none exist
+        if not transaction.notes:
+            if transaction.transaction_type == "DEPOSIT":
+                transaction.notes = (
+                    f"Deposit of {transaction.amount} AW from payment provider"
+                )
+            elif transaction.transaction_type == "PURCHASE":
+                transaction.notes = f"Purchase transaction of {transaction.amount} AW"
+            elif transaction.transaction_type == "TRANSFER":
+                if transaction.sender_id == user.id:
+                    transaction.notes = f"Transfer of {transaction.amount} AW to {transaction.receiver_name}"
+                else:
+                    transaction.notes = f"Transfer of {transaction.amount} AW from {transaction.sender_name}"
+            elif transaction.transaction_type == "REFUND":
+                transaction.notes = f"Refund of {transaction.amount} AW"
+            else:
+                transaction.notes = f"{transaction.transaction_type} transaction of {transaction.amount} AW"
+
+    return render_template(
+        "account_receipt_history.html",
+        user=user,
+        transactions=transactions,
+        total_spent=total_spent,
+        total_received=total_received,
+        transaction_count=len(transactions),
+    )
 
 
 if __name__ == "__main__":

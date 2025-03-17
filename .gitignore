@@ -1,29 +1,73 @@
-# Python bytecode
+# Python cache files
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Migration versions
+migrations/versions/
 
 # Virtual environment
 venv/
-.venv/
+ENV/
+env/
 
-# SQLite database
-app.db
-
-# Environment variables
-.env
-
-# IDE/editor files
+# IDE files
 .idea/
 .vscode/
 *.swp
+*.swo
+.DS_Store
 
-# Logs
+# Custom files
+base.mdc
 *.log
 
-# Other temporary files
-*.DS_Store
+# Environment variables
+.env
+.flaskenv
 
-# Ignore compiled files
-*.egg-info/
-dist/
-build/
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# More thorough Python cache ignores
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+.pytest_cache/
+pytest.ini

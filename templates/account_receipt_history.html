@@ -1,0 +1,286 @@
+{% extends "nav_footer_template.html" %}
+{% block title %}Transaction History - Lorekeeper{% endblock %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <!-- Header Section -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h1 class="display-5 mb-3">Transaction History</h1>
+            <p class="lead">View and analyze your transaction history and financial activity</p>
+        </div>
+    </div>
+
+    <!-- Transaction Insights -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Spent</h5>
+                    <h2 class="display-6 text-danger">{{ total_spent }} AW</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Received</h5>
+                    <h2 class="display-6 text-success">{{ total_received }} AW</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Current Balance</h5>
+                    <h2 class="display-6">{{ user.balance }} AW</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Transactions</h5>
+                    <h2 class="display-6">{{ transaction_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="transactionType" class="form-label">Transaction Type</label>
+                    <select class="form-select" id="transactionType">
+                        <option value="all" selected>All Transactions</option>
+                        <option value="deposit">Deposits</option>
+                        <option value="purchase">Purchases</option>
+                        <option value="transfer">Transfers</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="dateRange" class="form-label">Date Range</label>
+                    <select class="form-select" id="dateRange">
+                        <option value="all" selected>All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="year">Last Year</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="searchTransaction" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="searchTransaction" placeholder="Search transactions...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title h5 mb-0">Transaction History</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if transaction.transaction_type == 'DEPOSIT' %}
+                                <span class="badge bg-primary">Deposit</span>
+                                {% elif transaction.transaction_type == 'PURCHASE' %}
+                                <span class="badge bg-info">Purchase</span>
+                                {% elif transaction.transaction_type == 'TRANSFER' %}
+                                <span class="badge bg-warning">Transfer</span>
+                                {% elif transaction.transaction_type == 'REFUND' %}
+                                <span class="badge bg-success">Refund</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ transaction.transaction_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ transaction.sender_name }}</td>
+                            <td>{{ transaction.receiver_name }}</td>
+                            <td>
+                                {% if transaction.sender_id == user.id %}
+                                <span class="text-danger">-{{ transaction.amount }} AW</span>
+                                {% else %}
+                                <span class="text-success">+{{ transaction.amount }} AW</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if transaction.status == 'Completed' else 'warning' }}">
+                                    {{ transaction.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#receiptModal"
+                                    data-id="{{ transaction.id }}"
+                                    data-type="{{ transaction.transaction_type }}"
+                                    data-amount="{{ transaction.amount }}"
+                                    data-date="{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') }}"
+                                    data-sender="{{ transaction.sender_name }}"
+                                    data-receiver="{{ transaction.receiver_name }}"
+                                    data-status="{{ transaction.status }}"
+                                    data-notes="{{ transaction.notes if transaction.notes else 'No additional notes' }}">
+                                    View Receipt
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Transaction history pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Back to Account Button -->
+    <div class="text-center mt-4 mb-5">
+        <a href="/account" class="btn btn-primary">Back to Account</a>
+    </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptModalLabel">Transaction Receipt</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card bg-dark border-secondary mb-3">
+                    <div class="card-header text-center">
+                        <h4 id="receipt-type">Transaction Receipt</h4>
+                        <p class="text-muted mb-0" id="receipt-date">Date: 2023-11-15 14:30</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <p class="mb-1">From:</p>
+                                <h6 id="receipt-sender">Sender Name</h6>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1">To:</p>
+                                <h6 id="receipt-receiver">Receiver Name</h6>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <p class="mb-1">Amount:</p>
+                                <h5 id="receipt-amount">100 AW</h5>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1">Status:</p>
+                                <h6><span class="badge bg-success" id="receipt-status">Completed</span></h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <p class="mb-1">Notes:</p>
+                                <p id="receipt-notes" class="text-muted">Transaction completed successfully.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p class="mb-0">Transaction ID: <span id="receipt-id">TXN123456</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Download Receipt</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for the receipt modal -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle receipt modal data
+        const receiptModal = document.getElementById('receiptModal');
+        if (receiptModal) {
+            receiptModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+
+                // Extract data from button attributes
+                const id = button.getAttribute('data-id');
+                const type = button.getAttribute('data-type');
+                const amount = button.getAttribute('data-amount');
+                const date = button.getAttribute('data-date');
+                const sender = button.getAttribute('data-sender');
+                const receiver = button.getAttribute('data-receiver');
+                const status = button.getAttribute('data-status');
+                const notes = button.getAttribute('data-notes');
+
+                // Update modal content
+                document.getElementById('receipt-id').textContent = id;
+                document.getElementById('receipt-type').textContent = type + ' Receipt';
+                document.getElementById('receipt-date').textContent = 'Date: ' + date;
+                document.getElementById('receipt-sender').textContent = sender;
+                document.getElementById('receipt-receiver').textContent = receiver;
+                document.getElementById('receipt-amount').textContent = amount + ' AW';
+                document.getElementById('receipt-status').textContent = status;
+                document.getElementById('receipt-status').className = 'badge bg-' + (status === 'Completed' ? 'success' : 'warning');
+                document.getElementById('receipt-notes').textContent = notes;
+            });
+        }
+
+        // Filter functionality
+        const transactionTypeFilter = document.getElementById('transactionType');
+        const dateRangeFilter = document.getElementById('dateRange');
+        const searchFilter = document.getElementById('searchTransaction');
+
+        if (transactionTypeFilter && dateRangeFilter && searchFilter) {
+            const filterTransactions = function() {
+                // This would be implemented with backend filtering or client-side filtering
+                console.log('Filtering transactions...');
+                console.log('Type:', transactionTypeFilter.value);
+                console.log('Date:', dateRangeFilter.value);
+                console.log('Search:', searchFilter.value);
+
+                // For now, just log the filter values
+                // In a real implementation, this would filter the table or make an AJAX request
+            };
+
+            transactionTypeFilter.addEventListener('change', filterTransactions);
+            dateRangeFilter.addEventListener('change', filterTransactions);
+            searchFilter.addEventListener('input', function() {
+                // Debounce search input
+                clearTimeout(this.timer);
+                this.timer = setTimeout(filterTransactions, 300);
+            });
+        }
+    });
+</script>
+{% endblock %}

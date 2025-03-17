@@ -167,21 +167,28 @@ Lorekeeper{% endblock %} {% block content %}
                   </tr>
                 </thead>
                 <tbody>
+                  {% for purchase in purchases %}
                   <tr>
-                    <td>2024-03-19</td>
-                    <td>Adventure Pack #1</td>
-                    <td>$19.99</td>
-                    <td><span class="badge bg-success">Completed</span></td>
+                    <td>{{ purchase.purchase_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ purchase.item_name }}</td>
+                    <td>{{ purchase.total_price }} AW</td>
+                    <td><span class="badge bg-success">{{ purchase.item_status }}</span></td>
                   </tr>
-                  <tr>
-                    <td>2024-03-18</td>
-                    <td>Legendary Monster: Raharr</td>
-                    <td>$4.99</td>
-                    <td><span class="badge bg-success">Completed</span></td>
-                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title h5 mb-0">Transaction History</h3>
+          </div>
+          <div class="card-body text-center">
+            <p class="mb-3">View your complete transaction history with detailed insights and analytics.</p>
+            <a href="/account/transactions" class="btn btn-primary">View Transaction History</a>
           </div>
         </div>
       </div>

@@ -1288,3 +1288,174 @@ h3 .currency-aw {
     background-color: var(--btn-hover);
     transform: translateY(-2px);
 }
+
+/* Data Table Standardization - Apply to all data tables */
+.data-table {
+    width: 100%;
+    background-color: var(--card-background);
+    color: var(--text-color);
+    margin-top: 1rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px var(--card-shadow);
+}
+
+.data-table thead {
+    background-color: var(--input-background);
+}
+
+.data-table th {
+    color: var(--accent-color);
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 2px solid var(--input-border);
+    text-align: left;
+}
+
+.data-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.data-table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--input-background);
+}
+
+.data-table .badge {
+    padding: 0.5em 0.75em;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Make admin tables use the standard data table styling */
+.admin-table {
+    composes: data-table;
+}
+
+/* Transaction History Button and Section */
+.transaction-btn {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    margin-top: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.transaction-btn:hover {
+    background-color: var(--btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--card-shadow);
+}
+
+.transaction-btn i {
+    transition: transform 0.3s ease;
+}
+
+.transaction-btn.active i {
+    transform: rotate(180deg);
+}
+
+.transaction-history {
+    margin-top: 1.5rem;
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.transaction-history.show {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Transaction Modal */
+.transaction-modal .modal-content {
+    background-color: var(--card-background);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+}
+
+.transaction-modal .modal-header {
+    border-bottom: 1px solid var(--input-border);
+    padding: 1.5rem;
+}
+
+.transaction-modal .modal-title {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+}
+
+.transaction-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.transaction-modal .btn-close {
+    color: var(--text-color);
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Transaction type badges */
+.badge-deposit {
+    background-color: #28a745;
+}
+
+.badge-transfer {
+    background-color: #17a2b8;
+}
+
+.badge-purchase {
+    background-color: #dc3545;
+}
+
+.badge-withdrawal {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-refund {
+    background-color: #6f42c1;
+}
+
+.badge-admin {
+    background-color: #fd7e14;
+}
+
+/* Amount styling */
+.amount-positive {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+/* Responsive tables for mobile */
+@media (max-width: 768px) {
+    .data-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .transaction-btn {
+        width: 100%;
+    }
+}

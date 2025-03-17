@@ -143,8 +143,8 @@ $(document).ready(function () {
         $("#email").text(userData.email);
         $("#privilege").text(userData.privilege_id);
         $("#sub-tier").text("Exclusive");
-        $("#balance").text("1000");
-        $("#pending-balance").text("0");
+        $("#balance").text(userData.balance);
+        $("#pending-balance").text(userData.pending_balance);
       })
       .catch(function (error) {
         console.error("Error processing user data:", error);
@@ -245,6 +245,8 @@ $(document).ready(function () {
     const summaryAmount = $("#summary-amount");
     const summaryPrice = $("#summary-price");
     const lessThan10 = $("#less-than-10");
+    const btnPayment = $("#btn-payment");
+
     function updatePounds() {
       const awValue = parseInt(awInput.val()) || 0;
       const poundsValue = awValue / 10;
@@ -257,39 +259,17 @@ $(document).ready(function () {
         lessThan10.addClass("d-none");
       }
     }
-
-    // Initialize payment buttons
-    function initializePaymentButtons() {
-      // Google Pay button handler
-      $(".google-pay").on("click", function (e) {
-        e.preventDefault();
-        // Check if Google Pay is available
-        if (window.google && google.payments) {
-          // Initialize Google Pay
-          console.log("Starting Google Pay...");
-        } else {
-          triggerFlash("Google Pay is not available", "warning");
-        }
-      });
-
-      // PayPal button handler
-      $(".paypal").on("click", function (e) {
-        e.preventDefault();
-        // Initialize PayPal payment
-        console.log("Starting PayPal checkout...");
-      });
-
-      // Stripe button handler
-      $(".stripe").on("click", function (e) {
-        e.preventDefault();
-        // Initialize Stripe payment
-        console.log("Starting Stripe checkout...");
-      });
-    }
+    btnPayment.on("click", function () {
+      const paymentRequest = {
+        provider_id: this.id,
+        user_id: userObj.id,
+        amountPound: summaryPrice,
+      };
+      console.log(paymentRequest);
+    });
 
     updatePounds();
     awInput.on("input", updatePounds);
-    initializePaymentButtons();
     console.log("Checkout deposit loaded");
   }
 
@@ -372,7 +352,4 @@ $(document).ready(function () {
 
     console.log("Admin dashboard initialized");
   }
-
-
-
 });
