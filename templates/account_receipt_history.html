@@ -4,7 +4,7 @@
 
 <div class="container mt-5 mb-5">
     <!-- Header Section -->
-    <div class="card mb-4">
+    <div class="admin-card mb-4">
         <div class="card-body text-center">
             <h1 class="display-5 mb-3">Transaction History</h1>
             <p class="lead">View and analyze your transaction history and financial activity</p>
@@ -14,23 +14,23 @@
     <!-- Transaction Insights -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="card bg-dark text-white h-100">
+            <div class="admin-card h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Spent</h5>
-                    <h2 class="display-6 text-danger">{{ total_spent }} AW</h2>
+                    <h2 class="display-6 amount-negative">{{ total_spent }} AW</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="card bg-dark text-white h-100">
+            <div class="admin-card h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Received</h5>
-                    <h2 class="display-6 text-success">{{ total_received }} AW</h2>
+                    <h2 class="display-6 amount-positive">{{ total_received }} AW</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="card bg-dark text-white h-100">
+            <div class="admin-card h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Current Balance</h5>
                     <h2 class="display-6">{{ user.balance }} AW</h2>
@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="card bg-dark text-white h-100">
+            <div class="admin-card h-100">
                 <div class="card-body text-center">
                     <h5 class="card-title">Transactions</h5>
                     <h2 class="display-6">{{ transaction_count }}</h2>
@@ -49,7 +49,10 @@
 
     <!-- Filter Controls -->
     <div class="card mb-4">
-        <div class="card-body">
+        <div class="card-header">
+            <h3 class="card-title h5 mb-0">Filter Transactions</h3>
+        </div>
+        <div class="card-body admin-form">
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label for="transactionType" class="form-label">Transaction Type</label>
@@ -84,7 +87,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-dark table-hover">
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -92,6 +95,7 @@
                             <th>From</th>
                             <th>To</th>
                             <th>Amount</th>
+                            <th>Reference</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -102,13 +106,13 @@
                             <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                             <td>
                                 {% if transaction.transaction_type == 'DEPOSIT' %}
-                                <span class="badge bg-primary">Deposit</span>
+                                <span class="badge badge-deposit">Deposit</span>
                                 {% elif transaction.transaction_type == 'PURCHASE' %}
-                                <span class="badge bg-info">Purchase</span>
+                                <span class="badge badge-purchase">Purchase</span>
                                 {% elif transaction.transaction_type == 'TRANSFER' %}
-                                <span class="badge bg-warning">Transfer</span>
+                                <span class="badge badge-transfer">Transfer</span>
                                 {% elif transaction.transaction_type == 'REFUND' %}
-                                <span class="badge bg-success">Refund</span>
+                                <span class="badge badge-refund">Refund</span>
                                 {% else %}
                                 <span class="badge bg-secondary">{{ transaction.transaction_type }}</span>
                                 {% endif %}
@@ -117,19 +121,21 @@
                             <td>{{ transaction.receiver_name }}</td>
                             <td>
                                 {% if transaction.sender_id == user.id %}
-                                <span class="text-danger">-{{ transaction.amount }} AW</span>
+                                <span class="amount-negative">-{{ transaction.amount }} AW</span>
                                 {% else %}
-                                <span class="text-success">+{{ transaction.amount }} AW</span>
+                                <span class="amount-positive">+{{ transaction.amount }} AW</span>
                                 {% endif %}
                             </td>
+                            <td>{{ transaction.reference_code if transaction.reference_code else 'N/A' }}</td>
                             <td>
-                                <span class="badge bg-{{ 'success' if transaction.status == 'Completed' else 'warning' }}">
+                                <span class="badge {% if transaction.status == 'Completed' %}bg-success{% else %}bg-warning{% endif %}">
                                     {{ transaction.status }}
                                 </span>
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#receiptModal"
+                                <button class="admin-btn admin-btn-primary" data-bs-toggle="modal" data-bs-target="#receiptModal"
                                     data-id="{{ transaction.id }}"
+                                    data-ref="{{ transaction.reference_code if transaction.reference_code else 'N/A' }}"
                                     data-type="{{ transaction.transaction_type }}"
                                     data-amount="{{ transaction.amount }}"
                                     data-date="{{ transaction.created_at.strftime('%Y-%m-%d %H:%M') }}"
@@ -165,64 +171,118 @@
 
     <!-- Back to Account Button -->
     <div class="text-center mt-4 mb-5">
-        <a href="/account" class="btn btn-primary">Back to Account</a>
+        <a href="/account" class="admin-btn admin-btn-primary">Back to Account</a>
     </div>
 </div>
 
 <!-- Receipt Modal -->
-<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content bg-dark text-white">
-            <div class="modal-header">
-                <h5 class="modal-title" id="receiptModalLabel">Transaction Receipt</h5>
+<div class="modal fade transaction-modal" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: var(--background-color)">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-light" id="receiptModalLabel">Transaction Receipt</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="card bg-dark border-secondary mb-3">
-                    <div class="card-header text-center">
-                        <h4 id="receipt-type">Transaction Receipt</h4>
-                        <p class="text-muted mb-0" id="receipt-date">Date: 2023-11-15 14:30</p>
+            <div class="modal-body p-4">
+                <div class="receipt-card">
+                    <div class="text-center mb-4">
+                        <h4 class="receipt-title fw-bold" id="receipt-type">Transaction Receipt</h4>
+                        <p class="text-muted small mb-0" id="receipt-date">Date: 2023-11-15 14:30</p>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
+                    <div class="receipt-details">
+                        <div class="row g-3 mb-4">
                             <div class="col-6">
-                                <p class="mb-1">From:</p>
-                                <h6 id="receipt-sender">Sender Name</h6>
+                                <div class="receipt-field">
+                                    <label class="text-muted small">From:</label>
+                                    <h6 class="fw-bold mb-0 text-light" id="receipt-sender">Sender Name</h6>
+                                </div>
                             </div>
                             <div class="col-6">
-                                <p class="mb-1">To:</p>
-                                <h6 id="receipt-receiver">Receiver Name</h6>
+                                <div class="receipt-field">
+                                    <label class="text-muted small">To:</label>
+                                    <h6 class="fw-bold mb-0 text-light" id="receipt-receiver">Receiver Name</h6>
+                                </div>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="row g-3 mb-4">
                             <div class="col-6">
-                                <p class="mb-1">Amount:</p>
-                                <h5 id="receipt-amount">100 AW</h5>
+                                <div class="receipt-field">
+                                    <label class="text-muted small">Amount:</label>
+                                    <h5 class="fw-bold text-accent mb-0" id="receipt-amount">100 AW</h5>
+                                </div>
                             </div>
                             <div class="col-6">
-                                <p class="mb-1">Status:</p>
-                                <h6><span class="badge bg-success" id="receipt-status">Completed</span></h6>
+                                <div class="receipt-field">
+                                    <label class="text-muted small">Status:</label>
+                                    <h6 class="mb-0"><span class="badge bg-success" id="receipt-status">Completed</span></h6>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <p class="mb-1">Notes:</p>
-                                <p id="receipt-notes" class="text-muted">Transaction completed successfully.</p>
-                            </div>
+                        <div class="receipt-field mb-4">
+                            <label class="text-muted small">Notes:</label>
+                            <p id="receipt-notes" class="mb-0 text-light">Transaction completed successfully.</p>
                         </div>
-                    </div>
-                    <div class="card-footer text-center">
-                        <p class="mb-0">Transaction ID: <span id="receipt-id">TXN123456</span></p>
+                        <div class="receipt-reference text-center p-3 rounded">
+                            <p class="small text-muted mb-0">Transaction Reference:</p>
+                            <p class="fw-bold mb-0 text-light" id="receipt-ref">REF12345</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Download Receipt</button>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="admin-btn" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="admin-btn admin-btn-primary">Download Receipt</button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.receipt-card {
+    background: var(--card-background);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--input-border);
+}
+
+.receipt-title {
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.receipt-field {
+    margin-bottom: 0.5rem;
+}
+
+.receipt-field label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--text-muted);
+}
+
+.receipt-reference {
+    background: var(--input-background);
+    border: 1px solid var(--input-border);
+}
+
+.modal-content {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.transaction-modal .modal-dialog {
+    max-width: 500px;
+}
+
+.text-accent {
+    color: var(--accent-color) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+</style>
 
 <!-- JavaScript for the receipt modal -->
 <script>
@@ -235,6 +295,7 @@
 
                 // Extract data from button attributes
                 const id = button.getAttribute('data-id');
+                const ref = button.getAttribute('data-ref');
                 const type = button.getAttribute('data-type');
                 const amount = button.getAttribute('data-amount');
                 const date = button.getAttribute('data-date');
@@ -244,7 +305,7 @@
                 const notes = button.getAttribute('data-notes');
 
                 // Update modal content
-                document.getElementById('receipt-id').textContent = id;
+                document.getElementById('receipt-ref').textContent = ref;
                 document.getElementById('receipt-type').textContent = type + ' Receipt';
                 document.getElementById('receipt-date').textContent = 'Date: ' + date;
                 document.getElementById('receipt-sender').textContent = sender;

@@ -78,7 +78,7 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
                 <li>
-                  <a class="dropdown-item" href="/moderator/dashboard"
+                  <a class="dropdown-item" href="{{ url_for('moderator_dashboard') }}"
                     >Moderation Dashboard</a
                   >
                 </li>
@@ -87,7 +87,7 @@
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <a class="dropdown-item" href="/admin">Admin Dashboard</a>
+                  <a class="dropdown-item" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
                 </li>
                 {% endif %}
               </ul>

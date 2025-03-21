@@ -177,15 +177,16 @@ class Utils:
             logger.error(logger.GAME, f"No tools found for category: {tool_category}")
             return None
 
-        for tool in TOOL_DATA[tool_category]:
-            if tool["id"] == tool_id:
-                return tool
+        if tool_category in TOOL_DATA:
+            for tool in TOOL_DATA[tool_category]:
+                if tool["id"] == tool_id:
+                    return tool
 
             logger.error(
                 logger.GAME,
                 f"No tool found with ID: {tool_id} in category: {tool_category}",
             )
-        return None
+            return None
 
     @staticmethod
     def sign_up_player(user_id):

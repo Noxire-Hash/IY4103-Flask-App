@@ -8,14 +8,14 @@ db = SQLAlchemy()
 ITEM_STATUS = ["Active", "Pending", "Hidden", "Archived"]
 TICKET_CATEGORIES = [
     "Game Problem",
-    "Technical Issue",
+    "Technical Problem",
     "Purchase Problem",
     "Account Problem",
     "Report User",
     "Feedback",
     "Billing Issue",
     "API Request",
-    "Become Merchant",
+    "Become Vendor",
     "Other",
 ]
 TICKET_STATUS = ["Open", "In Progress", "Closed"]
@@ -34,6 +34,15 @@ PAYMENT_PROVIDERS = {
     "GOOGLE_PAY": -3,
     "PAYPAL": -4,
 }  # Special IDs for payment providers
+ACCOUNT_STATUS = [
+    "Active",
+    "Inactive",
+    "Banned",
+    "Game Ban",
+    "Community Suspended",
+    "Community Ban",
+    "Vendor Ban",
+]
 
 
 class Privilege(db.Model):
@@ -51,15 +60,25 @@ class User(db.Model):
     password = db.Column(db.String(128), nullable=False)
     privilege_id = db.Column(db.Integer, db.ForeignKey("privileges.id"), default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(64), default="Active", index=True)
 
-    # Relationships with cascade delete
+    # Standardize all relationships to use back_populates
     purchases = db.relationship(
-        "Purchase", backref="user", lazy=True, cascade="all, delete-orphan"
+        "Purchase", back_populates="user", lazy=True, cascade="all, delete-orphan"
     )
     subscriptions = db.relationship(
-        "Subscription", backref="user", lazy=True, cascade="all, delete-orphan"
+        "Subscription", back_populates="user", lazy=True, cascade="all, delete-orphan"
     )
-    receipts = db.relationship("Receipt", backref="user", lazy=True)
+    received_transactions = db.relationship(
+        "Receipt", foreign_keys="Receipt.receiver_id", back_populates="receiver"
+    )
+    tickets = db.relationship("SupportTicket", back_populates="user")
+    responses = db.relationship("SupportTicketResponse", back_populates="responder")
+    balance_logs = db.relationship("TransactionLog", back_populates="user")
+    game_states = db.relationship("GameState", back_populates="user")
+    grindstone_items = db.relationship("GrindStoneItem", back_populates="user")
+    community_posts = db.relationship("CommunityPost", back_populates="creator")
+    community_replies = db.relationship("CommunityReply", back_populates="creator")
 
     # Balance fields
     balance = db.Column(db.Integer, default=0)
@@ -124,6 +143,9 @@ class Purchase(db.Model):
     purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
     total_price = db.Column(db.Float, nullable=False)
 
+    # Add the user relationship
+    user = db.relationship("User", back_populates="purchases")
+
 
 class Subscription(db.Model):
     __tablename__ = "subscriptions"
@@ -134,6 +156,9 @@ class Subscription(db.Model):
     )  # E.g., "Basic", "Premium"
     end_date = db.Column(db.DateTime, nullable=True)
     # Null if perpetual or inactive
+
+    # Add the user relationship to match User.subscriptions
+    user = db.relationship("User", back_populates="subscriptions")
 
 
 class DndCharacter(db.Model):
@@ -156,14 +181,14 @@ class SupportTicket(db.Model):
     status = db.Column(db.String(20), default="Open", index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship to responses - with cascade delete
+    # Update relationships to use back_populates consistently
     responses = db.relationship(
         "SupportTicketResponse",
         back_populates="ticket",
         lazy="dynamic",
         cascade="all, delete-orphan",
     )
-    user = db.relationship("User", backref="tickets")
+    user = db.relationship("User", back_populates="tickets")
 
 
 class SupportTicketResponse(db.Model):
@@ -176,8 +201,10 @@ class SupportTicketResponse(db.Model):
     response = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_user = db.Column(db.Boolean, default=False)
+
+    # Update relationships to use back_populates
     ticket = db.relationship("SupportTicket", back_populates="responses")
-    responder = db.relationship("User", backref="responses")
+    responder = db.relationship("User", back_populates="responses")
 
 
 class Receipt(db.Model):
@@ -196,9 +223,15 @@ class Receipt(db.Model):
     status = db.Column(db.String(64), default="Pending", index=True)
     transaction_type = db.Column(db.String(64), nullable=False, index=True)
 
-    # Add relationship to receiver
+    # Define relationships
     receiver = db.relationship(
-        "User", foreign_keys=[receiver_id], backref="received_transactions"
+        "User", foreign_keys=[receiver_id], back_populates="received_transactions"
+    )
+    transaction_logs = db.relationship(
+        "TransactionLog",
+        back_populates="receipt",
+        lazy=True,
+        cascade="all, delete-orphan",
     )
 
 
@@ -218,8 +251,6 @@ class SystemTransaction(db.Model):
 
 
 class TransactionLog(db.Model):
-    """Simple transaction log for balance changes"""
-
     __tablename__ = "transaction_logs"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(
@@ -233,6 +264,76 @@ class TransactionLog(db.Model):
     description = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationships
-    user = db.relationship("User", backref="balance_logs")
-    receipt = db.relationship("Receipt", backref="logs")
+    # Update relationships
+    user = db.relationship("User", back_populates="balance_logs")
+    receipt = db.relationship("Receipt", back_populates="transaction_logs")
+
+
+class CommunityPost(db.Model):
+    __tablename__ = "community_posts"
+    id = db.Column(db.Integer, primary_key=True)
+    creator_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String(255), nullable=False)
+    parent_id = db.Column(
+        db.Integer, db.ForeignKey("community_posts.id"), nullable=True
+    )
+    tags = db.Column(db.String(255))
+    upvotes = db.Column(db.Integer, default=0)
+    downvotes = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Add relationships
+    replies = db.relationship(
+        "CommunityReply", back_populates="post", lazy=True, cascade="all, delete-orphan"
+    )
+    creator = db.relationship("User", back_populates="community_posts")
+
+
+class CommunityReply(db.Model):
+    __tablename__ = "community_replys"
+    id = db.Column(db.Integer, primary_key=True)
+    creator_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    post_id = db.Column(
+        db.Integer, db.ForeignKey("community_posts.id"), nullable=False, index=True
+    )
+    content = db.Column(db.Text, nullable=False)
+    upvotes = db.Column(db.Integer, default=0)
+    downvotes = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Update relationships
+    post = db.relationship("CommunityPost", back_populates="replies")
+    creator = db.relationship("User", back_populates="community_replies")
+
+
+class GameState(db.Model):
+    __tablename__ = "game_states"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    game_id = db.Column(db.Integer, nullable=False)
+    state_data = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Add relationship
+    user = db.relationship("User", back_populates="game_states")
+
+
+class GrindStoneItem(db.Model):
+    __tablename__ = "grindstone_items"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    generic_id = db.Column(db.Integer, nullable=False, index=True)
+    unique_id = db.Column(db.String(255), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Add relationship
+    user = db.relationship("User", back_populates="grindstone_items")

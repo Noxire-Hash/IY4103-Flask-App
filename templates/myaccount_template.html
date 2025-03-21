@@ -4,10 +4,8 @@ Lorekeeper{% endblock %} {% block content %}
 <div id="wrapper">
   <div class="container mt-5">
     <!-- Header Section with Avatar -->
-    <div class="card mb-5">
+    <div class="account-card mb-5">
       <div class="card-body text-center">
-        <!-- Profile Picture Section -->
-
         <!-- User Info -->
         <h2 class="mb-2">Welcome back, <span id="username" class="glow">[Username]</span></h2>
         <p class="text-muted mb-2">Email: <span id="email">[email@example.com]</span></p>
@@ -19,145 +17,105 @@ Lorekeeper{% endblock %} {% block content %}
       <!-- Left Column -->
       <div class="col-md-4">
         <!-- Quick Access Panel -->
-        <div class="card mb-4">
+        <div class="account-card mb-4">
           <div class="card-header">
-            <h3 class="card-title h5 mb-0">Quick Access</h3>
+            <h3>Quick Access</h3>
           </div>
-          <div class="card-body">
+          <div class="card-body quick-access">
             <div class="d-grid gap-2">
-              <a href="/store" class="btn btn-outline-primary">Store</a>
-              <a href="/support" class="btn btn-outline-primary">Support</a>
-              <a href="/checkout/deposit" class="btn btn-outline-primary">Deposit</a>
-              <a
-                href="/vendor/dashboard"
-                class="btn btn-outline-primary d-none"
-                id="vendor-link"
-                >Manage Products</a
-              >
-              <a
-                href="/admin"
-                class="btn btn-outline-primary d-none"
-                id="admin-link"
-                >Admin Dashboard</a
-              >
-              <a
-                href="/moderator/dashboard"
-                class="btn btn-outline-primary d-none"
-                id="moderator_link"
-                >
-              </a>
+              <a href="/store" class="admin-btn admin-btn-primary">Store</a>
+              <a href="/support" class="admin-btn admin-btn-primary">Support</a>
+              <a href="/checkout/deposit" class="admin-btn admin-btn-primary">Deposit</a>
+              <a href="/vendor/dashboard" class="admin-btn admin-btn-primary d-none" id="vendor-link">Manage Products</a>
+              <a href="/admin" class="admin-btn admin-btn-primary d-none" id="admin-link">Admin Dashboard</a>
+              <a href="/moderator/dashboard" class="admin-btn admin-btn-primary d-none" id="moderator_link"></a>
             </div>
           </div>
         </div>
 
         <!-- Subscription Status -->
-        <div class="card mb-4">
+        <div class="account-card mb-4">
           <div class="card-header">
-            <h3 class="card-title h5 mb-0">Subscription Status</h3>
+            <h3>Subscription Status</h3>
           </div>
           <div class="card-body">
-            <h6 class="fw-bold">Current Plan:</h6>
+            <div class="balance-label">Current Plan:</div>
             <p class="mb-3">
               <span id="sub-tier" class="badge bg-secondary">[Free/Premium/Exclusive]</span>
             </p>
-            <a href="/store#subscriptions" class="btn btn-primary btn-sm">Upgrade Plan</a>
+            <a href="/store#subscriptions" class="admin-btn admin-btn-primary">Upgrade Plan</a>
           </div>
         </div>
 
         <!-- Balance Section -->
-        <div class="card mb-4">
+        <div class="account-card mb-4">
           <div class="card-header">
-            <h3 class="card-title h5 mb-0">Balance</h3>
+            <h3>Balance</h3>
           </div>
           <div class="card-body">
-            <h6 class="fw-bold">Current Balance:</h6>
+            <div class="balance-label">Current Balance:</div>
             <p class="mb-3">
               <span id="balance-field" class="badge bg-secondary"><span id="balance">100</span><span id="currency-code"> AW</span></span>
             </p>
-            <h6 class="fw-bold">Pending Balance:</h6>
+            <div class="balance-label">Pending Balance:</div>
             <p class="mb-3">
               <span id="pending-balance-field" class="badge bg-secondary"><span id="pending-balance">1000</span><span id="currency-code"> AW</span></span>
             </p>
-            <a href="/checkout/deposit" class="btn btn-primary btn-sm">Deposit</a>
-            <a href="/store#subscriptions" class="btn btn-primary btn-sm">Withdraw</a>
+            <div class="d-grid gap-2">
+              <a href="/checkout/deposit" class="admin-btn admin-btn-primary">Deposit</a>
+              <a href="/store#subscriptions" class="admin-btn admin-btn-primary">Withdraw</a>
+            </div>
           </div>
         </div>
-
-
-
-
       </div>
-
-
-
 
       <!-- Right Column -->
       <div class="col-md-8">
         <!-- Account Management -->
-        <div class="card mb-4">
+        <div class="account-card mb-4">
           <div class="card-header">
-            <h3 class="card-title h5 mb-0">Account Management</h3>
+            <h3>Account Management</h3>
           </div>
           <div class="card-body">
             <!-- Bio -->
-            <div class="mb-4">
-              <label for="bio" class="form-label">Bio</label>
-              <textarea class="form-control mb-2" id="bio" rows="3">Share your adventures!</textarea>
-              <button class="btn btn-primary btn-sm">Save Bio</button>
-            </div>
-
-            <hr>
-
-            <!-- Email Change -->
-            <div class="mb-4">
-              <label for="new-email" class="form-label">Change Email</label>
-              <input
-                type="email"
-                class="form-control mb-2"
-                id="new-email"
-                placeholder="Enter new email"
-              />
-              <button class="btn btn-primary btn-sm">Update Email</button>
-            </div>
-
-            <hr>
-
-            <!-- Password Change -->
-            <div class="mb-4">
-              <label class="form-label">Change Password</label>
-              <div class="mb-2">
-                <input
-                  type="password"
-                  class="form-control mb-2"
-                  id="current-password"
-                  placeholder="Current password"
-                />
-                <input
-                  type="password"
-                  class="form-control mb-2"
-                  id="new-password"
-                  placeholder="New password"
-                />
-                <input
-                  type="password"
-                  class="form-control mb-2"
-                  id="confirm-password"
-                  placeholder="Confirm new password"
-                />
+            <form class="account-form">
+              <div class="mb-4">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control mb-2" id="bio" rows="3">Share your adventures!</textarea>
+                <button type="button" class="admin-btn admin-btn-primary">Save Bio</button>
               </div>
-              <button class="btn btn-primary btn-sm">Update Password</button>
-            </div>
+
+              <hr>
+
+              <!-- Email Change -->
+              <div class="mb-4">
+                <label for="new-email" class="form-label">Change Email</label>
+                <input type="email" class="form-control mb-2" id="new-email" placeholder="Enter new email"/>
+                <button type="button" class="admin-btn admin-btn-primary">Update Email</button>
+              </div>
+
+              <hr>
+
+              <!-- Password Change -->
+              <div class="mb-4">
+                <label class="form-label">Change Password</label>
+                <input type="password" class="form-control" id="current-password" placeholder="Current password"/>
+                <input type="password" class="form-control" id="new-password" placeholder="New password"/>
+                <input type="password" class="form-control mb-2" id="confirm-password" placeholder="Confirm new password"/>
+                <button type="button" class="admin-btn admin-btn-primary">Update Password</button>
+              </div>
+            </form>
           </div>
         </div>
 
         <!-- Purchase History -->
-        <div class="card mb-4">
+        <div class="account-card mb-4">
           <div class="card-header">
-            <h3 class="card-title h5 mb-0">Recent Purchases</h3>
+            <h3>Recent Purchases</h3>
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-dark table-hover">
+              <table class="data-table">
                 <thead>
                   <tr>
                     <th>Date</th>
@@ -171,7 +129,7 @@ Lorekeeper{% endblock %} {% block content %}
                   <tr>
                     <td>{{ purchase.purchase_date.strftime('%Y-%m-%d') }}</td>
                     <td>{{ purchase.item_name }}</td>
-                    <td>{{ purchase.total_price }} AW</td>
+                    <td><span class="amount-positive">{{ purchase.total_price }} AW</span></td>
                     <td><span class="badge bg-success">{{ purchase.item_status }}</span></td>
                   </tr>
                   {% endfor %}
@@ -182,13 +140,13 @@ Lorekeeper{% endblock %} {% block content %}
         </div>
 
         <!-- Transaction History -->
-        <div class="card mb-4">
+        <div class="account-card mb-4">
           <div class="card-header">
-            <h3 class="card-title h5 mb-0">Transaction History</h3>
+            <h3>Transaction History</h3>
           </div>
           <div class="card-body text-center">
             <p class="mb-3">View your complete transaction history with detailed insights and analytics.</p>
-            <a href="/account/transactions" class="btn btn-primary">View Transaction History</a>
+            <a href="/account/transactions" class="admin-btn admin-btn-primary">View Transaction History</a>
           </div>
         </div>
       </div>

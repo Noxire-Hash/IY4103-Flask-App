@@ -4,39 +4,6 @@
 <div class="container mt-5 admin-dashboard">
     <h2 class="text-center" style="color: var(--accent-color);">Admin Dashboard</h2>
 
-    <!-- Add JavaScript for handling sender type selection -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const senderType = document.getElementById('sender_type');
-            const senderUserDiv = document.getElementById('senderUserDiv');
-            const systemDiv = document.getElementById('systemDiv');
-            const paymentProviderDiv = document.getElementById('paymentProviderDiv');
-
-            senderType.addEventListener('change', function() {
-                // Hide all sender options first
-                senderUserDiv.style.display = 'none';
-                systemDiv.style.display = 'none';
-                paymentProviderDiv.style.display = 'none';
-
-                // Show the appropriate div based on selection
-                switch(this.value) {
-                    case 'user':
-                        senderUserDiv.style.display = 'block';
-                        break;
-                    case 'system':
-                        systemDiv.style.display = 'block';
-                        break;
-                    case 'payment_provider':
-                        paymentProviderDiv.style.display = 'block';
-                        break;
-                }
-            });
-
-            // Trigger change event to set initial state
-            senderType.dispatchEvent(new Event('change'));
-        });
-    </script>
-
     <!-- Tabs for different sections -->
     <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
         <li class="nav-item">
@@ -136,66 +103,88 @@
         <!-- Transactions Tab -->
         <div class="tab-pane fade" id="transactions" role="tabpanel">
             <div class="admin-card">
-                <div class="card-body">
+                <div class="card-body admin-form">
                     <h5 class="card-title">Create Transaction</h5>
-                    <form id="createTransactionForm" method="POST" action="{{ url_for('admin_create_transaction') }}" class="admin-form">
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="transaction_type" class="form-label">Transaction Type</label>
-                                <select class="form-select" id="transaction_type" name="transaction_type" required>
-                                    <option value="DEPOSIT">Deposit</option>
-                                    <option value="TRANSFER">Transfer</option>
-                                </select>
+                    <form method="POST" action="{{ url_for('admin_create_transaction') }}" id="transactionForm">
+                        <!-- Hidden field to store transaction type -->
+                        <input type="hidden" id="transaction_type" name="transaction_type" value="TRANSFER">
+
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount</label>
+                            <input type="number" class="form-control" id="amount" name="amount" required min="1" step="0.01">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sender_type" class="form-label">Sender Type</label>
+                            <select class="form-select" id="sender_type" name="sender_type" required>
+                                <option value="user">User</option>
+                                <option value="system">System</option>
+                                <option value="payment_provider">Payment Provider</option>
+                            </select>
+                        </div>
+
+                        <!-- User Sender Selection -->
+                        <div id="userSenderDiv" class="mb-3">
+                            <label for="sender_user_search" class="form-label">Search for Sender User</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="sender_user_search" placeholder="Search by username or email">
+                                <button class="btn btn-outline-secondary" type="button" id="sender_search_btn">Search</button>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="amount" class="form-label">Amount</label>
-                                <input type="number" class="form-control" id="amount" name="amount" required>
+                            <select class="form-select mt-2" id="sender_id_select" name="sender_id">
+                                <option value="">Select a user</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" data-username="{{ user.username }}" data-balance="{{ user.balance }}">
+                                    {{ user.username }} (ID: {{ user.id }}, Balance: {{ user.balance }} AW)
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- System Sender Selection -->
+                        <div id="systemDiv" class="mb-3" style="display: none;">
+                            <div class="alert alert-info">
+                                System will be used as the sender. This will create a DEPOSIT.
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="sender_type" class="form-label">Sender Type</label>
-                                <select class="form-select" id="sender_type" name="sender_type">
-                                    <option value="user">User</option>
-                                    <option value="system">System</option>
-                                    <option value="payment_provider">Payment Provider</option>
-                                </select>
+                            <input type="hidden" id="system_id" name="system_id" value="-999">
+                        </div>
+
+                        <!-- Payment Provider Selection -->
+                        <div id="paymentProviderDiv" class="mb-3" style="display: none;">
+                            <label for="payment_provider" class="form-label">Payment Provider</label>
+                            <select class="form-select" id="payment_provider" name="payment_provider">
+                                <option value="-1">Shopify</option>
+                                <option value="-2">Apple Pay</option>
+                                <option value="-3">Google Pay</option>
+                                <option value="-4">PayPal</option>
+                            </select>
+                            <div class="alert alert-info mt-2">
+                                This will create a DEPOSIT transaction.
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3" id="senderUserDiv">
-                                <label for="sender_id" class="form-label">Sender</label>
-                                <select class="form-select" id="sender_id" name="sender_id">
-                                    {% for user in users %}
-                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.balance }} AW)</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
 
-                            <div class="col-md-6 mb-3" id="systemDiv" style="display: none;">
-                                <label for="system_id" class="form-label">System</label>
-                                <select class="form-select" id="system_id" name="system_id">
-                                    <option value="-999">SYSTEM</option>
-                                </select>
+                        <!-- Receiver Selection -->
+                        <div class="mb-3">
+                            <label for="receiver_user_search" class="form-label">Search for Receiver User</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="receiver_user_search" placeholder="Search by username or email">
+                                <button class="btn btn-outline-secondary" type="button" id="receiver_search_btn">Search</button>
                             </div>
-
-                            <div class="col-md-6 mb-3" id="paymentProviderDiv" style="display: none;">
-                                <label for="payment_provider" class="form-label">Payment Provider</label>
-                                <select class="form-select" id="payment_provider" name="payment_provider">
-                                    <option value="-1">Shopify</option>
-                                    <option value="-2">Apple Pay</option>
-                                    <option value="-3">Google Pay</option>
-                                    <option value="-4">PayPal</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="receiver_id" class="form-label">Receiver</label>
-                                <select class="form-select" id="receiver_id" name="receiver_id" required>
-                                    {% for user in users %}
-                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.balance }} AW)</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                            <select class="form-select mt-2" id="receiver_id_select" name="receiver_id">
+                                <option value="">Select a user</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" data-username="{{ user.username }}" data-balance="{{ user.balance }}">
+                                    {{ user.username }} (ID: {{ user.id }}, Balance: {{ user.balance }} AW)
+                                </option>
+                                {% endfor %}
+                            </select>
                         </div>
-                        <button type="submit" class="admin-btn admin-btn-primary">Create Transaction</button>
+
+                        <!-- Transaction Summary -->
+                        <div class="alert alert-info mb-3" id="transaction_summary">
+                            Transaction summary will appear here...
+                        </div>
+
+                        <button type="submit" name="create_transaction" class="admin-btn admin-btn-primary">Create Transaction</button>
                     </form>
                 </div>
             </div>
@@ -233,12 +222,295 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="resetPassword" class="admin-btn" form="resetPassword" id="resetPassword">Generate OTP</button>
+                <button type="button" class="admin-btn" id="resetPassword">Generate OTP</button>
                 <button type="submit" form="editUserForm" class="admin-btn admin-btn-primary">Save Changes</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle edit user button clicks
+        document.querySelectorAll('.edit-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                fetch(`{{ url_for('admin_get_user', user_id=0) }}`.replace('0', userId))
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('edit_user_id').value = data.id;
+                        document.getElementById('edit_username').value = data.username;
+                        document.getElementById('edit_email').value = data.email;
+                        document.getElementById('edit_balance').value = data.balance;
+                    });
+            });
+        });
+
+        // Handle edit user form submission
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('edit_user_id').value;
+            const formData = new FormData(this);
+
+            fetch(`{{ url_for('admin_update_user', user_id=0) }}`.replace('0', userId), {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error updating user: ' + data.error);
+                }
+            });
+        });
+
+        // Handle privilege select changes
+        document.querySelectorAll('.privilege-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const userId = this.dataset.userId;
+                const newPrivilegeId = this.value;
+
+                fetch(`{{ url_for('admin_update_user', user_id=0) }}`.replace('0', userId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        privilege_id: newPrivilegeId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert('Error updating privilege: ' + data.error);
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+        // Transaction tab functionality
+        const senderType = document.getElementById('sender_type');
+        const userSenderDiv = document.getElementById('userSenderDiv');
+        const systemDiv = document.getElementById('systemDiv');
+        const paymentProviderDiv = document.getElementById('paymentProviderDiv');
+        const transactionTypeField = document.getElementById('transaction_type');
+        const transactionSummary = document.getElementById('transaction_summary');
+        const transactionForm = document.getElementById('transactionForm');
+
+        // Add form submission validation
+        transactionForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            let errorMessage = '';
+
+            // Validate amount
+            const amount = document.getElementById('amount').value;
+            if (!amount || parseFloat(amount) <= 0) {
+                isValid = false;
+                errorMessage = 'Please enter a valid amount greater than zero.';
+                document.getElementById('amount').focus();
+            }
+
+            // Validate sender based on type
+            else {
+                const senderTypeValue = senderType.value;
+
+                if (senderTypeValue === 'user') {
+                    const senderSelect = document.getElementById('sender_id_select');
+                    if (!senderSelect.value) {
+                        isValid = false;
+                        errorMessage = 'Please select a sender user.';
+                        senderSelect.focus();
+                    }
+                }
+                else if (senderTypeValue === 'payment_provider') {
+                    const providerSelect = document.getElementById('payment_provider');
+                    if (!providerSelect.value) {
+                        isValid = false;
+                        errorMessage = 'Please select a payment provider.';
+                        providerSelect.focus();
+                    }
+                }
+
+                // Validate receiver
+                if (isValid) {
+                    const receiverSelect = document.getElementById('receiver_id_select');
+                    if (!receiverSelect.value) {
+                        isValid = false;
+                        errorMessage = 'Please select a receiver user.';
+                        receiverSelect.focus();
+                    }
+                    // Check for same sender and receiver
+                    else if (senderTypeValue === 'user' &&
+                        document.getElementById('sender_id_select').value === receiverSelect.value) {
+                        isValid = false;
+                        errorMessage = 'Sender and receiver cannot be the same user.';
+                        receiverSelect.focus();
+                    }
+                }
+            }
+
+            // Stop submission if validation failed
+            if (!isValid) {
+                e.preventDefault();
+                alert(errorMessage);
+                return false;
+            }
+
+            // Confirm transaction
+            const confirmMsg = 'Create this transaction?\n\n' +
+                             document.getElementById('transaction_summary').textContent
+                                .replace(/<br>/g, '\n')
+                                .replace(/<strong>|<\/strong>/g, '');
+            if (!confirm(confirmMsg)) {
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        });
+
+        // Function to filter dropdown options based on search input
+        function filterOptions(inputElement, selectElement) {
+            const searchValue = inputElement.value.toLowerCase();
+            const options = selectElement.querySelectorAll('option');
+
+            let visibleCount = 0;
+
+            options.forEach(option => {
+                if (option.value === '') return; // Skip the placeholder option
+
+                const username = option.getAttribute('data-username').toLowerCase();
+                const optionText = option.textContent.toLowerCase();
+
+                if (username.includes(searchValue) || optionText.includes(searchValue)) {
+                    option.style.display = '';
+                    visibleCount++;
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // If no options match, show a message
+            if (visibleCount === 0) {
+                const noResultOption = document.createElement('option');
+                noResultOption.value = '';
+                noResultOption.textContent = 'No users found';
+                noResultOption.disabled = true;
+                selectElement.appendChild(noResultOption);
+            }
+        }
+
+        // Add event listeners to search buttons
+        document.getElementById('sender_search_btn').addEventListener('click', function() {
+            filterOptions(
+                document.getElementById('sender_user_search'),
+                document.getElementById('sender_id_select')
+            );
+        });
+
+        document.getElementById('receiver_search_btn').addEventListener('click', function() {
+            filterOptions(
+                document.getElementById('receiver_user_search'),
+                document.getElementById('receiver_id_select')
+            );
+        });
+
+        // Also filter on key press (debounced)
+        let senderTimeout;
+        document.getElementById('sender_user_search').addEventListener('keyup', function() {
+            clearTimeout(senderTimeout);
+            senderTimeout = setTimeout(() => {
+                filterOptions(this, document.getElementById('sender_id_select'));
+            }, 300);
+        });
+
+        let receiverTimeout;
+        document.getElementById('receiver_user_search').addEventListener('keyup', function() {
+            clearTimeout(receiverTimeout);
+            receiverTimeout = setTimeout(() => {
+                filterOptions(this, document.getElementById('receiver_id_select'));
+            }, 300);
+        });
+
+        // Handle sender type changes
+        senderType.addEventListener('change', function() {
+            // Hide all sender options first
+            userSenderDiv.style.display = 'none';
+            systemDiv.style.display = 'none';
+            paymentProviderDiv.style.display = 'none';
+
+            // Reset required attribute on all sender fields to prevent validation errors
+            document.getElementById('sender_id_select').removeAttribute('required');
+            document.getElementById('payment_provider').removeAttribute('required');
+
+            // Show the appropriate div based on selection and set transaction type
+            switch(this.value) {
+                case 'user':
+                    userSenderDiv.style.display = 'block';
+                    transactionTypeField.value = 'TRANSFER';
+                    break;
+                case 'system':
+                    systemDiv.style.display = 'block';
+                    transactionTypeField.value = 'DEPOSIT';
+                    break;
+                case 'payment_provider':
+                    paymentProviderDiv.style.display = 'block';
+                    transactionTypeField.value = 'DEPOSIT';
+                    break;
+            }
+            updateTransactionSummary();
+        });
+
+        // Initialize sender type display
+        senderType.dispatchEvent(new Event('change'));
+
+        // Update transaction summary when form fields change
+        const formElements = document.querySelectorAll('#transactionForm select, #transactionForm input[type="number"]');
+        formElements.forEach(element => {
+            element.addEventListener('change', updateTransactionSummary);
+        });
+
+        // Function to update transaction summary
+        function updateTransactionSummary() {
+            const amount = document.getElementById('amount').value || '0';
+            const senderType = document.getElementById('sender_type').value;
+            const transactionType = document.getElementById('transaction_type').value;
+
+            let senderName = 'Unknown';
+            if (senderType === 'user') {
+                const senderSelect = document.getElementById('sender_id_select');
+                if (senderSelect.selectedIndex > 0) {
+                    senderName = senderSelect.options[senderSelect.selectedIndex].getAttribute('data-username');
+                }
+            } else if (senderType === 'system') {
+                senderName = 'System';
+            } else if (senderType === 'payment_provider') {
+                const providerSelect = document.getElementById('payment_provider');
+                senderName = providerSelect.options[providerSelect.selectedIndex].textContent;
+            }
+
+            let receiverName = 'Unknown';
+            const receiverSelect = document.getElementById('receiver_id_select');
+            if (receiverSelect.selectedIndex > 0) {
+                receiverName = receiverSelect.options[receiverSelect.selectedIndex].getAttribute('data-username');
+            }
+
+            transactionSummary.innerHTML = `
+                <strong>Transaction Summary:</strong><br>
+                Type: ${transactionType}<br>
+                Amount: ${amount} AW<br>
+                From: ${senderName}<br>
+                To: ${receiverName}
+            `;
+        }
+
+        // Initial summary update
+        updateTransactionSummary();
+    });
+</script>
 
 {% endblock %}
 

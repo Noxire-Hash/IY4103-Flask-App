@@ -8,7 +8,8 @@
                 <!-- Main Item Card -->
                 <div class="card mb-4">
                     <!-- Placeholder/Image Area -->
-                    <div class="item-preview-placeholder shimmer">
+                    <div class="item-preview-placeholder">
+                        <div class="shimmer-overlay"></div>
                         <div class="placeholder-content">
                             <i class="fas fa-dice-d20 fa-3x"></i>
                             <p>Preview Coming Soon</p>
@@ -143,8 +144,55 @@
     </div>
 </div>
 
+<style>
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    .item-preview-placeholder {
+        height: 400px;
+        width: 100%;
+        background: linear-gradient(
+            90deg,
+            var(--bg-color) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            var(--bg-color) 100%
+        );
+        background-size: 1000px 100%;
+        animation: shimmer 2s infinite linear;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .placeholder-content {
+        text-align: center;
+        color: var(--text-color);
+        opacity: 0.5;
+    }
+
+    .placeholder-content i {
+        margin-bottom: 1rem;
+    }
+
+    .placeholder-content p {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+</style>
+
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}  <!-- This will include scripts from parent template -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Removing the hover effect - deleting the entire mousemove event handler
+});
+</script>
 {% endblock %}

@@ -36,7 +36,7 @@ from utils import SystemTransactionHandler as sth
 # App setup
 app = Flask(
     __name__,
-    static_url_path="/static",  # Change this line
+    static_url_path="/static",
     static_folder="static",
 )
 app.secret_key = os.urandom(24)
@@ -270,10 +270,20 @@ def test_flash():
 # Admin routes
 
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect(url_for("home"))
+
+
 @app.route("/admin", methods=["GET", "POST"])
+@app.route(
+    "/admin/", methods=["GET", "POST"]
+)  # Adding an alternate route with trailing slash
 def admin_dashboard():
     # Restrict access to admin users
-    if session.get("privilege_id") != 999:  # Assuming 2 is Admin privilege ID
+    if session.get("privilege_id") != 999:
         flash("Access denied! Admins only.", "danger")
         return redirect(url_for("home"))
 
@@ -389,19 +399,61 @@ def admin_create_transaction():
         return redirect(url_for("admin_dashboard"))
 
     try:
-        amount = float(request.form.get("amount"))
+        # Check if the create_transaction button was clicked
+        if "create_transaction" not in request.form:
+            flash("No transaction action specified.", "warning")
+            return redirect(url_for("admin_dashboard"))
+
+        # Validate amount
+        amount = request.form.get("amount")
+        if not amount:
+            flash("Transaction amount is required.", "danger")
+            return redirect(url_for("admin_dashboard"))
+
+        amount = float(amount)
+        if amount <= 0:
+            flash("Transaction amount must be greater than zero.", "danger")
+            return redirect(url_for("admin_dashboard"))
+
         transaction_type = request.form.get("transaction_type")
         sender_type = request.form.get("sender_type")
-        receiver_id = int(request.form.get("receiver_id"))
+
+        # Validate receiver
+        receiver_id_str = request.form.get("receiver_id")
+        if not receiver_id_str or receiver_id_str.strip() == "":
+            flash("Please select a receiver for the transaction.", "danger")
+            return redirect(url_for("admin_dashboard"))
+
+        receiver_id = int(receiver_id_str)
 
         # Determine sender_id based on sender_type
         if sender_type == "payment_provider":
-            sender_id = int(request.form.get("payment_provider"))
+            payment_provider = request.form.get("payment_provider")
+            if not payment_provider:
+                flash("Please select a payment provider.", "danger")
+                return redirect(url_for("admin_dashboard"))
+
+            sender_id = int(payment_provider)
+            transaction_type = "DEPOSIT"  # Force transaction type for payment providers
         elif sender_type == "system":
             sender_id = int(request.form.get("system_id", SYSTEM_ID))
+            transaction_type = "DEPOSIT"  # Force transaction type for system
         else:
-            sender_id = int(request.form.get("sender_id"))
+            # Get sender ID from the select dropdown
+            sender_id_str = request.form.get("sender_id")
+            if not sender_id_str or sender_id_str.strip() == "":
+                flash("Please select a sender for the transaction.", "danger")
+                return redirect(url_for("admin_dashboard"))
 
+            sender_id = int(sender_id_str)
+            transaction_type = "TRANSFER"  # Force transaction type for user-to-user
+
+        # Prevent sending to self
+        if sender_type == "user" and sender_id == receiver_id:
+            flash("Sender and receiver cannot be the same user.", "danger")
+            return redirect(url_for("admin_dashboard"))
+
+        # Create and process the transaction
         success, message, receipt_id = sth.create_and_process(
             amount=amount,
             sender_id=sender_id,
@@ -411,12 +463,17 @@ def admin_create_transaction():
         )
 
         if success:
-            flash("Transaction created successfully!", "success")
+            flash(
+                f"Transaction created successfully! Receipt ID: {receipt_id}", "success"
+            )
         else:
             flash(f"Transaction failed: {message}", "danger")
 
+    except ValueError as ve:
+        flash(f"Invalid input: {str(ve)}", "danger")
     except Exception as e:
         flash(f"Error creating transaction: {str(e)}", "danger")
+        print(f"Transaction error: {e}")  # Log the error for debugging
 
     return redirect(url_for("admin_dashboard"))
 
@@ -522,26 +579,29 @@ def getCookie():
     return redirect(url_for("home"))
 
 
-@app.route("/get_items", methods=["POST", "GET"])
+@app.route("/get_items")
 def get_items():
-    # May god forgive me for what about to do
+    # Fix this function to match the structure of api_featured_items
     items = Item.query.all()
-    item_dict = {}
+    items_list = []  # Change from dict to list
     for item in items:
         vendor_name = get_username_from_id(item.vendor_id)
-        item_dict[item.id] = {
-            "name": item.name,
-            "description": item.description,
-            "price": item.price,
-            "vendor_id": item.vendor_id,
-            "vendor_name": vendor_name,
-            "category": item.category,
-            "tags": item.tags,
-            "sales": item.sales,
-            "status": item.status,
-            "created_at": str(item.created_at),
-        }
-    return jsonify(item_dict)
+        items_list.append(
+            {  # Append to list instead of dict
+                "id": item.id,  # Make sure ID is included
+                "name": item.name,
+                "description": item.description,
+                "price": item.price,
+                "vendor_id": item.vendor_id,
+                "vendor_name": vendor_name,
+                "category": item.category,
+                "tags": item.tags,
+                "sales": item.sales,
+                "status": item.status,
+                "created_at": str(item.created_at),
+            }
+        )
+    return jsonify({"items": items_list})  # Return in same format as api_featured_items
 
 
 @app.errorhandler(404)
@@ -1144,6 +1204,106 @@ def transaction_history():
         total_received=total_received,
         transaction_count=len(transactions),
     )
+
+
+@app.route("/api/featured-items")
+def api_featured_items():
+    try:
+        # Get 3 featured items (could be based on popularity, new arrivals, etc.)
+        featured_items = Item.query.limit(3).all()
+        items_data = []
+
+        for item in featured_items:
+            vendor = User.query.get(item.vendor_id)
+            vendor_name = vendor.username if vendor else "Unknown Vendor"
+
+            items_data.append(
+                {
+                    "id": item.id,
+                    "name": item.name,
+                    "description": item.description,
+                    "price": item.price,
+                    "category": item.category,
+                    "vendor_name": vendor_name,
+                    "image_url": item.image_url if hasattr(item, "image_url") else None,
+                }
+            )
+
+        return jsonify({"success": True, "items": items_data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/items")
+def api_all_items():
+    try:
+        # Get all items, could add pagination later
+        all_items = Item.query.all()
+        items_data = []
+
+        for item in all_items:
+            vendor = User.query.get(item.vendor_id)
+            vendor_name = vendor.username if vendor else "Unknown Vendor"
+
+            items_data.append(
+                {
+                    "id": item.id,
+                    "name": item.name,
+                    "description": item.description,
+                    "price": item.price,
+                    "category": item.category,
+                    "vendor_name": vendor_name,
+                    "image_url": item.image_url if hasattr(item, "image_url") else None,
+                }
+            )
+
+        return jsonify({"success": True, "items": items_data})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/community")
+def community():
+    return render_template("forms_index.html")
+
+
+@app.route("/store/item/<int:item_id>")
+def item_details(item_id):
+    # Get the item from the database
+    item = Item.query.get_or_404(item_id)
+
+    # Render the item details template
+    return render_template("item_details.html", item=item)
+
+
+@app.route("/user/<int:user_id>")
+def user_account(user_id=None):
+    # This is a very minimal data set to make the template work
+    # In a real app, you would fetch this data from your database
+    mock_data = {
+        "user": {
+            "id": user_id or session.get("user_id"),
+            "username": session.get("username"),
+            "created_at": "2023-01-01",
+            "is_admin": False,
+            "subscription_tier": "premium",
+            "bio": "This is a sample user biography.",
+        },
+        "user_items": [],
+        "user_reviews": [],
+        "user_stats": {
+            "item_count": 0,
+            "review_count": 0,
+            "avg_rating": 0,
+            "follower_count": 0,
+        },
+        "is_following": False,
+        "is_admin": False,
+        "more_items": False,
+        "more_reviews": False,
+    }
+
+    return render_template("user_account.html", **mock_data)
 
 
 if __name__ == "__main__":

@@ -1,235 +1,461 @@
-{% extends "nav_footer_template.html" %} {% block content %}
-<div class="container mt-5">
-  <!-- Header -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h2>Moderator Dashboard</h2>
-      <p>
-        Welcome, {{ session.get('username') }}! Here you can manage support
-        tickets and user accounts.
-      </p>
-    </div>
-  </div>
+{% extends "nav_footer_template.html" %}
 
-  <!-- Support Tickets Section -->
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h3>Open Support Tickets</h3>
-      <div class="btn-group">
-        <button class="btn btn-sm btn-primary" onclick="filterTickets('all')">
-          All
-        </button>
-        <button class="btn btn-sm btn-success" onclick="filterTickets('open')">
-          Open
-        </button>
-        <button
-          class="btn btn-sm btn-secondary"
-          onclick="filterTickets('closed')"
-        >
-          Closed
-        </button>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-dark">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Username</th>
-              <th>Category</th>
-              <th>Subject</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for ticket in tickets %}
-            <tr>
-              <td>{{ ticket.created_at.strftime('%Y-%m-%d') }}</td>
-              <td>{{ get_username_from_id(ticket.user_id) }}</td>
-              <td>{{ ticket.category }}</td>
-              <td>{{ ticket.subject }}</td>
-              <td>
-                <span
-                  class="badge {% if ticket.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}"
-                >
-                  {{ ticket.status }}
-                </span>
-              </td>
-              <td>
-                <a
-                  href="{{ url_for('view_ticket', ticket_id=ticket.id) }}"
-                  class="btn btn-sm btn-primary"
-                >
-                  View
-                </a>
-                {% if ticket.status != 'Closed' %}
-                <button
-                  class="btn btn-sm btn-success"
-                  onclick="closeTicket({{ ticket.id }})"
-                >
-                  Close
-                </button>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+{% block title %}Moderator Dashboard{% endblock %}
 
-  <!-- User Management Section -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>User Management</h3>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-dark">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in users %}
-            <tr>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                <span
-                  class="badge {% if user.is_banned %}bg-danger{% else %}bg-success{% endif %}"
-                >
-                  {% if user.is_banned %}Banned{% else %}Active{% endif %}
-                </span>
-              </td>
-              <td>
-                <div class="btn-group">
-                  <button
-                    class="btn btn-sm btn-warning"
-                    onclick="timeoutUser({{ user.id }})"
-                  >
-                    Timeout
-                  </button>
-                  {% if not user.is_banned %}
-                  <button
-                    class="btn btn-sm btn-danger"
-                    onclick="banUser({{ user.id }})"
-                  >
-                    Ban
-                  </button>
-                  {% else %}
-                  <button
-                    class="btn btn-sm btn-success"
-                    onclick="unbanUser({{ user.id }})"
-                  >
-                    Unban
-                  </button>
-                  {% endif %}
-                  <button
-                    class="btn btn-sm btn-info"
-                    onclick="viewUserHistory({{ user.id }})"
-                  >
-                    History
-                  </button>
+{% block content %}
+<div class="container mt-5 admin-dashboard">
+    <h2 class="text-center" style="color: var(--accent-color);">Moderator Dashboard</h2>
+
+    <!-- Quick Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="admin-card p-3">
+                <div class="d-flex align-items-center">
+                    <div class="stats-icon bg-primary">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="small text-muted">Open Tickets</div>
+                        <div class="h3 mb-0">{{ tickets|selectattr('status', 'eq', 'Open')|list|length }}</div>
+                    </div>
                 </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="admin-card p-3">
+                <div class="d-flex align-items-center">
+                    <div class="stats-icon bg-success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="ms-3">
+                        <div class="small text-muted">Active Users</div>
+                        <div class="h3 mb-0">{{ users|selectattr('is_banned', 'eq', false)|list|length }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Tabs for different sections -->
+    <ul class="nav nav-tabs mb-4" id="moderatorTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="tickets-tab" data-bs-toggle="tab" href="#tickets" role="tab" style="color: var(--accent-color);">Support Tickets</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" style="color: var(--accent-color);">User Management</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="transactions-tab" data-bs-toggle="tab" href="#transactions" role="tab" style="color: var(--accent-color);">Transaction History</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="moderatorTabContent">
+        <!-- Support Tickets Tab -->
+        <div class="tab-pane fade show active" id="tickets" role="tabpanel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Support Tickets</h5>
+                        <div class="d-flex gap-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary active" onclick="filterTickets('all')">
+                                    All
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterTickets('open')">
+                                    Open
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterTickets('closed')">
+                                    Closed
+                                </button>
+                            </div>
+                            <input type="text" class="form-control form-control-sm" placeholder="Search tickets..." id="ticketSearch">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Username</th>
+                                    <th>Category</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets %}
+                                <tr>
+                                    <td>{{ ticket.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ get_username_from_id(ticket.user_id) }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ ticket.category }}</span>
+                                    </td>
+                                    <td>{{ ticket.subject }}</td>
+                                    <td>
+                                        <span class="badge {% if ticket.status == 'Open' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ ticket.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                            {% if ticket.status != 'Closed' %}
+                                            <button type="button" class="btn btn-sm btn-success" onclick="closeTicket('{{ ticket.id }}')">
+                                                <i class="fas fa-check me-1"></i>Close
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Tab -->
+        <div class="tab-pane fade" id="users" role="tabpanel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">User Management</h5>
+                        <input type="text" class="form-control form-control-sm w-auto" placeholder="Search users" id="userSearch">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge {% if user.is_banned %}bg-danger{% else %}bg-success{% endif %}">
+                                            {% if user.is_banned %}Banned{% else %}Active{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="timeoutUser('{{ user.id }}')" title="Timeout User">
+                                                <i class="fas fa-clock"></i>
+                                            </button>
+                                            {% if not user.is_banned %}
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="banUser('{{ user.id }}')" title="Ban User">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                            {% else %}
+                                            <button type="button" class="btn btn-sm btn-success" onclick="unbanUser('{{ user.id }}')" title="Unban User">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="viewUserHistory('{{ user.id }}')" title="View History">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction History Tab -->
+        <div class="tab-pane fade" id="transactions" role="tabpanel">
+            <div class="admin-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Transaction History</h5>
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="Search by transaction ID or username" id="receiptSearch">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="searchReceipts()">Search</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Date</th>
+                                    <th>Username</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receiptTableBody">
+                                <!-- Receipt data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Modal for Viewing Ticket Details -->
-<div class="modal fade" id="ticketModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content bg-dark text-light">
-      <div class="modal-header">
-        <h5 class="modal-title">Ticket Details</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div id="ticketDetails"></div>
-      </div>
+<!-- Modals -->
+<!-- User History Modal -->
+<div class="modal fade admin-modal" id="userHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="userHistory"></div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Modal for User History -->
-<div class="modal fade" id="userHistoryModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content bg-dark text-light">
-      <div class="modal-header">
-        <h5 class="modal-title">User History</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div id="userHistory"></div>
-      </div>
+<!-- Receipt Details Modal -->
+<div class="modal fade admin-modal" id="receiptModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Receipt Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="receiptDetails"></div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
-  // Function to view ticket details
-  function viewTicket(ticketId) {
-    // Add your AJAX call to get ticket details
-    $("#ticketModal").modal("show");
-  }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
 
-  // Function to close ticket
-  function closeTicket(ticketId) {
-    if (confirm("Are you sure you want to close this ticket?")) {
-      // Add your AJAX call to close the ticket
+        // Setup search functionality
+        setupSearch();
+    });
+
+    function setupSearch() {
+        // Ticket search
+        document.getElementById('ticketSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#tickets tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // User search
+        document.getElementById('userSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#users tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
     }
-  }
 
-  // Function to timeout user
-  function timeoutUser(userId) {
-    const duration = prompt("Enter timeout duration in hours:");
-    if (duration) {
-      // Add your AJAX call to timeout the user
+    function searchReceipts() {
+        const searchTerm = document.getElementById('receiptSearch').value;
+        // Add your AJAX call to search receipts
+        // Example:
+        fetch(`/api/receipts/search?q=${searchTerm}`)
+            .then(response => response.json())
+            .then(data => {
+                updateReceiptTable(data);
+            })
+            .catch(error => console.error('Error:', error));
     }
-  }
 
-  // Functions for user management
-  function banUser(userId) {
-    if (confirm("Are you sure you want to ban this user?")) {
-      // Add your AJAX call to ban the user
+    function updateReceiptTable(receipts) {
+        const tbody = document.getElementById('receiptTableBody');
+        tbody.innerHTML = '';
+
+        receipts.forEach(receipt => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${receipt.transaction_id}</td>
+                <td>${receipt.date}</td>
+                <td>${receipt.username}</td>
+                <td>${receipt.amount}</td>
+                <td>
+                    <span class="badge ${receipt.status === 'Completed' ? 'bg-success' : 'bg-warning'}">
+                        ${receipt.status}
+                    </span>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="viewReceipt('${receipt.transaction_id}')">
+                        View
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
     }
-  }
 
-  function unbanUser(userId) {
-    if (confirm("Are you sure you want to unban this user?")) {
-      // Add your AJAX call to unban the user
+    function viewReceipt(transactionId) {
+        // Add your AJAX call to get receipt details
+        $('#receiptModal').modal('show');
     }
-  }
 
-  function viewUserHistory(userId) {
-    // Add your AJAX call to get user history
-    $("#userHistoryModal").modal("show");
-  }
+    function closeTicket(ticketId) {
+        if (confirm('Are you sure you want to close this ticket?')) {
+            // Add your AJAX call to close the ticket
+            fetch(`/api/tickets/${ticketId}/close`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to close ticket');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
 
-  // Function to filter tickets
-  function filterTickets(status) {
-    // Add your filtering logic here
-  }
+    function timeoutUser(userId) {
+        const duration = prompt('Enter timeout duration in hours:');
+        if (duration) {
+            // Add your AJAX call to timeout the user
+        }
+    }
+
+    function banUser(userId) {
+        if (confirm('Are you sure you want to ban this user?')) {
+            // Add your AJAX call to ban the user
+        }
+    }
+
+    function unbanUser(userId) {
+        if (confirm('Are you sure you want to unban this user?')) {
+            // Add your AJAX call to unban the user
+        }
+    }
+
+    function viewUserHistory(userId) {
+        // Add your AJAX call to get user history
+        $('#userHistoryModal').modal('show');
+    }
+
+    function filterTickets(status) {
+        const rows = document.querySelectorAll('#tickets tbody tr');
+        rows.forEach(row => {
+            const statusCell = row.querySelector('td:nth-child(5)');
+            if (status === 'all' || statusCell.textContent.trim().toLowerCase().includes(status)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Update active button state
+        document.querySelectorAll('.btn-group .admin-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
 </script>
+
+<style>
+    /* Update background color styles */
+    .admin-dashboard {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .tab-content {
+        background-color: var(--bg-color);
+    }
+
+    .nav-tabs {
+        background-color: var(--bg-color);
+    }
+
+    .admin-dashboard .stats-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+    }
+
+    .admin-dashboard .stats-icon i {
+        font-size: 20px;
+    }
+
+    .admin-dashboard .badge {
+        padding: 0.5em 0.75em;
+    }
+
+    .admin-table th {
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .admin-table td {
+        vertical-align: middle;
+    }
+
+    /* Update nav-tabs styling */
+    .nav-tabs .nav-link {
+        border: none;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .nav-tabs .nav-link.active {
+        border: none;
+        border-bottom: 2px solid var(--accent-color);
+        color: var(--accent-color) !important;
+        font-weight: 500;
+        background-color: var(--bg-color);
+    }
+
+    .nav-tabs .nav-link:hover {
+        border: none;
+        border-bottom: 2px solid var(--accent-color);
+        background-color: var(--bg-color);
+    }
+</style>
 {% endblock %}
