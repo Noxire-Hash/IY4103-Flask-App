@@ -101,84 +101,6 @@ function loadUserAccount() {
 }
 
 // Add this function outside document ready
-function handleUserAccountPage() {
-    console.log("Loading user account page");
-
-    // Follow/Unfollow functionality
-    const followBtn = document.getElementById('followBtn');
-    const unfollowBtn = document.getElementById('unfollowBtn');
-
-    if (followBtn) {
-        followBtn.addEventListener('click', function() {
-            // Show loading state
-            followBtn.disabled = true;
-            followBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Following...';
-
-            const userId = followBtn.getAttribute('data-user-id');
-            // Ajax call to follow user
-            fetch(`/api/follow/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    // Reset button
-                    followBtn.disabled = false;
-                    followBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i> Follow User';
-                    alert('Error following user: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Reset button
-                followBtn.disabled = false;
-                followBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i> Follow User';
-                alert('Error following user');
-            });
-        });
-    }
-
-    if (unfollowBtn) {
-        unfollowBtn.addEventListener('click', function() {
-            // Handle unfollow action
-            unfollowBtn.disabled = true;
-            unfollowBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Unfollowing...';
-
-            const userId = unfollowBtn.getAttribute('data-user-id');
-            fetch(`/api/unfollow/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    // Reset button
-                    unfollowBtn.disabled = false;
-                    unfollowBtn.innerHTML = '<i class="fas fa-user-minus me-2"></i> Unfollow';
-                    alert('Error unfollowing user: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Reset button
-                unfollowBtn.disabled = false;
-                unfollowBtn.innerHTML = '<i class="fas fa-user-minus me-2"></i> Unfollow';
-                alert('Error unfollowing user');
-            });
-        });
-    }
-}
 
 $(document).ready(function() {
     console.log("index.js is running on this page:", window.location.pathname);
@@ -202,40 +124,60 @@ $(document).ready(function() {
     function setupEventListeners() {
         // Register form validation
         const form = $("#register-form");
-        form.on("submit", handleRegisterSubmit);
+        if (form.length) {
+            form.on("submit", handleRegisterSubmit);
+        }
 
         // User data button
-        $("#get_userdata").click(getUserData);
+        const userDataBtn = $("#get_userdata");
+        if (userDataBtn.length) {
+            userDataBtn.click(getUserData);
+        }
     }
 
     function handlePageSpecificCode() {
         const path = window.location.pathname;
+        console.log("Handling page specific code for:", path);
 
-        switch (path) {
-            case PATHS.ACCOUNT:
-                handleAccountPage();
-                break;
-            case PATHS.STORE:
-                fillStoreItems();
-                break;
-            case PATHS.VENDOR_DASHBOARD:
-                fillVendorData();
-                break;
-            case PATHS.CHECKOUT_DEPOSIT:
-                handleCheckoutDeposit();
-                break;
-            case PATHS.ADMIN_DASHBOARD:
-                handleAdminDashboard();
-                break;
-            case PATHS.USER_ACCOUNT:
-                handleUserAccountPage();
-                break;
+        // Check exact path matches first
+        if (path === PATHS.ACCOUNT) {
+            handleAccountPage();
         }
-
-        // Handle item preview pages
-        if (path.includes(PATHS.ITEM_PREVIEW)) {
+        else if (path === PATHS.STORE) {
+            console.log("Loading store page specific code");
+            // Only load featured items on the store page
+            loadFeaturedItems();
+            loadAllItems();
+        }
+        else if (path === PATHS.VENDOR_DASHBOARD) {
+            fillVendorData();
+        }
+        else if (path === PATHS.CHECKOUT_DEPOSIT) {
+            handleCheckoutDeposit();
+        }
+        else if (path === PATHS.ADMIN_DASHBOARD) {
+            handleAdminDashboard();
+        }
+        // Check if path starts with USER_ACCOUNT
+        else if (path.startsWith(PATHS.USER_ACCOUNT)) {
+            handleUserAccountPage();
+        }
+        // Check if path includes ITEM_PREVIEW
+        else if (path.includes(PATHS.ITEM_PREVIEW)) {
             const itemId = path.split("/").pop();
             handleItemPreview(itemId);
+        }
+
+        // Initialize admin dashboard if on admin page
+        if ($('#admin-dashboard').length) {
+            handleAdminDashboard();
+        }
+
+        // Initialize store features only if we're on the store page
+        if ($('#featured-items-container').length) {
+            console.log("Found featured items container, loading items");
+            loadFeaturedItems();
+            loadAllItems();
         }
     }
 
@@ -331,7 +273,25 @@ $(document).ready(function() {
                 $("#sub-tier").text("Exclusive");
                 $("#balance").text(userData.balance);
                 $("#pending-balance").text(userData.pending_balance);
+                $("#bio").text(userData.bio);
+                $("#update-bio").click(function() {
+                    console.log("Update bio clicked");
+                    $.ajax({
+                        url: "/api/account/update_bio",
+                        type: "POST",
+                        data: { bio: $("#bio").val() },
+                        success: function(response) {
+                            console.log("Bio updated successfully");
+                            triggerFlash("Bio updated successfully", "success");
+                        },
+                        error: function(error) {
+                            console.error("Error updating bio:", error);
+                            triggerFlash("Error updating bio", "danger");
+                        }
+                    });
+                });
             })
+
             .catch(function (error) {
                 console.error("Error processing user data:", error);
                 triggerFlash("Error loading user privileges", "danger");
@@ -587,23 +547,32 @@ $(document).ready(function() {
         });
     }
 
-    // Load featured items
-    loadFeaturedItems();
+    // User Account Page handler
+    function handleUserAccountPage() {
+        console.log("Loading User Account Page specific code");
 
-    // Load all items
-    loadAllItems();
+        // Simple code for the user account page
+        const messageBtn = document.querySelector('.btn-outline-primary i.fa-envelope');
+        if (messageBtn && messageBtn.parentElement) {
+            messageBtn.parentElement.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Message functionality would be implemented here');
+            });
+        }
 
-    // Initialize admin dashboard if on admin page
-    if ($('#admin-dashboard').length) {
-        initAdminDashboard();
-    }
+        // Get admin action buttons if they exist
+        if (document.getElementById('adminActionModal')) {
+            const adminButtons = document.querySelectorAll('#adminActionModal .list-group-item');
 
-    // Initialize features based on which page we're on
-
-    // Check if we're on store page
-    if ($('#featured-items-container').length) {
-        loadFeaturedItems();
-        loadAllItems();
+            adminButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.textContent.trim();
+                    console.log('Admin action selected:', action);
+                    alert(`Admin action: ${action} would be executed here`);
+                });
+            });
+        }
     }
 
     // Initialize other features as needed

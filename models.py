@@ -58,6 +58,7 @@ class User(db.Model):
     username = db.Column(db.String(64), nullable=False, index=True)
     email = db.Column(db.String(128), unique=True, nullable=False, index=True)
     password = db.Column(db.String(128), nullable=False)
+    bio = db.Column(db.String(256), default="")
     privilege_id = db.Column(db.Integer, db.ForeignKey("privileges.id"), default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(64), default="Active", index=True)

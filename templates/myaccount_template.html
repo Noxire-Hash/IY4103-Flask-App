@@ -81,8 +81,8 @@ Lorekeeper{% endblock %} {% block content %}
             <form class="account-form">
               <div class="mb-4">
                 <label for="bio" class="form-label">Bio</label>
-                <textarea class="form-control mb-2" id="bio" rows="3">Share your adventures!</textarea>
-                <button type="button" class="admin-btn admin-btn-primary">Save Bio</button>
+                <textarea class="form-control mb-2" id="bio" rows="3"></textarea>
+                <button href = "api/account/update_bio" type="button" class="admin-btn admin-btn-primary" id="update-bio">Save Bio</button>
               </div>
 
               <hr>

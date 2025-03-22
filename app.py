@@ -243,31 +243,24 @@ def account():
     )
 
 
-@app.route("/test_db")
-def test_db():
-    try:
-        test_user = User.query.filter_by(
-            username="testuser", email="test@test.com", password="1234", privilege_id=1
-        ).first()
-        db.session.add(test_user)
-        db.session.commit()
-        print("User added successfully.")
-        return "User added successfully."
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error: {e}")
-        return f"Error: {e}"
-
-
-@app.route("/test_flash")
-def test_flash():
-    flash("This is a success message!", "success")
-    flash("This is a warning message!", "warning")
-    flash("This is an error message!", "danger")
-    return redirect(url_for("home"))
-
-
-# Admin routes
+@app.route("/api/account/update_bio", methods=["POST"])
+def update_bio():
+    if request.method == "POST":
+        try:
+            bio = request.form.get("bio")
+            user = User.query.get(session.get("user_id"))
+            logger.info(logger.SYSTEM, f"Updating bio for user {user.username}: {bio}")
+            user.bio = bio
+            print(f"Bio updated for user {user.username}: {user.bio}")
+            db.session.commit()
+            logger.success(logger.SYSTEM, f"Bio updated for user {user.username}")
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            logger.error(
+                logger.SYSTEM, f"Error updating bio for user {user.username}: {e}"
+            )
+            return jsonify({"error": str(e)}), 500
 
 
 @app.route("/logout")
@@ -509,6 +502,7 @@ def get_user_data():
                     "id": user.id,
                     "username": user.username,
                     "email": user.email,
+                    "bio": user.bio,
                     "privilege_id": user.privilege_id,
                     "created_at": user.created_at.strftime("%Y-%m-%d"),
                     "balance": user.balance,
@@ -1278,32 +1272,46 @@ def item_details(item_id):
 
 @app.route("/user/<int:user_id>")
 def user_account(user_id=None):
-    # This is a very minimal data set to make the template work
-    # In a real app, you would fetch this data from your database
-    mock_data = {
-        "user": {
-            "id": user_id or session.get("user_id"),
-            "username": session.get("username"),
-            "created_at": "2023-01-01",
-            "is_admin": False,
-            "subscription_tier": "premium",
-            "bio": "This is a sample user biography.",
-        },
-        "user_items": [],
-        "user_reviews": [],
-        "user_stats": {
+    if not user_id and not session.get("user_id"):
+        flash("User not found", "warning")
+        return redirect(url_for("home"))
+
+    # Use the provided user_id or fall back to the logged-in user's ID
+    user_id = user_id or session.get("user_id")
+
+    try:
+        # Get the user from the database
+        user = User.query.get_or_404(user_id)
+
+        # Check if user is a vendor (privilege_id 2 or higher)
+        is_vendor = user.privilege_id >= 2
+
+        # Create basic user stats
+        user_stats = {
+            "follower_count": 0,  # Placeholder, implement followers feature later
             "item_count": 0,
             "review_count": 0,
-            "avg_rating": 0,
-            "follower_count": 0,
-        },
-        "is_following": False,
-        "is_admin": False,
-        "more_items": False,
-        "more_reviews": False,
-    }
+            "avg_rating": 0.0,
+        }
 
-    return render_template("user_account.html", **mock_data)
+        # If the user is a vendor, get their item count
+        if is_vendor:
+            user_stats["item_count"] = Item.query.filter_by(vendor_id=user.id).count()
+
+        # Set admin flag if the logged-in user is an admin
+        is_admin = session.get("privilege_id") == 999
+
+        return render_template(
+            "user_account.html",
+            user=user,
+            user_stats=user_stats,
+            is_vendor=is_vendor,
+            is_admin=is_admin,
+        )
+    except Exception as e:
+        print(f"Error loading user profile: {e}")
+        flash("Error loading user profile", "danger")
+        return redirect(url_for("home"))
 
 
 if __name__ == "__main__":
