@@ -13,14 +13,46 @@
                     </div>
                     <div class="user-info">
                         <h2 class="mb-1">{{ user.username if user.username else 'Username' }}</h2>
+
+                        <!-- User Status & Badges -->
                         <div class="user-badges mb-2">
-                            <span class="badge bg-secondary">Member since {{ user.created_at }}</span>
+                            <!-- Membership Badge -->
+                            <span class="badge bg-secondary">Member since {{ formatted_date }}</span>
+
+                            <!-- Role Badges -->
+                            {% if user.is_admin %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-shield-alt me-1"></i> Admin
+                                </span>
+                            {% elif user.is_moderator %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-gavel me-1"></i> Moderator
+                                </span>
+                            {% endif %}
+
+                            <!-- Subscription Badge -->
                             {% if user.subscription_tier %}
                                 <span class="badge subscription-badge subscription-{{ user.subscription_tier }}">
-                                    {{ user.subscription_tier|capitalize }}
+                                    <i class="fas fa-crown me-1"></i> {{ user.subscription_tier|capitalize }}
                                 </span>
                             {% endif %}
                         </div>
+
+                        <!-- User Levels Row -->
+                        <div class="user-levels mb-2">
+                            <!-- Community Level -->
+                            <span class="badge bg-primary">
+                                <i class="fas fa-users me-1"></i> Community Level {{ user.community_level|default(1) }}
+                            </span>
+
+                            <!-- Vendor Level (if applicable) -->
+                            {% if is_vendor %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-store me-1"></i> Vendor Level {{ user.vendor_level|default(1) }}
+                                </span>
+                            {% endif %}
+                        </div>
+
                         <p class="text-muted mb-0">{{ user.bio if user.bio else "No bio provided" }}</p>
                     </div>
                 </div>

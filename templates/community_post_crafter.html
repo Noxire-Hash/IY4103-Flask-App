@@ -1,0 +1,370 @@
+{% extends "nav_footer_template.html" %}
+
+{% block title %}Create a Post - The Taverns{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header with enhanced styling -->
+            <div class="post-crafter-header mb-4">
+                <div>
+                    <h1 class="h2 text-primary mb-2">Create a Post</h1>
+                    <p class="text-muted">Share your thoughts with the community</p>
+                </div>
+                <a href="/community" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Taverns
+                </a>
+            </div>
+
+            <!-- Post Creation Form with enhanced styling -->
+            <div class="account-card post-crafter-card mb-4">
+                <div class="card-body p-4">
+                    <form id="postCrafterForm" action="/community/create_post" method="POST">
+                        <!-- Tavern Selection with icon -->
+                        <div class="mb-4">
+                            <label for="postTavern" class="form-label"><i class="fas fa-book-open me-2"></i>Choose Tavern</label>
+                            <select class="form-select bg-dark text-light border-secondary tavern-select" id="postTavern" name="category" required>
+                                <option value="">Select a tavern...</option>
+                                <option value="Adventure Stories">Adventure Stories</option>
+                                <option value="Grindstone Suggestions">Grindstone Suggestions</option>
+                                <option value="Bug Reports">Bug Reports</option>
+                                <option value="Store Items">Store Items</option>
+                                <option value="Community">Community</option>
+                                <option value="Lore Discussion">Lore Discussion</option>
+                            </select>
+                            <div class="form-text text-muted">Choose the tavern most relevant to your post.</div>
+                        </div>
+
+                        <!-- Post Title with enhanced counter -->
+                        <div class="mb-4">
+                            <label for="postTitle" class="form-label"><i class="fas fa-heading me-2"></i>Title</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="postTitle" name="title" maxlength="100" required>
+                            <div class="d-flex justify-content-between mt-1">
+                                <div class="form-text text-muted">Create a clear, descriptive title</div>
+                                <div class="form-text">
+                                    <span id="titleCounter" class="counter-badge">0</span><span class="text-muted">/100</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post Tags with improved tag preview -->
+                        <div class="mb-4">
+                            <label for="postTags" class="form-label"><i class="fas fa-tags me-2"></i>Tags</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="postTags" name="tags" placeholder="gameplay, feedback, question" maxlength="100">
+                            <div class="form-text text-muted">Add up to 5 tags separated by commas</div>
+                            <div class="mt-2 tag-preview-container" id="tagPreview"></div>
+                        </div>
+
+                        <!-- Post Content with enhanced editor -->
+                        <div class="mb-4">
+                            <label for="postContent" class="form-label"><i class="fas fa-pen-fancy me-2"></i>Content</label>
+                            <div class="post-editor-wrapper">
+                                <!-- Editor Toolbar with enhanced styling -->
+                                <div class="editor-toolbar bg-dark border-secondary rounded-top p-2 d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="bold" title="Bold">
+                                        <i class="fas fa-bold"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="italic" title="Italic">
+                                        <i class="fas fa-italic"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="heading" title="Heading">
+                                        <i class="fas fa-heading"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="list" title="List">
+                                        <i class="fas fa-list-ul"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="link" title="Link">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="image" title="Image">
+                                        <i class="fas fa-image"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-dark format-btn" data-format="code" title="Code">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Editor Content Area with placeholder text -->
+                                <textarea class="form-control bg-dark text-light border-secondary rounded-bottom" id="postContent" name="content" rows="12" placeholder="Write your post here... Use the formatting tools above to style your content." required></textarea>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <div class="form-text text-muted">Craft your message using the formatting tools</div>
+                                <div class="form-text">
+                                    <span id="contentCounter" class="counter-badge">0</span><span class="text-muted"> characters</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview Toggle with pulsing effect -->
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-secondary w-100 preview-toggle" id="previewToggle">
+                                <i class="fas fa-eye me-2"></i>Preview Post
+                            </button>
+                        </div>
+
+                        <!-- Post Preview Area with enhanced styling -->
+                        <div class="mb-4 d-none" id="previewArea">
+                            <div class="card bg-dark border-secondary preview-card">
+                                <div class="card-header border-secondary">
+                                    <h5 class="mb-0"><i class="fas fa-glasses me-2"></i>Preview</h5>
+                                </div>
+                                <div class="card-body">
+                                    <h4 id="previewTitle" class="text-primary mb-2"></h4>
+                                    <div class="mb-3" id="previewTags"></div>
+                                    <div id="previewContent" class="post-content-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Post Options with improved styling -->
+                        <div class="mb-4 post-options">
+                            <h5 class="mb-3"><i class="fas fa-cog me-2"></i>Post Options</h5>
+                            <div class="form-check mb-2 enhanced-checkbox">
+                                <input type="checkbox" class="form-check-input" id="notifyReplies" name="notify_replies" checked>
+                                <label class="form-check-label" for="notifyReplies">Notify me of replies</label>
+                            </div>
+                            <div class="form-check enhanced-checkbox">
+                                <input type="checkbox" class="form-check-input" id="saveAsDraft" name="save_as_draft">
+                                <label class="form-check-label" for="saveAsDraft">Save as draft</label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons with enhanced styling -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/community'">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <div>
+                                <button type="submit" class="btn btn-outline-primary me-2" id="draftBtn" name="action" value="draft">
+                                    <i class="fas fa-save me-2"></i>Save Draft
+                                </button>
+                                <button type="submit" class="btn btn-primary publish-btn" id="publishBtn" name="action" value="publish">
+                                    <i class="fas fa-paper-plane me-2"></i>Publish Post
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Post Guidelines Card with enhanced styling -->
+            <div class="account-card guidelines-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-info-circle me-2"></i>Community Guidelines</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>Do's</h5>
+                            <ul class="mb-0 guidelines-list">
+                                <li>Be respectful and constructive</li>
+                                <li>Stay on topic within each tavern</li>
+                                <li>Share unique and interesting content</li>
+                                <li>Use appropriate formatting for readability</li>
+                                <li>Give credit when sharing others' work</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-times-circle text-danger me-2"></i>Don'ts</h5>
+                            <ul class="mb-0 guidelines-list">
+                                <li>Post offensive or inappropriate content</li>
+                                <li>Spam or post repetitive content</li>
+                                <li>Share personal information</li>
+                                <li>Create misleading or clickbait titles</li>
+                                <li>Promote scams or unauthorized services</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Debug statement to verify script loading -->
+<script>
+    console.log('Community post crafter page loaded');
+    console.log('Page path:', window.location.pathname);
+    // Check if jQuery is loaded
+    if (typeof jQuery !== 'undefined') {
+        console.log('jQuery is loaded');
+    } else {
+        console.log('jQuery is NOT loaded');
+    }
+</script>
+
+<style>
+/* Post Crafter Specific Styles */
+.post-crafter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-background);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--input-border);
+}
+
+.post-crafter-card {
+    border: 1px solid var(--input-border);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.post-crafter-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.editor-toolbar {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px !important;
+}
+
+.editor-toolbar .btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+
+.editor-toolbar .btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.post-content-preview {
+    min-height: 150px;
+    line-height: 1.6;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--input-background);
+    border: 1px solid var(--input-border);
+}
+
+.post-content-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 10px 0;
+}
+
+.tag-preview-container {
+    min-height: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.counter-badge {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.form-label i {
+    color: var(--accent-color);
+}
+
+.tavern-select {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid var(--input-border);
+}
+
+.tavern-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(177, 152, 237, 0.25);
+}
+
+.preview-toggle {
+    transition: all 0.3s ease;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.preview-toggle:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.preview-card {
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.guidelines-card {
+    border: 1px solid var(--input-border);
+    transition: all 0.3s ease;
+}
+
+.guidelines-card:hover {
+    border-color: var(--accent-color);
+}
+
+.guidelines-list li {
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+.guidelines-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.post-options {
+    background-color: var(--input-background);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+}
+
+.enhanced-checkbox .form-check-input:checked {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.publish-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.publish-btn:hover {
+    background-color: var(--btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#postContent {
+    min-height: 200px;
+    transition: all 0.3s ease;
+    font-family: 'Roboto', sans-serif;
+    resize: vertical;
+}
+
+#postContent:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(177, 152, 237, 0.25);
+}
+</style>
+{% endblock %}

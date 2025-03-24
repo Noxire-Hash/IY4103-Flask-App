@@ -7,42 +7,49 @@
             <div class="col-lg-8">
                 <!-- Main Item Card -->
                 <div class="card mb-4">
-                    <!-- Placeholder/Image Area -->
+                    <!-- Item Image/Preview -->
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" class="card-img-top item-image" alt="{{ item.name }}">
+                    {% else %}
                     <div class="item-preview-placeholder">
-                        <div class="shimmer-overlay"></div>
                         <div class="placeholder-content">
                             <i class="fas fa-dice-d20 fa-3x"></i>
-                            <p>Preview Coming Soon</p>
+                            <p>No Preview Available</p>
                         </div>
                     </div>
+                    {% endif %}
 
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h1 class="card-title item-title mb-2 shimmer">Loading...</h1>
-                                <p class="text-muted mb-2">By <a href="#" class="vendor-name shimmer">Loading...</a></p>
+                                <h1 class="card-title item-title mb-2">{{ item.name|default('Item Name') }}</h1>
+                                <p class="text-muted mb-2">By <a href="/user/{{ item.vendor_id }}" class="vendor-name">{{ item.vendor_name|default('Vendor') }}</a></p>
                             </div>
                             <div class="text-end">
-                                <h3 class="item-price mb-2 shimmer">$0.00</h3>
-                                <span class="badge bg-success sales-count shimmer">0 sales</span>
+                                <h3 class="item-price mb-2">{{ item.price|default(0) }} AW</h3>
+                                <span class="badge bg-success sales-count">{{ item.sales|default(0) }} sales</span>
                             </div>
                         </div>
 
                         <!-- Tags -->
-                        <div class="item-tags mb-3 shimmer">
-                            <span class="badge bg-secondary">Loading...</span>
+                        <div class="item-tags mb-3">
+                            {% if item.tags %}
+                                {% for tag in item.tags.split(',') %}
+                                    <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="badge bg-secondary">No tags</span>
+                            {% endif %}
                         </div>
 
                         <!-- Description -->
                         <h5>Description</h5>
-                        <p class="item-description shimmer">Loading...</p>
+                        <p class="item-description">{{ item.description|default('No description available.') }}</p>
 
                         <!-- Purchase Button -->
                         <div class="d-grid gap-2">
-                            <!-- Debug print -->
-                            <!-- {{ item.id }} -->
                             <a href="{{ url_for('checkout', item_id=item.id) }}" class="btn btn-primary purchase-btn store-color">
-                                <i class="fas fa-shopping-cart me-2"></i>Purchase Now (ID: {{ item.id }})
+                                <i class="fas fa-shopping-cart me-2"></i>Purchase Now
                             </a>
                         </div>
                     </div>
@@ -54,46 +61,81 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h3 class="h5 mb-0">Ratings & Reviews</h3>
                             <div class="rating-summary">
-                                <span class="average-rating">0.0</span>
+                                <span class="average-rating">{{ avg_rating|default('0.0') }}</span>
                                 <div class="stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
+                                    {% for i in range(5) %}
+                                        {% if i < avg_rating|int %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% elif i < avg_rating and i >= avg_rating|int %}
+                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
-                                <span class="rating-count">(0 reviews)</span>
+                                <span class="rating-count">({{ reviews|length|default(0) }} reviews)</span>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <!-- Review Form -->
-                        <form id="reviewForm" class="mb-4">
-                            <div class="mb-3">
-                                <label class="form-label">Your Rating</label>
-                                <div class="rating-input">
-                                    <i class="fas fa-star" data-rating="1"></i>
-                                    <i class="fas fa-star" data-rating="2"></i>
-                                    <i class="fas fa-star" data-rating="3"></i>
-                                    <i class="fas fa-star" data-rating="4"></i>
-                                    <i class="fas fa-star" data-rating="5"></i>
+                        {% if session.get('user_id') %}
+                            <form id="reviewForm" class="mb-4" action="{{ url_for('submit_review', item_id=item.id) }}" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Your Rating</label>
+                                    <div class="rating-input">
+                                        <input type="hidden" name="rating" id="selected_rating" value="5">
+                                        <i class="fas fa-star active" data-rating="1"></i>
+                                        <i class="fas fa-star active" data-rating="2"></i>
+                                        <i class="fas fa-star active" data-rating="3"></i>
+                                        <i class="fas fa-star active" data-rating="4"></i>
+                                        <i class="fas fa-star active" data-rating="5"></i>
+                                    </div>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="reviewText" class="form-label">Your Review</label>
+                                    <textarea class="form-control" id="reviewText" name="review_text" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <a href="{{ url_for('login') }}">Log in</a> to leave a review.
                             </div>
-                            <div class="mb-3">
-                                <label for="reviewText" class="form-label">Your Review</label>
-                                <textarea class="form-control" id="reviewText" rows="3" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit Review</button>
-                        </form>
+                        {% endif %}
 
                         <!-- Reviews List -->
                         <div id="reviewsList">
-                            <!-- Reviews will be loaded here -->
-                            <div class="review-placeholder shimmer mb-3">
-                                <div class="placeholder-line"></div>
-                                <div class="placeholder-line"></div>
-                                <div class="placeholder-line"></div>
-                            </div>
+                            {% if reviews %}
+                                {% for review in reviews %}
+                                    <div class="review-item mb-3 p-3 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <a href="/user/{{ review.user_id }}" class="fw-bold">{{ review.username }}</a>
+                                                <div class="small text-muted">
+                                                    {{ review.created_at|format_date}}
+                                                </div>
+                                            </div>
+                                            <div class="review-rating">
+                                                {% for i in range(5) %}
+                                                    {% if i < review.rating %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <p class="mt-2">{{ review.review }}</p>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                                    <p>No reviews yet. Be the first to leave a review!</p>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -108,18 +150,18 @@
                     </div>
                     <div class="card-body">
                         <div class="vendor-info">
-                            <h4 class="vendor-name mb-2">Loading...</h4>
+                            <h4 class="vendor-name mb-2">{{ item.vendor_name|default('Vendor') }}</h4>
                             <p class="vendor-stats mb-3">
                                 <span class="badge bg-primary me-2">
                                     <i class="fas fa-scroll me-1"></i>
-                                    <span class="total-items">0</span> items
+                                    <span class="total-items">{{ vendor_items_count|default(0) }}</span> items
                                 </span>
                                 <span class="badge bg-success">
                                     <i class="fas fa-star me-1"></i>
-                                    <span class="vendor-rating">0.0</span>
+                                    <span class="vendor-rating">{{ vendor_rating|default('0.0') }}</span>
                                 </span>
                             </p>
-                            <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+                            <a href="/user/{{ item.vendor_id }}" class="btn btn-outline-primary btn-sm">View Profile</a>
                         </div>
                     </div>
                 </div>
@@ -131,11 +173,34 @@
                     </div>
                     <div class="card-body">
                         <div class="similar-items-list">
-                            <!-- Similar items will be loaded here -->
-                            <div class="similar-item-placeholder shimmer mb-3">
-                                <div class="placeholder-line"></div>
-                                <div class="placeholder-line"></div>
-                            </div>
+                            {% if similar_items %}
+                                {% for similar_item in similar_items %}
+                                    <div class="similar-item mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0 me-2">
+                                                {% if similar_item.image_url %}
+                                                    <img src="{{ similar_item.image_url }}" class="similar-item-img" width="50" height="50" alt="{{ similar_item.name }}">
+                                                {% else %}
+                                                    <div class="similar-item-placeholder">
+                                                        <i class="fas fa-dice-d20"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <a href="{{ url_for('item_preview', item_id=similar_item.id) }}" class="text-decoration-none">
+                                                    <h6 class="mb-0">{{ similar_item.name }}</h6>
+                                                </a>
+                                                <div class="text-muted small">{{ similar_item.price }} AW</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-search fa-2x mb-2"></i>
+                                    <p>No similar items found.</p>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -145,29 +210,16 @@
 </div>
 
 <style>
-    @keyframes shimmer {
-        0% {
-            background-position: -1000px 0;
-        }
-        100% {
-            background-position: 1000px 0;
-        }
-    }
-
+    /* Item Preview Styles */
     .item-preview-placeholder {
         height: 400px;
         width: 100%;
-        background: linear-gradient(
-            90deg,
-            var(--bg-color) 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            var(--bg-color) 100%
-        );
-        background-size: 1000px 100%;
-        animation: shimmer 2s infinite linear;
+        background-color: var(--bg-color);
         display: flex;
         align-items: center;
         justify-content: center;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
     }
 
     .placeholder-content {
@@ -184,15 +236,117 @@
         margin: 0;
         font-size: 1.1rem;
     }
-</style>
 
+    .item-image {
+        max-height: 400px;
+        object-fit: contain;
+    }
+
+    /* Rating Styles */
+    .rating-input {
+        display: flex;
+        font-size: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .rating-input i {
+        color: #aaa;
+        cursor: pointer;
+        margin-right: 0.25rem;
+        transition: color 0.2s ease;
+    }
+
+    .rating-input i.active,
+    .stars i.text-warning {
+        color: #ffc107 !important;
+    }
+
+    /* Review Styles */
+    .review-item {
+        transition: background-color 0.2s ease;
+    }
+
+    .review-item:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    /* Similar Items Styles */
+    .similar-item {
+        transition: transform 0.2s ease;
+    }
+
+    .similar-item:hover {
+        transform: translateX(5px);
+    }
+
+    .similar-item-placeholder {
+        width: 50px;
+        height: 50px;
+        background-color: var(--bg-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.25rem;
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
-{{ super() }}  <!-- This will include scripts from parent template -->
+{{ super() }}  <!-- This includes scripts from parent template -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Removing the hover effect - deleting the entire mousemove event handler
+    // Star rating functionality
+    const ratingInput = document.querySelector('.rating-input');
+    const selectedRating = document.getElementById('selected_rating');
+
+    if (ratingInput) {
+        const stars = ratingInput.querySelectorAll('i');
+
+        stars.forEach(star => {
+            // Hover effect
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.dataset.rating);
+                updateStars(rating);
+            });
+
+            // Click to set rating
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.rating);
+                selectedRating.value = rating;
+                updateStars(rating);
+            });
+        });
+
+        // Reset stars when mouse leaves the container
+        ratingInput.addEventListener('mouseleave', function() {
+            const currentRating = parseInt(selectedRating.value);
+            updateStars(currentRating);
+        });
+
+        // Function to update star appearance
+        function updateStars(rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+    }
+
+    // Additional hover effect for purchase button
+    const purchaseBtn = document.querySelector('.purchase-btn');
+    if (purchaseBtn) {
+        purchaseBtn.addEventListener('mouseenter', function() {
+            this.classList.add('btn-hover');
+        });
+
+        purchaseBtn.addEventListener('mouseleave', function() {
+            this.classList.remove('btn-hover');
+        });
+    }
 });
 </script>
 {% endblock %}

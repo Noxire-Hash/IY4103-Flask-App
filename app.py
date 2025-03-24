@@ -21,9 +21,11 @@ from models import (
     SYSTEM_ID,
     TICKET_CATEGORIES,
     TICKET_STATUS,
+    CommunityPost,
     Item,
     Privilege,
     Purchase,
+    ReviewOfItem,
     SupportTicket,
     SupportTicketResponse,
     SystemTransaction,
@@ -85,28 +87,70 @@ def store():
 
 @app.route("/store/item/<int:item_id>")
 def item_preview(item_id):
-    if not session.get("user_id"):
-        flash("Please log in to view items", "warning")
-        return redirect(url_for("login"))
+    # Get item details
+    item = Item.query.get_or_404(item_id)
 
-    try:
-        # Get item data
-        item = Item.query.get_or_404(item_id)
-        vendor = User.query.get_or_404(
-            item.vendor_id
-        )  # Use get_or_404 to ensure vendor exists
+    # Get vendor info
+    vendor = User.query.get(item.vendor_id)
 
-        return render_template(
-            "item_preview.html",
-            item=item,
-            vendor=vendor,
-            similar_items=[],  # Simplified for now
+    # Get reviews
+    reviews = ReviewOfItem.query.filter_by(item_id=item_id).all()
+
+    # Calculate average rating
+    avg_rating = 0
+    if reviews:
+        avg_rating = sum(review.rating for review in reviews) / len(reviews)
+
+    # Get vendor stats
+    vendor_items_count = Item.query.filter_by(vendor_id=item.vendor_id).count()
+
+    # Get vendor average rating
+    vendor_items = Item.query.filter_by(vendor_id=item.vendor_id).all()
+    vendor_reviews = []
+    for vendor_item in vendor_items:
+        vendor_reviews.extend(
+            ReviewOfItem.query.filter_by(item_id=vendor_item.id).all()
         )
 
-    except Exception as e:
-        print(f"Error in item_preview: {e}")
-        flash("Error loading item details", "danger")
-        return redirect(url_for("store"))
+    vendor_rating = 0
+    if vendor_reviews:
+        vendor_rating = sum(review.rating for review in vendor_reviews) / len(
+            vendor_reviews
+        )
+
+    # Get similar items (based on tags or category)
+    similar_items = []
+    if item.tags:
+        item_tags = [tag.strip() for tag in item.tags.split(",")]
+        similar_items = (
+            Item.query.filter(Item.id != item_id, Item.category == item.category)
+            .limit(5)
+            .all()
+        )
+
+    # Enrich reviews with usernames
+    enriched_reviews = []
+    for review in reviews:
+        user = User.query.get(review.user_id)
+        enriched_reviews.append(
+            {
+                "user_id": review.user_id,
+                "username": user.username if user else "Unknown User",
+                "rating": review.rating,
+                "review": review.review,
+                "created_at": review.created_at,
+            }
+        )
+
+    return render_template(
+        "item_preview.html",
+        item=item,
+        reviews=enriched_reviews,
+        avg_rating=avg_rating,
+        vendor_items_count=vendor_items_count,
+        vendor_rating=vendor_rating,
+        similar_items=similar_items,
+    )
 
 
 @app.route("/news")
@@ -1258,7 +1302,32 @@ def api_all_items():
 
 @app.route("/community")
 def community():
-    return render_template("forms_index.html")
+    # Query posts with joined user data to get usernames
+    posts = (
+        db.session.query(CommunityPost, User.username.label("creator_username"))
+        .join(User, CommunityPost.creator_id == User.id)
+        .all()
+    )
+
+    # Format the posts for template rendering
+    formatted_posts = []
+    for post, username in posts:
+        post_dict = {
+            "id": post.id,
+            "title": post.title,
+            "content": post.content,
+            "category": post.category,
+            "tags": post.tags,
+            "upvotes": post.upvotes,
+            "downvotes": post.downvotes,
+            "created_at": post.created_at,
+            "creator_id": post.creator_id,
+            "creator_username": username,
+            # Add any other needed fields
+        }
+        formatted_posts.append(post_dict)
+
+    return render_template("forms_index.html", posts=formatted_posts)
 
 
 @app.route("/store/item/<int:item_id>")
@@ -1283,6 +1352,12 @@ def user_account(user_id=None):
         # Get the user from the database
         user = User.query.get_or_404(user_id)
 
+        # Format dates for display ONLY - create a separate variable for display
+        # Don't modify the original datetime object
+        formatted_date = (
+            user.created_at.strftime("%b %d, %Y") if user.created_at else "Unknown"
+        )
+
         # Check if user is a vendor (privilege_id 2 or higher)
         is_vendor = user.privilege_id >= 2
 
@@ -1292,6 +1367,8 @@ def user_account(user_id=None):
             "item_count": 0,
             "review_count": 0,
             "avg_rating": 0.0,
+            "days_member": 0,  # Will calculate this if needed
+            "purchase_count": 0,
         }
 
         # If the user is a vendor, get their item count
@@ -1304,6 +1381,7 @@ def user_account(user_id=None):
         return render_template(
             "user_account.html",
             user=user,
+            formatted_date=formatted_date,  # Pass formatted date separately
             user_stats=user_stats,
             is_vendor=is_vendor,
             is_admin=is_admin,
@@ -1312,6 +1390,143 @@ def user_account(user_id=None):
         print(f"Error loading user profile: {e}")
         flash("Error loading user profile", "danger")
         return redirect(url_for("home"))
+
+
+@app.template_filter("strftime")
+def strftime_filter(date, format="%Y-%m-%d"):
+    """Convert a datetime to a different format."""
+    if isinstance(date, str):
+        try:
+            from datetime import datetime
+
+            date = datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            return date
+    return date.strftime(format) if date else ""
+
+
+@app.route("/community/create_post", methods=["GET", "POST"])
+def create_post():
+    if request.method == "POST":
+        # Get form data
+        title = request.form.get("title")
+        content = request.form.get("content")
+        category = request.form.get("category")
+        tags = request.form.get("tags")
+
+        # Create new post
+        new_post = CommunityPost(
+            creator_id=session.get("user_id"),
+            title=title,
+            content=content,
+            category=category,
+            tags=tags,
+        )
+
+        try:
+            db.session.add(new_post)
+            db.session.commit()
+            flash("Post published successfully!", "success")
+            return redirect(url_for("community"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error creating post: {str(e)}", "danger")
+            return redirect(url_for("post_crafter"))
+
+    return render_template("community_post_crafter.html")
+
+
+@app.route("/community/save_draft", methods=["POST"])
+def save_draft():
+    # Similar to create_post but mark as draft
+    # Add a is_draft field to your CommunityPost model if needed
+    if request.method == "POST":
+        # Process similar to create_post but mark as draft
+        flash("Draft saved successfully!", "success")
+        return redirect(url_for("community"))
+
+
+@app.template_filter("format_currency")
+def format_currency(value):
+    """Format a number as AW currency."""
+    return f"{value} AW"
+
+
+@app.template_filter("format_date")
+def format_date(date):
+    """Format a date to a user-friendly format."""
+    if not date:
+        return "N/A"
+
+    from datetime import datetime, timedelta, timezone
+
+    # If it's a string, try to convert it to datetime
+    if isinstance(date, str):
+        try:
+            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            try:
+                date = datetime.strptime(date, "%Y-%m-%d")
+            except ValueError:
+                return date
+
+    # Get current time
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    # Calculate the time difference
+    diff = now - date
+
+    # Format based on how recent the date is
+    if diff < timedelta(minutes=1):
+        return "Just now"
+    elif diff < timedelta(hours=1):
+        minutes = int(diff.total_seconds() / 60)
+        return f"{minutes}m ago"
+    elif diff < timedelta(days=1):
+        hours = int(diff.total_seconds() / 3600)
+        return f"{hours}h ago"
+    elif diff < timedelta(days=2):
+        return "Yesterday"
+    elif diff < timedelta(days=7):
+        days = int(diff.total_seconds() / 86400)
+        return f"{days} days ago"
+    else:
+        return date.strftime("%b %d, %Y")
+
+
+@app.route("/submit_review/<int:item_id>", methods=["POST"])
+def submit_review(item_id):
+    # Check if user is logged in
+    if not session.get("user_id"):
+        flash("Please log in to submit a review", "warning")
+        return redirect(url_for("login"))
+
+    try:
+        # Get form data
+        rating = int(request.form.get("rating", 5))  # Default to 5 if not provided
+        review_text = request.form.get("review_text", "")
+
+        # Validate rating
+        if not 1 <= rating <= 5:
+            flash("Rating must be between 1 and 5", "danger")
+            return redirect(url_for("item_preview", item_id=item_id))
+
+        # Create new review
+        new_review = ReviewOfItem(
+            user_id=session["user_id"],
+            item_id=item_id,
+            rating=rating,
+            review=review_text,
+        )
+
+        db.session.add(new_review)
+        db.session.commit()
+        flash("Review submitted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error submitting review: {str(e)}", "danger")
+
+    return redirect(url_for("item_preview", item_id=item_id))
 
 
 if __name__ == "__main__":

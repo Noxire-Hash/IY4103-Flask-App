@@ -18,6 +18,13 @@ TICKET_CATEGORIES = [
     "Become Vendor",
     "Other",
 ]
+COMMUNITY_LEVELS = ["Lost Soul", "Wanderer", "Chronicler", "Sage", "Elder"]
+MERCHANT_LEVELS = [
+    "Street Padddler",
+    "Bazaar Trader",
+    "Guild Merchant",
+    "The Gilded Baron",
+]
 TICKET_STATUS = ["Open", "In Progress", "Closed"]
 PURCHASE_STATUS = ["Pending", "Completed", "Cancelled"]
 TRANSACTION_TYPES = [
@@ -62,8 +69,8 @@ class User(db.Model):
     privilege_id = db.Column(db.Integer, db.ForeignKey("privileges.id"), default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(64), default="Active", index=True)
-
-    # Standardize all relationships to use back_populates
+    balance = db.Column(db.Integer, default=0)
+    pending_balance = db.Column(db.Integer, default=0)
     purchases = db.relationship(
         "Purchase", back_populates="user", lazy=True, cascade="all, delete-orphan"
     )
@@ -80,10 +87,6 @@ class User(db.Model):
     grindstone_items = db.relationship("GrindStoneItem", back_populates="user")
     community_posts = db.relationship("CommunityPost", back_populates="creator")
     community_replies = db.relationship("CommunityReply", back_populates="creator")
-
-    # Balance fields
-    balance = db.Column(db.Integer, default=0)
-    pending_balance = db.Column(db.Integer, default=0)
 
 
 class Vendor(db.Model):
@@ -286,12 +289,14 @@ class CommunityPost(db.Model):
     upvotes = db.Column(db.Integer, default=0)
     downvotes = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
     # Add relationships
     replies = db.relationship(
         "CommunityReply", back_populates="post", lazy=True, cascade="all, delete-orphan"
     )
     creator = db.relationship("User", back_populates="community_posts")
+    comments = db.relationship(
+        "CommunityReply", back_populates="post", lazy=True, cascade="all, delete-orphan"
+    )
 
 
 class CommunityReply(db.Model):

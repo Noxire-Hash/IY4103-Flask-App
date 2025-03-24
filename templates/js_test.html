@@ -1,0 +1,91 @@
+{% extends "nav_footer_template.html" %}
+
+{% block title %}JavaScript Test Page{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h1 class="text-center mb-4">JavaScript Test Page</h1>
+
+            <div class="card bg-dark border-secondary mb-4">
+                <div class="card-header">
+                    <h3>Interactive Tests</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>jQuery Test</h5>
+                        <button id="jquery-test-btn" class="btn btn-primary">Test jQuery</button>
+                        <div id="jquery-test-result" class="mt-2"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>DOM Manipulation Test</h5>
+                        <input type="text" id="test-input" class="form-control bg-dark text-light mb-2" placeholder="Type something...">
+                        <div id="test-output" class="p-3 border border-secondary rounded">Output will appear here</div>
+                    </div>
+
+                    <div>
+                        <h5>Event Test</h5>
+                        <div id="click-counter" class="p-3 border border-secondary rounded text-center">
+                            Click count: <span id="counter">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h3>Console Output</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-warning">Please open your browser's developer console (F12) to see log messages.</p>
+                    <div id="logs" class="p-3 bg-dark border border-secondary rounded" style="max-height: 300px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    console.log("JS test page loaded");
+
+    // Function to log to both console and page
+    function log(message) {
+        console.log(message);
+        const logEl = document.createElement('div');
+        logEl.textContent = `> ${message}`;
+        document.getElementById('logs').appendChild(logEl);
+    }
+
+    $(document).ready(function() {
+        log("Document ready event fired");
+
+        // jQuery test
+        $('#jquery-test-btn').on('click', function() {
+            log("jQuery button clicked");
+            $('#jquery-test-result').html('<div class="alert alert-success">jQuery is working properly!</div>');
+        });
+
+        // Input test
+        $('#test-input').on('input', function() {
+            const text = $(this).val();
+            log(`Input changed: "${text}"`);
+            $('#test-output').text(text || 'Output will appear here');
+        });
+
+        // Click counter
+        let count = 0;
+        $('#click-counter').on('click', function() {
+            count++;
+            log(`Click counter clicked: ${count}`);
+            $('#counter').text(count);
+        });
+
+        log("All event handlers registered");
+    });
+</script>
+{% endblock %}
