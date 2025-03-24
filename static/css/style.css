@@ -56,6 +56,9 @@ body {
   flex-direction: column;
   min-height: 100vh; /* Ensures footer stays at the bottom */
   overflow-x: hidden; /* Prevent horizontal scroll */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Navbar */
@@ -77,8 +80,90 @@ body {
   background-color: var(--card-background); /* Use your defined color */
 }
 
+/* Enhanced Logo Treatment */
 .navbar-brand {
-  font-size: 1.5rem; /* Adjust brand size */
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 0;
+  position: relative;
+  display: inline-block;
+}
+
+/* Make the LoreKeeper name pop more */
+.navbar-brand .glow {
+  font-family: 'Cinzel', serif; /* More fantasy/medieval font for the name */
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Unified Glow Effect with consistent timing */
+@keyframes unifiedGlow {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Apply this to all glow instances for consistency */
+.glow {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    var(--accent-color) 0%,
+    #d4c5ff 40%,
+    var(--accent-color) 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+
+  /* Very subtle glow that won't overpower */
+  filter: drop-shadow(0 0 1px rgba(177, 152, 237, 0.3));
+}
+
+/* Logo icon styling if you have one */
+.navbar-brand img,
+.navbar-brand svg,
+.navbar-brand i {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img,
+.navbar-brand:hover svg,
+.navbar-brand:hover i {
+  transform: rotate(10deg);
+}
+
+/* Subtle magical effect on hover */
+.navbar-brand::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-color) 50%,
+    transparent 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.navbar-brand:hover::after {
+  transform: scaleX(1);
 }
 
 /* Refined Mobile Navbar Styles */
@@ -510,24 +595,45 @@ footer a:hover {
   border-radius: 0 0 10px 10px;
 }
 
-/* Glow Effect for Lorekeeper Text */
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
-  }
-  50% {
-    text-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color);
-  }
-  100% {
-    text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
-  }
+/* Enhanced Shifting Glow Effect for Lorekeeper Text - Subtle Version */
+@keyframes shiftGlow {
+    0% {
+        background-position: -100% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 .glow {
-  color: var(--accent-color) !important;
-  text-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color) !important;
-  animation: glow 3s ease-in-out infinite;
-  text-decoration: none;
+    position: relative;
+    color: transparent !important;
+    background: linear-gradient(
+        90deg,
+        var(--accent-color) 0%,
+        #d4c5ff 15%,
+        var(--accent-color) 30%,
+        #9670e5 45%,
+        var(--accent-color) 55%,
+        #d4c5ff 70%,
+        var(--accent-color) 85%,
+        #9670e5 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+    animation: shiftGlow 6s infinite linear;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+
+    /* Reduced glow intensity */
+    filter: drop-shadow(0 0 1px rgba(177, 152, 237, 0.5))
+            drop-shadow(0 0 3px rgba(177, 152, 237, 0.2));
+
+    /* Subtle text shadow */
+    text-shadow: 0 0 2px rgba(177, 152, 237, 0.3);
 }
 
 /* Form Styles */
@@ -766,12 +872,141 @@ footer a:hover {
 
 /* Remove shimmer animation */
 .shimmer {
-    background: none;
-    animation: none;
+    position: relative;
+    background: var(--card-background);
+    overflow: hidden;
+    animation: shimmer-bg 2s infinite;
 }
 
 .shimmer::after {
-    display: none;
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--accent-rgb), 0.2) 50%,
+        transparent 100%
+    );
+    animation: shimmer 2s infinite;
+    transform: translateX(-100%);
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes shimmer-bg {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.9;
+    }
+}
+
+/* Loading placeholders for store items */
+.loading-placeholder {
+    display: block;
+    background: var(--input-background);
+    border-radius: 4px;
+}
+
+.loading-placeholder.title {
+    height: 24px;
+    margin-bottom: 12px;
+    width: 70%;
+}
+
+.loading-placeholder.description {
+    height: 16px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.loading-placeholder.price {
+    height: 24px;
+    width: 40%;
+    margin-top: 12px;
+}
+
+/* Item preview placeholder with shimmer */
+.item-preview-placeholder {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    background-color: var(--card-background);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shimmer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        transparent 40%,
+        rgba(177, 152, 237, 0.1) 45%,
+        rgba(177, 152, 237, 0.2) 50%,
+        rgba(177, 152, 237, 0.1) 55%,
+        transparent 60%
+    );
+    background-size: 200% 200%;
+    animation: shimmerNew 6s linear infinite;
+}
+
+@keyframes shimmerNew {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.placeholder-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+}
+
+.placeholder-content i {
+    color: var(--accent-color);
+    opacity: 0.8;
+    margin-bottom: 1.2rem;
+    font-size: 3.5rem;
+    animation: pulseIcon 4s infinite ease-in-out;
+}
+
+.placeholder-content p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+@keyframes pulseIcon {
+    0%, 100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.03);
+    }
 }
 
 /* Improved store layout */
@@ -1168,94 +1403,6 @@ footer a:hover {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--primary-color);
-}
-
-/* Update the shimmer animation and effect */
-@keyframes shimmer {
-    0% {
-        transform: translateX(-150%);
-    }
-    100% {
-        transform: translateX(150%);
-    }
-}
-
-@keyframes fadeInOut {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 0.9; }
-}
-
-.item-preview-placeholder {
-    position: relative;
-    height: 400px;
-    width: 100%;
-    background-color: var(--card-background);
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.shimmer-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        45deg,
-        transparent 40%,
-        rgba(177, 152, 237, 0.1) 45%,
-        rgba(177, 152, 237, 0.2) 50%,
-        rgba(177, 152, 237, 0.1) 55%,
-        transparent 60%
-    );
-    background-size: 200% 200%;
-    animation: shimmerNew 6s linear infinite;
-}
-
-@keyframes shimmerNew {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-.placeholder-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 2rem;
-}
-
-.placeholder-content i {
-    color: var(--accent-color);
-    opacity: 0.8;
-    margin-bottom: 1.2rem;
-    font-size: 3.5rem;
-    animation: pulseIcon 4s infinite ease-in-out;
-}
-
-.placeholder-content p {
-    color: var(--text-muted);
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-@keyframes pulseIcon {
-    0%, 100% {
-        opacity: 0.7;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.9;
-        transform: scale(1.03);
-    }
 }
 
 /* Admin Dashboard Styles */
@@ -1911,5 +2058,63 @@ footer a:hover {
     0% { box-shadow: 0 0 0 0 rgba(177, 152, 237, 0.7); }
     70% { box-shadow: 0 0 0 10px rgba(177, 152, 237, 0); }
     100% { box-shadow: 0 0 0 0 rgba(177, 152, 237, 0); }
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, .btn, .nav-link, .form-control {
+  transition: all 0.25s ease-in-out;
+}
+
+/* Enhance focus states for accessibility */
+:focus {
+  outline: 2px solid rgba(177, 152, 237, 0.5);
+  outline-offset: 2px;
+}
+
+/* Improve dark mode system detection */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Optimize animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .glow {
+    animation: none !important;
+    background-position: 0 0 !important;
+    filter: none !important;
+  }
+
+  .shimmer::after {
+    animation: none !important;
+  }
+}
+
+/* Better loading state handling */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 10px);
+  left: calc(50% - 10px);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(177, 152, 237, 0.3);
+  border-top: 2px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
