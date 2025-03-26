@@ -1312,6 +1312,7 @@ def community():
     # Format the posts for template rendering
     formatted_posts = []
     for post, username in posts:
+        post.tags = post.tags.split(",")
         post_dict = {
             "id": post.id,
             "title": post.title,
@@ -1323,7 +1324,6 @@ def community():
             "created_at": post.created_at,
             "creator_id": post.creator_id,
             "creator_username": username,
-            # Add any other needed fields
         }
         formatted_posts.append(post_dict)
 

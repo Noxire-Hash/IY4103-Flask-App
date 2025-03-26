@@ -61,6 +61,14 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Add a content-wrapper class */
+.content-wrapper {
+  flex: 1 0 auto; /* This makes the content area expand to push footer down */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 /* Navbar */
 .navbar {
   background-color: var(--card-background);
@@ -177,8 +185,7 @@ body {
 }
 
 .navbar-toggler:focus {
-  box-shadow: 0 0 0 3px rgba(177, 152, 237, 0.25);
-  outline: none;
+  box-shadow: none;
 }
 
 .navbar-toggler:hover {
@@ -533,8 +540,6 @@ footer {
   border-top: 1px solid var(--input-border);
   margin-top: auto; /* Pushes footer to the bottom */
   flex-shrink: 0;
-  position: relative;
-  bottom: 0;
   width: 100%;
 }
 footer a {
@@ -2065,10 +2070,28 @@ a, button, .btn, .nav-link, .form-control {
   transition: all 0.25s ease-in-out;
 }
 
-/* Enhance focus states for accessibility */
+/* Update focus styles to remove outline on mouse clicks but keep it for keyboard navigation */
 :focus {
+  outline: none; /* Remove default outline */
+}
+
+/* Only show outline for keyboard navigation */
+:focus-visible {
   outline: 2px solid rgba(177, 152, 237, 0.5);
   outline-offset: 2px;
+}
+
+/* For browsers that don't support :focus-visible yet */
+.navbar a:focus:not(:focus-visible),
+.navbar button:focus:not(:focus-visible),
+.navbar .navbar-toggler:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* For the navbar toggler specifically */
+.navbar-toggler:focus {
+  box-shadow: none;
 }
 
 /* Improve dark mode system detection */
@@ -2116,5 +2139,13 @@ a, button, .btn, .nav-link, .form-control {
   border-top: 2px solid var(--accent-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+/* Fix specifically for the forums page */
+.container-fluid {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding-bottom: 2rem; /* Space before footer */
 }
 

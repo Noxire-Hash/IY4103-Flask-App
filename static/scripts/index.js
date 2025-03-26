@@ -1,108 +1,112 @@
 // 1. First define all utility functions
 function formatCurrency(amount) {
-    return `${Number(amount).toFixed(2)} AW`;
+  return `${Number(amount).toFixed(2)} AW`;
 }
 
 // 2. Define the updateFeaturedItem function
 function updateFeaturedItem(item, index) {
-    console.log('Updating featured item:', item);
+  console.log("Updating featured item:", item);
 
-    // Update item details
-    $(`#featured-item-name-${index}`).text(item.name);
-    $(`#featured-item-description-${index}`).text(
-        item.description.length > 120
-            ? item.description.substring(0, 120) + '...'
-            : item.description
-    );
-    $(`#featured-item-vendor-name-${index}`).text(`By ${item.vendor_name}`);
-    $(`#featured-item-price-${index}`).text(formatCurrency(item.price));
+  // Update item details
+  $(`#featured-item-name-${index}`).text(item.name);
+  $(`#featured-item-description-${index}`).text(
+    item.description.length > 120
+      ? item.description.substring(0, 120) + "..."
+      : item.description,
+  );
+  $(`#featured-item-vendor-name-${index}`).text(`By ${item.vendor_name}`);
+  $(`#featured-item-price-${index}`).text(formatCurrency(item.price));
 
-    // Update button with correct URL and click handler
-    const button = $(`#featured-item-btn-${index}`);
+  // Update button with correct URL and click handler
+  const button = $(`#featured-item-btn-${index}`);
 
-    // Add debug log to check item data
-    console.log(`Item ${index} data:`, {id: item.id, name: item.name});
+  // Add debug log to check item data
+  console.log(`Item ${index} data:`, { id: item.id, name: item.name });
 
-    if (item && item.id) {
-        const itemUrl = `/store/item/${item.id}`;
-        button
-            .removeClass('disabled btn-secondary')
-            .addClass('btn-primary')
-            .css({
-                'opacity': '1',
-                'cursor': 'pointer',
-                'pointer-events': 'auto'
-            })
-            .attr('href', itemUrl)
-            .off('click')
-            .on('click', function(e) {
-                e.preventDefault();
-                window.location.href = itemUrl;
-            });
-    } else {
-        console.warn(`Missing item ID for featured item ${index}`); // Add warning log
-        button
-            .attr('href', '#')
-            .addClass('disabled btn-secondary')
-            .removeClass('btn-primary')
-            .css({
-                'opacity': '0.65',
-                'cursor': 'not-allowed',
-                'pointer-events': 'none'
-            });
-    }
+  if (item && item.id) {
+    const itemUrl = `/store/item/${item.id}`;
+    button
+      .removeClass("disabled btn-secondary")
+      .addClass("btn-primary")
+      .css({
+        opacity: "1",
+        cursor: "pointer",
+        "pointer-events": "auto",
+      })
+      .attr("href", itemUrl)
+      .off("click")
+      .on("click", function (e) {
+        e.preventDefault();
+        window.location.href = itemUrl;
+      });
+  } else {
+    console.warn(`Missing item ID for featured item ${index}`); // Add warning log
+    button
+      .attr("href", "#")
+      .addClass("disabled btn-secondary")
+      .removeClass("btn-primary")
+      .css({
+        opacity: "0.65",
+        cursor: "not-allowed",
+        "pointer-events": "none",
+      });
+  }
 }
 
 // 3. Define the loadFeaturedItems function
 function loadFeaturedItems() {
-    $.ajax({
-        url: '/api/featured-items',
-        type: 'GET',
-        success: function(response) {
-            if (response.items && response.items.length > 0) {
-                for (let i = 0; i < Math.min(response.items.length, 3); i++) {
-                    updateFeaturedItem(response.items[i], i);
-                }
-            } else {
-                for (let i = 0; i < 3; i++) {
-                    $(`#featured-item-name-${i}`).text('No featured items available');
-                    $(`#featured-item-description-${i}`).text('Check back later for featured items!');
-                    $(`#featured-item-vendor-name-${i}`).text('');
-                    $(`#featured-item-price-${i}`).text('N/A');
-                    $(`#featured-item-btn-${i}`).addClass('disabled').text('Not Available');
-                }
-            }
-        },
-        error: function(error) {
-            console.error('Error loading featured items:', error);
-            for (let i = 0; i < 3; i++) {
-                $(`#featured-item-name-${i}`).text('Error loading items');
-                $(`#featured-item-description-${i}`).text('Please try again later');
-                $(`#featured-item-vendor-name-${i}`).text('');
-                $(`#featured-item-price-${i}`).text('N/A');
-                $(`#featured-item-btn-${i}`).addClass('disabled').text('Not Available');
-            }
+  $.ajax({
+    url: "/api/featured-items",
+    type: "GET",
+    success: function (response) {
+      if (response.items && response.items.length > 0) {
+        for (let i = 0; i < Math.min(response.items.length, 3); i++) {
+          updateFeaturedItem(response.items[i], i);
         }
-    });
+      } else {
+        for (let i = 0; i < 3; i++) {
+          $(`#featured-item-name-${i}`).text("No featured items available");
+          $(`#featured-item-description-${i}`).text(
+            "Check back later for featured items!",
+          );
+          $(`#featured-item-vendor-name-${i}`).text("");
+          $(`#featured-item-price-${i}`).text("N/A");
+          $(`#featured-item-btn-${i}`)
+            .addClass("disabled")
+            .text("Not Available");
+        }
+      }
+    },
+    error: function (error) {
+      console.error("Error loading featured items:", error);
+      for (let i = 0; i < 3; i++) {
+        $(`#featured-item-name-${i}`).text("Error loading items");
+        $(`#featured-item-description-${i}`).text("Please try again later");
+        $(`#featured-item-vendor-name-${i}`).text("");
+        $(`#featured-item-price-${i}`).text("N/A");
+        $(`#featured-item-btn-${i}`).addClass("disabled").text("Not Available");
+      }
+    },
+  });
 }
 
 // Define loadUserAccount as a separate function
-  function loadUserAccount() {
-    $.ajax({
-      url: "/user_account",
-      type: "GET",
-        success: function(response) {
-        console.log("User account loaded:", response);
-      },
-        error: function(error) {
-        console.error("Error loading user account:", error);
-      },
-    });
-  }
+function loadUserAccount() {
+  $.ajax({
+    url: "/user_account",
+    type: "GET",
+    success: function (response) {
+      console.log("User account loaded:", response);
+    },
+    error: function (error) {
+      console.error("Error loading user account:", error);
+    },
+  });
+}
 
 // Add this function outside document ready
 
-$(document).ready(function() {
+$(document).ready(function () {
   console.log("index.js is running on this page:", window.location.pathname);
 
   // Constants
@@ -114,8 +118,8 @@ $(document).ready(function() {
     CHECKOUT_DEPOSIT: "/checkout/deposit",
     ADMIN_DASHBOARD: "/admin",
     USER_ACCOUNT: "/user",
-        COMMUNITY: "/community",
-        COMMUNITY_POST_CRAFTER: "/community/create_post"
+    COMMUNITY: "/community",
+    COMMUNITY_POST_CRAFTER: "/community/create_post",
   };
 
   // Event Listeners
@@ -126,95 +130,89 @@ $(document).ready(function() {
   function setupEventListeners() {
     // Register form validation
     const form = $("#register-form");
-        if (form.length) {
-    form.on("submit", handleRegisterSubmit);
-        }
+    if (form.length) {
+      form.on("submit", handleRegisterSubmit);
+    }
 
     // User data button
-        const userDataBtn = $("#get_userdata");
-        if (userDataBtn.length) {
-            userDataBtn.click(getUserData);
-        }
+    const userDataBtn = $("#get_userdata");
+    if (userDataBtn.length) {
+      userDataBtn.click(getUserData);
+    }
   }
 
   function handlePageSpecificCode() {
     const path = window.location.pathname;
-        console.log("Path detected:", path);
+    console.log("Path detected:", path);
 
-        // Path-specific initializations
-        if (path === PATHS.ACCOUNT) {
-            handleMyAccountPage();
-        }
-        else if (path === PATHS.STORE) {
-            console.log("Loading store page specific code");
-            // Only load featured items on the store page
-            loadFeaturedItems();
-            loadAllItems();
-        }
-        else if (path === PATHS.VENDOR_DASHBOARD) {
-        fillVendorData();
-        }
-        else if (path === PATHS.CHECKOUT_DEPOSIT) {
-        handleCheckoutDeposit();
-        }
-        else if (path === PATHS.ADMIN_DASHBOARD) {
-        handleAdminDashboard();
-        }
-        else if (path === PATHS.USER_ACCOUNT) {
-            handleUserAccountPage();
-        }
-        else if (path === PATHS.COMMUNITY) {
-            console.log("Loading community forums page");
+    // Path-specific initializations
+    if (path === PATHS.ACCOUNT) {
+      handleMyAccountPage();
+    } else if (path === PATHS.STORE) {
+      console.log("Loading store page specific code");
+      // Only load featured items on the store page
+      loadFeaturedItems();
+      loadAllItems();
+    } else if (path === PATHS.VENDOR_DASHBOARD) {
+      fillVendorData();
+    } else if (path === PATHS.CHECKOUT_DEPOSIT) {
+      handleCheckoutDeposit();
+    } else if (path === PATHS.ADMIN_DASHBOARD) {
+      handleAdminDashboard();
+    } else if (path === PATHS.USER_ACCOUNT) {
+      handleUserAccountPage();
+    } else if (path === PATHS.COMMUNITY) {
+      console.log("Loading community forums page");
+      enhanceCommunityForumsPage();
 
-            // Initialize forums page functionality with enhanced UI
-            enhanceCommunityForumsPage();
+      // Initialize forums page functionality with enhanced UI
+    } else if (path === PATHS.COMMUNITY_POST_CRAFTER) {
+      console.log("Loading community post crafter page from index.js");
 
+      // Initialize post crafter with enhanced functionality
+      handleCommunityPostCrafter();
+
+      // Add transitions and animations to the post crafter page
+      $("#postTitle, #postContent")
+        .on("focus", function () {
+          $(this).parent().addClass("input-focused");
+        })
+        .on("blur", function () {
+          $(this).parent().removeClass("input-focused");
+        });
+
+      // Smoother preview toggle
+      $("#previewToggle").on("click", function () {
+        const $editor = $("#editorSection");
+        const $preview = $("#previewSection");
+
+        if ($editor.is(":visible")) {
+          $editor.fadeOut(200, function () {
+            $preview.fadeIn(200);
+          });
+        } else {
+          $preview.fadeOut(200, function () {
+            $editor.fadeIn(200);
+          });
         }
-        else if (path === PATHS.COMMUNITY_POST_CRAFTER) {
-            console.log("Loading community post crafter page from index.js");
+      });
+    }
 
-            // Initialize post crafter with enhanced functionality
-            handleCommunityPostCrafter();
+    // Check for specific elements on the page regardless of path
+    if ($("#admin-dashboard").length) {
+      handleAdminDashboard();
+    }
 
-            // Add transitions and animations to the post crafter page
-            $('#postTitle, #postContent').on('focus', function() {
-                $(this).parent().addClass('input-focused');
-            }).on('blur', function() {
-                $(this).parent().removeClass('input-focused');
-            });
+    if ($("#featured-items-container").length) {
+      console.log("Found featured items container, loading items");
+      loadFeaturedItems();
+      loadAllItems();
+    }
 
-            // Smoother preview toggle
-            $('#previewToggle').on('click', function() {
-                const $editor = $('#editorSection');
-                const $preview = $('#previewSection');
-
-                if ($editor.is(':visible')) {
-                    $editor.fadeOut(200, function() {
-                        $preview.fadeIn(200);
-                    });
-                } else {
-                    $preview.fadeOut(200, function() {
-                        $editor.fadeIn(200);
-                    });
-                }
-            });
-        }
-
-        // Check for specific elements on the page regardless of path
-        if ($('#admin-dashboard').length) {
-        handleAdminDashboard();
-        }
-
-        if ($('#featured-items-container').length) {
-            console.log("Found featured items container, loading items");
-            loadFeaturedItems();
-            loadAllItems();
-        }
-
-        // Check if postCrafterForm exists on any page
-        if ($('#postCrafterForm').length) {
-            console.log("Found post crafter form, initializing");
-            handleCommunityPostCrafter();
+    // Check if postCrafterForm exists on any page
+    if ($("#postCrafterForm").length) {
+      console.log("Found post crafter form, initializing");
+      handleCommunityPostCrafter();
     }
   }
 
@@ -282,7 +280,7 @@ $(document).ready(function() {
   }
 
   // Page Specific Functions
-    function handleMyAccountPage() {
+  function handleMyAccountPage() {
     getUserData()
       .then(function (userData) {
         if (typeof userData === "string") {
@@ -303,31 +301,31 @@ $(document).ready(function() {
             $("#vendor-link").removeClass("d-none");
             break;
         }
-       // Update user fields
+        // Update user fields
         $("#username").text(userData.username);
         $("#email").text(userData.email);
         $("#privilege").text(userData.privilege_id);
         $("#sub-tier").text("Exclusive");
         $("#balance").text(userData.balance);
         $("#pending-balance").text(userData.pending_balance);
-                $("#bio").text(userData.bio);
-                $("#update-bio").click(function() {
-                    console.log("Update bio clicked");
-                    $.ajax({
-                        url: "/api/account/update_bio",
-                        type: "POST",
-                        data: { bio: $("#bio").val() },
-                        success: function(response) {
-                            console.log("Bio updated successfully");
-                            triggerFlash("Bio updated successfully", "success");
-                        },
-                        error: function(error) {
-                            console.error("Error updating bio:", error);
-                            triggerFlash("Error updating bio", "danger");
-                        }
-                    });
-                });
-            })
+        $("#bio").text(userData.bio);
+        $("#update-bio").click(function () {
+          console.log("Update bio clicked");
+          $.ajax({
+            url: "/api/account/update_bio",
+            type: "POST",
+            data: { bio: $("#bio").val() },
+            success: function (response) {
+              console.log("Bio updated successfully");
+              triggerFlash("Bio updated successfully", "success");
+            },
+            error: function (error) {
+              console.error("Error updating bio:", error);
+              triggerFlash("Error updating bio", "danger");
+            },
+          });
+        });
+      })
 
       .catch(function (error) {
         console.error("Error processing user data:", error);
@@ -337,46 +335,46 @@ $(document).ready(function() {
 
   function fillStoreItems() {
     getStoreItems()
-        .then(function(response) {
-            console.log('Raw items response:', response); // Debug log
+      .then(function (response) {
+        console.log("Raw items response:", response); // Debug log
 
-            if (response.items && response.items.length > 0) {
-                const numItemsToShow = Math.min(3, response.items.length);
-                for (let i = 0; i < numItemsToShow; i++) {
-                    updateFeaturedItem(response.items[i], i);
-                }
-            } else {
-                console.warn('No items returned from getStoreItems');
-                // Handle empty state
-                for (let i = 0; i < 3; i++) {
-                    $(`#featured-item-name-${i}`).text('No items available');
-                    $(`#featured-item-description-${i}`).text('Check back later!');
-                    $(`#featured-item-vendor-name-${i}`).text('');
-                    $(`#featured-item-price-${i}`).text('N/A');
-                    $(`#featured-item-btn-${i}`)
-                        .addClass('disabled')
-                        .attr('href', '#')
-                        .text('Not Available');
-                }
-            }
-        })
-        .catch(function(error) {
-            console.error("Error filling store items:", error);
-            triggerFlash("Error loading store items", "danger");
-        });
+        if (response.items && response.items.length > 0) {
+          const numItemsToShow = Math.min(3, response.items.length);
+          for (let i = 0; i < numItemsToShow; i++) {
+            updateFeaturedItem(response.items[i], i);
+          }
+        } else {
+          console.warn("No items returned from getStoreItems");
+          // Handle empty state
+          for (let i = 0; i < 3; i++) {
+            $(`#featured-item-name-${i}`).text("No items available");
+            $(`#featured-item-description-${i}`).text("Check back later!");
+            $(`#featured-item-vendor-name-${i}`).text("");
+            $(`#featured-item-price-${i}`).text("N/A");
+            $(`#featured-item-btn-${i}`)
+              .addClass("disabled")
+              .attr("href", "#")
+              .text("Not Available");
+          }
+        }
+      })
+      .catch(function (error) {
+        console.error("Error filling store items:", error);
+        triggerFlash("Error loading store items", "danger");
+      });
   }
 
   function handleItemPreview(itemId) {
     $.ajax({
-        type: "GET",
-        url: `/get_item_data_from_id/${itemId}`,
+      type: "GET",
+      url: `/get_item_data_from_id/${itemId}`,
       success: function (response) {
         console.log("Item data received:", response);
-            updateItemPreview(response);
-        },
+        updateItemPreview(response);
+      },
       error: function (error) {
         console.error("Error loading item data:", error);
-            triggerFlash("Error loading item details", "danger");
+        triggerFlash("Error loading item details", "danger");
       },
     });
   }
@@ -386,7 +384,7 @@ $(document).ready(function() {
       <div class="featured-card">
         <div class="featured-content">
           <h5 class="card-title">${item.name}</h5>
-          <p class="card-text">${item.description.substring(0, 100)}${item.description.length > 100 ? '...' : ''}</p>
+          <p class="card-text">${item.description.substring(0, 100)}${item.description.length > 100 ? "..." : ""}</p>
           <p class="card-text">By ${item.vendor_name}</p>
           <div class="d-flex justify-content-between align-items-center mt-3">
             <h6 class="fw-bold mb-0">${formatCurrency(item.price)}</h6>
@@ -407,8 +405,8 @@ $(document).ready(function() {
       $(".sales-count").text(`${itemData.sales} sales`).removeClass("shimmer");
       $(".item-description").text(itemData.description).removeClass("shimmer");
 
-        // Update tags if they exist
-        if (itemData.tags) {
+      // Update tags if they exist
+      if (itemData.tags) {
         const tags = itemData.tags.split(",");
         const tagsHtml = tags
           .map(
@@ -421,7 +419,7 @@ $(document).ready(function() {
 
       $(".purchase-btn").removeClass("shimmer");
     } catch (error) {
-        triggerFlash("Error updating item details", "danger");
+      triggerFlash("Error updating item details", "danger");
     }
   }
 
@@ -545,7 +543,7 @@ $(document).ready(function() {
   }
 
   function loadAllItems() {
-    const itemsContainer = $('#itemsContainer');
+    const itemsContainer = $("#itemsContainer");
     itemsContainer.empty();
 
     // Add loading placeholders
@@ -562,13 +560,15 @@ $(document).ready(function() {
     }
 
     $.ajax({
-      url: '/api/items',
-      type: 'GET',
-      success: function(response) {
+      url: "/api/items",
+      type: "GET",
+      success: function (response) {
         itemsContainer.empty();
 
         if (!response.items || response.items.length === 0) {
-          itemsContainer.html('<div class="col-12 text-center"><p>No items available at this time. Check back later!</p></div>');
+          itemsContainer.html(
+            '<div class="col-12 text-center"><p>No items available at this time. Check back later!</p></div>',
+          );
           return;
         }
 
@@ -577,299 +577,338 @@ $(document).ready(function() {
           itemsContainer.append(itemCard);
         });
       },
-      error: function(error) {
-        console.error('Error loading items:', error);
-        itemsContainer.html('<div class="col-12 text-center"><p class="text-danger">Failed to load items. Please try again later.</p></div>');
-      }
+      error: function (error) {
+        console.error("Error loading items:", error);
+        itemsContainer.html(
+          '<div class="col-12 text-center"><p class="text-danger">Failed to load items. Please try again later.</p></div>',
+        );
+      },
     });
   }
 
-    // User Account Page handler
-    function handleUserAccountPage() {
-        console.log("Loading User Account Page specific code");
+  // User Account Page handler
+  function handleUserAccountPage() {
+    console.log("Loading User Account Page specific code");
 
-        // Simple code for the user account page
-        const messageBtn = document.querySelector('.btn-outline-primary i.fa-envelope');
-        if (messageBtn && messageBtn.parentElement) {
-            messageBtn.parentElement.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Message functionality would be implemented here');
-            });
-        }
-
-        // Get admin action buttons if they exist
-        if (document.getElementById('adminActionModal')) {
-            const adminButtons = document.querySelectorAll('#adminActionModal .list-group-item');
-
-            adminButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const action = this.textContent.trim();
-                    console.log('Admin action selected:', action);
-                    alert(`Admin action: ${action} would be executed here`);
-                });
-            });
-        }
+    // Simple code for the user account page
+    const messageBtn = document.querySelector(
+      ".btn-outline-primary i.fa-envelope",
+    );
+    if (messageBtn && messageBtn.parentElement) {
+      messageBtn.parentElement.addEventListener("click", function (e) {
+        e.preventDefault();
+        alert("Message functionality would be implemented here");
+      });
     }
 
-    function handleCommunityPostCrafter() {
-        // Check if already initialized to prevent duplicate execution
-        if (window.postCrafterInitialized) {
-            console.log("Post crafter already initialized, skipping");
+    // Get admin action buttons if they exist
+    if (document.getElementById("adminActionModal")) {
+      const adminButtons = document.querySelectorAll(
+        "#adminActionModal .list-group-item",
+      );
+
+      adminButtons.forEach((button) => {
+        button.addEventListener("click", function (e) {
+          e.preventDefault();
+          const action = this.textContent.trim();
+          console.log("Admin action selected:", action);
+          alert(`Admin action: ${action} would be executed here`);
+        });
+      });
+    }
+  }
+
+  function handleCommunityPostCrafter() {
+    // Check if already initialized to prevent duplicate execution
+    if (window.postCrafterInitialized) {
+      console.log("Post crafter already initialized, skipping");
+      return;
+    }
+
+    console.log("Initializing post crafter functionality");
+
+    // Character counters
+    const $titleInput = $("#postTitle");
+    const $titleCounter = $("#titleCounter");
+    const $contentInput = $("#postContent");
+    const $contentCounter = $("#contentCounter");
+
+    $titleInput.on("input", function () {
+      $titleCounter.text($(this).val().length);
+    });
+
+    $contentInput.on("input", function () {
+      $contentCounter.text($(this).val().length);
+    });
+
+    // Tag previewer
+    const $tagsInput = $("#postTags");
+    const $tagPreview = $("#tagPreview");
+
+    $tagsInput.on("input", function () {
+      const tags = $(this)
+        .val()
+        .split(",")
+        .filter((tag) => tag.trim() !== "");
+      $tagPreview.empty();
+
+      tags.slice(0, 5).forEach((tag) => {
+        $("<span>")
+          .addClass("badge bg-primary me-2 mb-2")
+          .text(tag.trim())
+          .appendTo($tagPreview);
+      });
+    });
+
+    // Preview toggle
+    const $previewToggle = $("#previewToggle");
+    const $previewArea = $("#previewArea");
+    const $previewTitle = $("#previewTitle");
+    const $previewTags = $("#previewTags");
+    const $previewContent = $("#previewContent");
+
+    // Remove any existing click handlers to prevent duplicates
+    $previewToggle.off("click");
+
+    $previewToggle.on("click", function (e) {
+      // Prevent default behavior and stop propagation
+      e.preventDefault();
+      e.stopPropagation();
+
+      console.log("Preview toggle clicked");
+
+      // Toggle preview visibility
+      if ($previewArea.hasClass("d-none")) {
+        // Show preview
+        $previewArea.removeClass("d-none");
+        $(this).html('<i class="fas fa-edit me-2"></i>Continue Editing');
+
+        try {
+          // Update preview content
+          $previewTitle.text($titleInput.val() || "Post Title");
+
+          // Update tags
+          $previewTags.empty();
+          const tags = $tagsInput
+            .val()
+            .split(",")
+            .filter((tag) => tag.trim() !== "");
+          tags.forEach((tag) => {
+            $("<span>")
+              .addClass("badge bg-secondary me-2")
+              .text(tag.trim())
+              .appendTo($previewTags);
+          });
+
+          // Format content with improved handling
+          let formattedContent =
+            $contentInput.val() || "Post content will appear here...";
+
+          // Apply formatting
+          formattedContent = formatPostContent(formattedContent);
+
+          // Set the formatted content
+          $previewContent.html(formattedContent);
+
+          console.log("Preview content updated successfully");
+        } catch (error) {
+          console.error("Error updating preview:", error);
+          $previewContent.html(
+            '<div class="alert alert-danger">Error generating preview. Please check your content.</div>',
+          );
+        }
+      } else {
+        // Hide preview
+        $previewArea.addClass("d-none");
+        $(this).html('<i class="fas fa-eye me-2"></i>Preview Post');
+      }
+    });
+
+    // Helper function to format post content with better regex handling
+    function formatPostContent(content) {
+      if (!content) return "<p>No content to preview</p>";
+
+      // Save original content for debugging
+      const originalContent = content;
+      console.log("Formatting content, length:", content.length);
+
+      try {
+        // First handle paragraphs
+        content = content.replace(/\n\n+/g, "</p><p>");
+        content = "<p>" + content + "</p>";
+
+        // Then handle single line breaks within paragraphs
+        content = content.replace(/\n/g, "<br>");
+
+        // Basic text formatting
+        content = content
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+        // Headers (match at beginning of line or after a break)
+        content = content
+          .replace(/(^|<br>|<\/p><p>)# (.*?)($|<br>|<\/p>)/g, "$1<h1>$2</h1>$3")
+          .replace(
+            /(^|<br>|<\/p><p>)## (.*?)($|<br>|<\/p>)/g,
+            "$1<h2>$2</h2>$3",
+          )
+          .replace(
+            /(^|<br>|<\/p><p>)### (.*?)($|<br>|<\/p>)/g,
+            "$1<h3>$2</h3>$3",
+          );
+
+        // Lists
+        let listItems = [];
+        content = content.replace(
+          /(^|<br>|<\/p><p>)- (.*?)($|<br>|<\/p>)/g,
+          function (match, p1, p2, p3) {
+            listItems.push(p2);
+            if (p3.startsWith("<br>") || p3.startsWith("</p>")) {
+              const list =
+                "<ul><li>" + listItems.join("</li><li>") + "</li></ul>";
+              listItems = [];
+              return p1 + list + p3;
+            }
+            return ""; // Temporarily remove the item so we can collect them
+          },
+        );
+
+        // Add any remaining list items
+        if (listItems.length > 0) {
+          content += "<ul><li>" + listItems.join("</li><li>") + "</li></ul>";
+        }
+
+        // Links and images
+        content = content
+          .replace(
+            /!\[(.*?)\]\((.*?)\)/g,
+            '<img src="$2" alt="$1" class="img-fluid rounded my-2">',
+          )
+          .replace(
+            /\[(.*?)\]\((.*?)\)/g,
+            '<a href="$2" target="_blank">$1</a>',
+          );
+
+        // Code blocks
+        content = content.replace(
+          /```([\s\S]*?)```/g,
+          '<pre class="bg-dark p-3 rounded"><code>$1</code></pre>',
+        );
+
+        // Clean up any empty paragraphs
+        content = content.replace(/<p><\/p>/g, "");
+
+        console.log("Formatting completed successfully");
+        return content;
+      } catch (error) {
+        console.error("Error during content formatting:", error);
+        return "<p>" + originalContent + "</p>"; // Return plain content on error
+      }
+    }
+
+    // Format buttons
+    $(".format-btn").off("click"); // Remove any existing handlers
+
+    $(".format-btn").on("click", function () {
+      const format = $(this).data("format");
+      const $textarea = $("#postContent");
+      const textarea = $textarea[0];
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = $textarea.val().substring(start, end);
+
+      let formattedText = "";
+
+      switch (format) {
+        case "bold":
+          formattedText = `**${selectedText}**`;
+          break;
+        case "italic":
+          formattedText = `*${selectedText}*`;
+          break;
+        case "heading":
+          formattedText = `## ${selectedText}`;
+          break;
+        case "list":
+          formattedText = selectedText
+            .split("\n")
+            .map((line) => `- ${line}`)
+            .join("\n");
+          break;
+        case "link":
+          const url = prompt("Enter URL:", "https://");
+          if (url) {
+            formattedText = `[${selectedText || "Link text"}](${url})`;
+          } else {
             return;
-        }
+          }
+          break;
+        case "image":
+          const imageUrl = prompt("Enter image URL:", "https://");
+          if (imageUrl) {
+            formattedText = `![${selectedText || "Image description"}](${imageUrl})`;
+          } else {
+            return;
+          }
+          break;
+        case "code":
+          formattedText = "```\n" + selectedText + "\n```";
+          break;
+      }
 
-        console.log("Initializing post crafter functionality");
+      // Insert the formatted text
+      $textarea.focus();
+      const currentValue = $textarea.val();
+      const newValue =
+        currentValue.substring(0, start) +
+        formattedText +
+        currentValue.substring(end);
+      $textarea.val(newValue);
 
-        // Character counters
-        const $titleInput = $('#postTitle');
-        const $titleCounter = $('#titleCounter');
-        const $contentInput = $('#postContent');
-        const $contentCounter = $('#contentCounter');
+      // Update character count
+      $contentCounter.text($textarea.val().length);
 
-        $titleInput.on('input', function() {
-            $titleCounter.text($(this).val().length);
-        });
+      // Set cursor position after the inserted text
+      const newPosition = start + formattedText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+    });
 
-        $contentInput.on('input', function() {
-            $contentCounter.text($(this).val().length);
-        });
+    // Mark as initialized to prevent duplicate initialization
+    window.postCrafterInitialized = true;
+    console.log("Post crafter initialization complete");
+  }
 
-        // Tag previewer
-        const $tagsInput = $('#postTags');
-        const $tagPreview = $('#tagPreview');
+  // Add a new function to handle the community forum page
+  function handleCommunityPage() {
+    // Make tavern cards clickable
+    $(".tavern-card").on("click", function () {
+      console.log("Tavern card clicked");
+      // Add navigation logic here
+    });
 
-        $tagsInput.on('input', function() {
-            const tags = $(this).val().split(',').filter(tag => tag.trim() !== '');
-            $tagPreview.empty();
-
-            tags.slice(0, 5).forEach(tag => {
-                $('<span>')
-                    .addClass('badge bg-primary me-2 mb-2')
-                    .text(tag.trim())
-                    .appendTo($tagPreview);
-            });
-        });
-
-        // Preview toggle
-        const $previewToggle = $('#previewToggle');
-        const $previewArea = $('#previewArea');
-        const $previewTitle = $('#previewTitle');
-        const $previewTags = $('#previewTags');
-        const $previewContent = $('#previewContent');
-
-        // Remove any existing click handlers to prevent duplicates
-        $previewToggle.off('click');
-
-        $previewToggle.on('click', function(e) {
-            // Prevent default behavior and stop propagation
-            e.preventDefault();
-            e.stopPropagation();
-
-            console.log("Preview toggle clicked");
-
-            // Toggle preview visibility
-            if ($previewArea.hasClass('d-none')) {
-                // Show preview
-                $previewArea.removeClass('d-none');
-                $(this).html('<i class="fas fa-edit me-2"></i>Continue Editing');
-
-                try {
-                    // Update preview content
-                    $previewTitle.text($titleInput.val() || 'Post Title');
-
-                    // Update tags
-                    $previewTags.empty();
-                    const tags = $tagsInput.val().split(',').filter(tag => tag.trim() !== '');
-                    tags.forEach(tag => {
-                        $('<span>')
-                            .addClass('badge bg-secondary me-2')
-                            .text(tag.trim())
-                            .appendTo($previewTags);
-                    });
-
-                    // Format content with improved handling
-                    let formattedContent = $contentInput.val() || 'Post content will appear here...';
-
-                    // Apply formatting
-                    formattedContent = formatPostContent(formattedContent);
-
-                    // Set the formatted content
-                    $previewContent.html(formattedContent);
-
-                    console.log("Preview content updated successfully");
-                } catch (error) {
-                    console.error("Error updating preview:", error);
-                    $previewContent.html('<div class="alert alert-danger">Error generating preview. Please check your content.</div>');
-                }
-            } else {
-                // Hide preview
-                $previewArea.addClass('d-none');
-                $(this).html('<i class="fas fa-eye me-2"></i>Preview Post');
-            }
-        });
-
-        // Helper function to format post content with better regex handling
-        function formatPostContent(content) {
-            if (!content) return '<p>No content to preview</p>';
-
-            // Save original content for debugging
-            const originalContent = content;
-            console.log("Formatting content, length:", content.length);
-
-            try {
-                // First handle paragraphs
-                content = content.replace(/\n\n+/g, '</p><p>');
-                content = '<p>' + content + '</p>';
-
-                // Then handle single line breaks within paragraphs
-                content = content.replace(/\n/g, '<br>');
-
-                // Basic text formatting
-                content = content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
-
-                // Headers (match at beginning of line or after a break)
-                content = content
-                    .replace(/(^|<br>|<\/p><p>)# (.*?)($|<br>|<\/p>)/g, '$1<h1>$2</h1>$3')
-                    .replace(/(^|<br>|<\/p><p>)## (.*?)($|<br>|<\/p>)/g, '$1<h2>$2</h2>$3')
-                    .replace(/(^|<br>|<\/p><p>)### (.*?)($|<br>|<\/p>)/g, '$1<h3>$2</h3>$3');
-
-                // Lists
-                let listItems = [];
-                content = content.replace(/(^|<br>|<\/p><p>)- (.*?)($|<br>|<\/p>)/g, function(match, p1, p2, p3) {
-                    listItems.push(p2);
-                    if (p3.startsWith('<br>') || p3.startsWith('</p>')) {
-                        const list = '<ul><li>' + listItems.join('</li><li>') + '</li></ul>';
-                        listItems = [];
-                        return p1 + list + p3;
-                    }
-                    return ''; // Temporarily remove the item so we can collect them
-                });
-
-                // Add any remaining list items
-                if (listItems.length > 0) {
-                    content += '<ul><li>' + listItems.join('</li><li>') + '</li></ul>';
-                }
-
-                // Links and images
-                content = content
-                    .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="img-fluid rounded my-2">')
-                    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-                // Code blocks
-                content = content.replace(/```([\s\S]*?)```/g, '<pre class="bg-dark p-3 rounded"><code>$1</code></pre>');
-
-                // Clean up any empty paragraphs
-                content = content.replace(/<p><\/p>/g, '');
-
-                console.log("Formatting completed successfully");
-                return content;
-            } catch (error) {
-                console.error("Error during content formatting:", error);
-                return '<p>' + originalContent + '</p>'; // Return plain content on error
-            }
-        }
-
-        // Format buttons
-        $('.format-btn').off('click'); // Remove any existing handlers
-
-        $('.format-btn').on('click', function() {
-            const format = $(this).data('format');
-            const $textarea = $('#postContent');
-            const textarea = $textarea[0];
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const selectedText = $textarea.val().substring(start, end);
-
-            let formattedText = '';
-
-            switch (format) {
-                case 'bold':
-                    formattedText = `**${selectedText}**`;
-                    break;
-                case 'italic':
-                    formattedText = `*${selectedText}*`;
-                    break;
-                case 'heading':
-                    formattedText = `## ${selectedText}`;
-                    break;
-                case 'list':
-                    formattedText = selectedText.split('\n').map(line => `- ${line}`).join('\n');
-                    break;
-                case 'link':
-                    const url = prompt('Enter URL:', 'https://');
-                    if (url) {
-                        formattedText = `[${selectedText || 'Link text'}](${url})`;
-                    } else {
-                        return;
-                    }
-                    break;
-                case 'image':
-                    const imageUrl = prompt('Enter image URL:', 'https://');
-                    if (imageUrl) {
-                        formattedText = `![${selectedText || 'Image description'}](${imageUrl})`;
-                    } else {
-                        return;
-                    }
-                    break;
-                case 'code':
-                    formattedText = '```\n' + selectedText + '\n```';
-                    break;
-            }
-
-            // Insert the formatted text
-            $textarea.focus();
-            const currentValue = $textarea.val();
-            const newValue = currentValue.substring(0, start) + formattedText + currentValue.substring(end);
-            $textarea.val(newValue);
-
-            // Update character count
-            $contentCounter.text($textarea.val().length);
-
-            // Set cursor position after the inserted text
-            const newPosition = start + formattedText.length;
-            textarea.setSelectionRange(newPosition, newPosition);
-        });
-
-        // Mark as initialized to prevent duplicate initialization
-        window.postCrafterInitialized = true;
-        console.log("Post crafter initialization complete");
+    // Setup tooltips if they exist
+    if ($('[data-bs-toggle="tooltip"]').length) {
+      $('[data-bs-toggle="tooltip"]').tooltip();
     }
-
-    // Add a new function to handle the community forum page
-    function handleCommunityPage() {
-        // Make tavern cards clickable
-        $('.tavern-card').on('click', function() {
-            console.log("Tavern card clicked");
-            // Add navigation logic here
-        });
-
-        // Setup tooltips if they exist
-        if ($('[data-bs-toggle="tooltip"]').length) {
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        }
   }
 
   // Initialize other features as needed
 });
 
-
 // Search and filter functionality
 function handleSearch() {
-  const searchInput = document.getElementById('searchInput');
-  const categorySelect = document.getElementById('categorySelect');
-  const sortSelect = document.getElementById('sortSelect');
-  const itemsContainer = document.getElementById('itemsContainer');
+  const searchInput = document.getElementById("searchInput");
+  const categorySelect = document.getElementById("categorySelect");
+  const sortSelect = document.getElementById("sortSelect");
+  const itemsContainer = document.getElementById("itemsContainer");
 
   // Clear existing items
-  itemsContainer.innerHTML = '';
+  itemsContainer.innerHTML = "";
 
   // Add loading placeholders
   for (let i = 0; i < 6; i++) {
-    const placeholder = document.createElement('div');
-    placeholder.className = 'col-md-4 mb-4';
+    const placeholder = document.createElement("div");
+    placeholder.className = "col-md-4 mb-4";
     placeholder.innerHTML = `
       <div class="item-card loading">
         <div class="loading-placeholder title"></div>
@@ -887,19 +926,19 @@ function handleSearch() {
 
   // Make API request with filters
   $.ajax({
-    url: '/api/items',
-    method: 'GET',
+    url: "/api/items",
+    method: "GET",
     data: {
       search: searchQuery,
       category: selectedCategory,
-      sort: sortBy
+      sort: sortBy,
     },
-    success: function(response) {
+    success: function (response) {
       // Clear loading placeholders
-      itemsContainer.innerHTML = '';
+      itemsContainer.innerHTML = "";
 
       if (response.items && response.items.length > 0) {
-        response.items.forEach(item => {
+        response.items.forEach((item) => {
           const itemCard = createItemCard(item);
           itemsContainer.appendChild(itemCard);
         });
@@ -911,23 +950,23 @@ function handleSearch() {
         `;
       }
     },
-    error: function(xhr, status, error) {
-      console.error('Error loading items:', error);
+    error: function (xhr, status, error) {
+      console.error("Error loading items:", error);
       itemsContainer.innerHTML = `
         <div class="col-12 text-center">
           <p class="text-danger">Error loading items. Please try again later.</p>
         </div>
       `;
-    }
+    },
   });
 }
 
 // Event listeners for search and filters
-document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('searchInput');
-  const categorySelect = document.getElementById('categorySelect');
-  const sortSelect = document.getElementById('sortSelect');
-  const searchButton = document.getElementById('searchButton');
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("searchInput");
+  const categorySelect = document.getElementById("categorySelect");
+  const sortSelect = document.getElementById("sortSelect");
+  const searchButton = document.getElementById("searchButton");
 
   // Only add event listeners if elements exist
   if (searchInput && categorySelect && sortSelect && searchButton) {
@@ -948,10 +987,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const debouncedSearch = debounce(handleSearch, 500);
 
     // Event listeners
-    searchInput.addEventListener('input', debouncedSearch);
-    categorySelect.addEventListener('change', handleSearch);
-    sortSelect.addEventListener('change', handleSearch);
-    searchButton.addEventListener('click', function(e) {
+    searchInput.addEventListener("input", debouncedSearch);
+    categorySelect.addEventListener("change", handleSearch);
+    sortSelect.addEventListener("change", handleSearch);
+    searchButton.addEventListener("click", function (e) {
       e.preventDefault();
       handleSearch();
     });
@@ -963,163 +1002,138 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Enhance community forums page function
 function enhanceCommunityForumsPage() {
-    console.log("Enhancing community forums page");
+  console.log("Enhancing community forums page");
 
-    // Format all dates on the page
-    $('.post-date').each(function() {
-        const dateString = $(this).data('date');
-        if (dateString) {
-            $(this).text(formatDate(dateString));
-        }
+  // Format all dates on the page
+  $(".post-date").each(function () {
+    const dateString = $(this).data("date");
+    if (dateString) {
+      $(this).text(formatDate(dateString));
+    }
+  });
+
+  // Make user links clickable - now using user IDs
+  $(document).on("click", ".post-author", function (e) {
+    e.preventDefault();
+    const userId = $(this).data("user-id");
+    if (userId) {
+      window.location.href = `/user/${userId}`;
+    }
+  });
+
+  // Fetch usernames for displayed posts if needed
+  fetchCreatorUsernames();
+
+  // Hover effects for post cards
+  $(".post-card").each(function () {
+    $(this).hover(
+      function () {
+        $(this).find(".post-content h5 a").css("color", "var(--accent-color)");
+      },
+      function () {
+        $(this).find(".post-content h5 a").css("color", "");
+      },
+    );
+  });
+
+  // Enhance voting experience
+  $(".vote-btn")
+    .on("mousedown", function () {
+      $(this).addClass("scale-95");
+    })
+    .on("mouseup mouseleave", function () {
+      $(this).removeClass("scale-95");
     });
 
-    // Make user links clickable - now using user IDs
-    $(document).on('click', '.post-author', function(e) {
-        e.preventDefault();
-        const userId = $(this).data('user-id');
-        if (userId) {
-            window.location.href = `/user/${userId}`;
-        }
-    });
+  // Add staggered loading animation for posts
+  $(".post-card").each(function (index) {
+    const $card = $(this);
+    $card.css("opacity", "0");
+    $card.css("transform", "translateY(20px)");
 
-    // Fetch usernames for displayed posts if needed
-    fetchCreatorUsernames();
+    setTimeout(
+      function () {
+        $card.css("transition", "opacity 0.5s ease, transform 0.5s ease");
+        $card.css("opacity", "1");
+        $card.css("transform", "translateY(0)");
+      },
+      100 + index * 100,
+    );
+  });
 
-    // Hover effects for post cards
-    $('.post-card').each(function() {
-        $(this).hover(
-            function() {
-                $(this).find('.post-content h5 a').css('color', 'var(--accent-color)');
-            },
-            function() {
-                $(this).find('.post-content h5 a').css('color', '');
-            }
+  // Add smooth scrolling for navigation
+  $('a[href^="#"]').on("click", function (e) {
+    const href = this.getAttribute("href");
+
+    // Only process if href has content after the #
+    if (href.length > 1) {
+      e.preventDefault();
+
+      const target = $(href);
+      if (target.length) {
+        $("html, body").animate(
+          {
+            scrollTop: target.offset().top - 70,
+          },
+          500,
         );
-    });
-
-    // Enhance voting experience
-    $('.vote-btn').on('mousedown', function() {
-        $(this).addClass('scale-95');
-    }).on('mouseup mouseleave', function() {
-        $(this).removeClass('scale-95');
-    });
-
-    // Add staggered loading animation for posts
-    $('.post-card').each(function(index) {
-        const $card = $(this);
-        $card.css('opacity', '0');
-        $card.css('transform', 'translateY(20px)');
-
-        setTimeout(function() {
-            $card.css('transition', 'opacity 0.5s ease, transform 0.5s ease');
-            $card.css('opacity', '1');
-            $card.css('transform', 'translateY(0)');
-        }, 100 + (index * 100));
-    });
-
-    // Add ripple effect to buttons
-    $('.btn').on('mousedown', function(e) {
-        const $this = $(this);
-
-        // Remove any existing ripple
-        $this.find('.ripple').remove();
-
-        // Create ripple element
-        const $ripple = $('<span class="ripple"></span>');
-        $this.append($ripple);
-
-        // Get button position and dimensions
-        const offset = $this.offset();
-        const width = $this.outerWidth();
-        const height = $this.outerHeight();
-
-        // Calculate ripple position
-        const posX = e.pageX - offset.left;
-        const posY = e.pageY - offset.top;
-
-        // Set ripple size and position
-        $ripple.css({
-            width: Math.max(width, height) * 2,
-            height: Math.max(width, height) * 2,
-            top: posY - $ripple.height() / 2,
-            left: posX - $ripple.width() / 2
-        });
-
-        // Trigger animation
-        setTimeout(function() {
-            $ripple.addClass('active');
-        }, 10);
-
-        // Remove ripple after animation
-        setTimeout(function() {
-            $ripple.remove();
-        }, 650);
-    });
-
-    // Add smooth scrolling for navigation
-    $('a[href^="#"]').on('click', function(e) {
-        e.preventDefault();
-
-        const target = $(this.getAttribute('href'));
-        if (target.length) {
-            $('html, body').animate({
-                scrollTop: target.offset().top - 70
-            }, 500);
-        }
-    });
+      }
+    }
+  });
 }
 
 // New function to fetch usernames for creator IDs
 function fetchCreatorUsernames() {
-    // Collect all user IDs that need usernames
-    const creatorIds = [];
-    $('.post-author').each(function() {
-        const userId = $(this).data('user-id');
-        // Only add if this element has no text or default "User" text
-        if (userId && ($(this).text() === 'User' || $(this).text().trim() === '')) {
-            creatorIds.push(userId);
-        }
-    });
-
-    // If we have IDs that need usernames, fetch them
-    if (creatorIds.length > 0) {
-        // Remove duplicates
-        const uniqueCreatorIds = [...new Set(creatorIds)];
-
-        console.log("Fetching usernames for creator IDs:", uniqueCreatorIds);
-
-        // Make an API request to get the usernames
-        $.ajax({
-            url: '/api/get_usernames',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ user_ids: uniqueCreatorIds }),
-            success: function(response) {
-                if (response.users) {
-                    // Update the username display for each post author
-                    $('.post-author').each(function() {
-                        const creatorId = $(this).data('user-id');
-                        const user = response.users.find(u => u.id == creatorId);
-                        if (user && user.username) {
-                            $(this).text(user.username);
-                        }
-                    });
-                }
-            },
-            error: function(error) {
-                console.error("Error fetching usernames:", error);
-            }
-        });
+  // Collect all user IDs that need usernames
+  const creatorIds = [];
+  $(".post-author").each(function () {
+    const userId = $(this).data("user-id");
+    // Only add if this element has no text or default "User" text
+    if (userId && ($(this).text() === "User" || $(this).text().trim() === "")) {
+      creatorIds.push(userId);
     }
+  });
+
+  // If we have IDs that need usernames, fetch them
+  if (creatorIds.length > 0) {
+    // Remove duplicates
+    const uniqueCreatorIds = [...new Set(creatorIds)];
+
+    console.log("Fetching usernames for creator IDs:", uniqueCreatorIds);
+
+    // Make an API request to get the usernames
+    $.ajax({
+      url: "/api/get_usernames",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ user_ids: uniqueCreatorIds }),
+      success: function (response) {
+        if (response.users) {
+          // Update the username display for each post author
+          $(".post-author").each(function () {
+            const creatorId = $(this).data("user-id");
+            const user = response.users.find((u) => u.id == creatorId);
+            if (user && user.username) {
+              $(this).text(user.username);
+            }
+          });
+        }
+      },
+      error: function (error) {
+        console.error("Error fetching usernames:", error);
+      },
+    });
+  }
 }
 
 // Initialize with enhanced animations
-$(document).ready(function() {
-    console.log("Document ready with enhanced animations");
+$(document).ready(function () {
+  console.log("Document ready with enhanced animations");
 
-    // Add CSS for new animation effects
-    $('<style>')
-        .html(`
+  // Add CSS for new animation effects
+  $("<style>")
+    .html(
+      `
             .scale-95 {
                 transform: scale(0.95) !important;
             }
@@ -1149,80 +1163,85 @@ $(document).ready(function() {
                     opacity: 0;
                 }
             }
-        `)
-        .appendTo('head');
+        `,
+    )
+    .appendTo("head");
 
-    // Initialize user context - will call the function we defined above
-    if (typeof initializeUserContext === 'function') {
-        initializeUserContext();
-    } else {
-        console.log("User context initialization skipped");
+  // Initialize user context - will call the function we defined above
+  if (typeof initializeUserContext === "function") {
+    initializeUserContext();
+  } else {
+    console.log("User context initialization skipped");
+  }
+
+  // Initialize tooltips and popovers with smoother animations
+  if (typeof bootstrap !== "undefined") {
+    if (bootstrap.Tooltip) {
+      var tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+      );
+      var tooltipOptions = {
+        animation: true,
+        delay: { show: 100, hide: 100 },
+      };
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, tooltipOptions);
+      });
     }
 
-    // Initialize tooltips and popovers with smoother animations
-    if (typeof bootstrap !== 'undefined') {
-        if (bootstrap.Tooltip) {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipOptions = {
-                animation: true,
-                delay: { show: 100, hide: 100 }
-            };
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl, tooltipOptions);
-            });
-        }
-
-        if (bootstrap.Popover) {
-            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl);
-            });
-        }
+    if (bootstrap.Popover) {
+      var popoverTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="popover"]'),
+      );
+      var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+      });
     }
+  }
 
-    // Call page-specific initialization
-    if (typeof handlePageSpecificCode === 'function') {
-        handlePageSpecificCode();
-    } else {
-        console.log("Page-specific code initialization skipped");
-    }
+  // Call page-specific initialization
+  if (typeof handlePageSpecificCode === "function") {
+    handlePageSpecificCode();
+  } else {
+    console.log("Page-specific code initialization skipped");
+  }
 });
 
 // Add this function to format dates in a friendly way
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now - date);
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (isNaN(date.getTime())) {
-        return "Unknown date";
-    }
+  if (isNaN(date.getTime())) {
+    return "Unknown date";
+  }
 
-    if (diffDays === 0) {
-        // Today, show hours
-        const hours = Math.floor(diffTime / (1000 * 60 * 60));
-        if (hours === 0) {
-            const minutes = Math.floor(diffTime / (1000 * 60));
-            return minutes === 0 ? "Just now" : `${minutes}m ago`;
-        }
-        return `${hours}h ago`;
-    } else if (diffDays === 1) {
-        return "Yesterday";
-    } else if (diffDays < 7) {
-        return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
-        const weeks = Math.floor(diffDays / 7);
-        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    } else {
-        // Format as MM/DD/YYYY for older posts
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  if (diffDays === 0) {
+    // Today, show hours
+    const hours = Math.floor(diffTime / (1000 * 60 * 60));
+    if (hours === 0) {
+      const minutes = Math.floor(diffTime / (1000 * 60));
+      return minutes === 0 ? "Just now" : `${minutes}m ago`;
     }
+    return `${hours}h ago`;
+  } else if (diffDays === 1) {
+    return "Yesterday";
+  } else if (diffDays < 7) {
+    return `${diffDays} days ago`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  } else {
+    // Format as MM/DD/YYYY for older posts
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  }
 }
 
 // First, add this missing function at the bottom of your index.js file
 function initializeUserContext() {
-    // Just a stub function to prevent errors
-    console.log("User context initialized");
-    // You can add actual user context initialization here if needed later
+  // Just a stub function to prevent errors
+  console.log("User context initialized");
+  // You can add actual user context initialization here if needed later
 }
