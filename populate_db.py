@@ -4,6 +4,12 @@ from datetime import datetime, timedelta
 from app import app, db
 from models import (
     PAYMENT_PROVIDERS,
+    CommunityPost,
+    CommunityReply,
+    GrindStoneEquipment,
+    GrindStoneInventoryItem,
+    GrindStonePlayerSave,
+    GrindStoneSkill,
     Item,
     Privilege,
     Purchase,
@@ -50,8 +56,14 @@ def create_dummy_users(privileges):
         )
         users.append(vendor)
 
-    # Create regular users
-    user_names = ["Player1", "Player2", "Player3", "Tester1", "Tester2"]
+    # Create regular users with Grindstone characters
+    user_names = [
+        "Adventurer1",
+        "DragonSlayer",
+        "MysticMage",
+        "WoodCutter",
+        "MinerKing",
+    ]
     for i, name in enumerate(user_names):
         user = User(
             username=name,
@@ -178,6 +190,104 @@ def create_dummy_support_tickets(users):
     return tickets, responses
 
 
+def create_grindstone_characters(users):
+    """Create Grindstone characters for regular users"""
+    characters = []
+    skills = [
+        "woodcutting_skills",
+        "mining_skills",
+        "hunting_skills",
+        "crafting_skills",
+        "adventure_skills",
+        "cooking_skills",
+    ]
+
+    for user in users:
+        if user.privilege_id == 1:  # Regular users only
+            # Create player save
+            character = GrindStonePlayerSave(
+                user_id=user.id,
+                character_name=f"{user.username}'s Character",
+                current_biome_id="biom_dark_woods",
+                level=random.randint(1, 10),
+                exp=random.randint(0, 1000),
+                coins=random.randint(100, 5000),
+            )
+            characters.append(character)
+            db.session.add(character)
+            db.session.flush()  # Get ID without committing
+
+            # Add equipment
+            equipment = GrindStoneEquipment(
+                player_save_id=character.id,
+                weapon="Basic Sword",
+                armor="Leather Armor",
+                tool="Basic Tool",
+            )
+            db.session.add(equipment)
+
+            # Add skills
+            for skill_name in skills:
+                skill = GrindStoneSkill(
+                    player_save_id=character.id,
+                    skill_name=skill_name,
+                    level=random.randint(1, 5),
+                    exp=random.randint(0, 500),
+                )
+                db.session.add(skill)
+
+            # Add inventory items
+            items = ["wood", "stone", "iron_ore", "food", "potion"]
+            for item in items:
+                inventory_item = GrindStoneInventoryItem(
+                    player_save_id=character.id,
+                    item_id=item,
+                    quantity=random.randint(1, 50),
+                )
+                db.session.add(inventory_item)
+
+    return characters
+
+
+def create_community_content(users):
+    """Create community posts and replies"""
+    posts = []
+    replies = []
+
+    categories = ["Guide", "Discussion", "Question", "Showcase", "News"]
+    tags = ["gameplay", "tips", "grindstone", "community", "help", "update"]
+
+    # Create and commit posts first
+    for _ in range(10):  # Create 10 posts
+        creator = random.choice(users)
+        post = CommunityPost(
+            creator_id=creator.id,
+            title=f"A post about {random.choice(categories)}",
+            content=f"This is a sample post content by {creator.username}",
+            category=random.choice(categories),
+            tags=",".join(random.sample(tags, 3)),
+            upvotes=random.randint(0, 100),
+            downvotes=random.randint(0, 20),
+        )
+        db.session.add(post)
+        db.session.flush()  # Get the post ID
+
+        # Create replies for this post
+        for _ in range(random.randint(1, 5)):
+            reply = CommunityReply(
+                creator_id=random.choice(users).id,
+                post_id=post.id,  # Now we have the post ID
+                content=f"This is a reply to the post '{post.title}'",
+                upvotes=random.randint(0, 20),
+                downvotes=random.randint(0, 5),
+            )
+            replies.append(reply)
+
+        posts.append(post)
+
+    return posts, replies
+
+
 def populate_database():
     with app.app_context():
         # Clear existing data
@@ -199,7 +309,7 @@ def populate_database():
                 id=998, name="Moderator", description="User with moderator access"
             ),
             "Admin": Privilege(
-                id=999, name="Admin", description="Admin with full access"
+                id=999, name="Admin", description="User with full access"
             ),
         }
 
@@ -212,6 +322,20 @@ def populate_database():
         users = create_dummy_users(privileges)
         for user in users:
             db.session.add(user)
+        db.session.commit()
+
+        # Create Grindstone characters
+        create_grindstone_characters(users)
+        db.session.commit()
+
+        # Create community content
+        posts, replies = create_community_content(users)
+        # Posts are already added and flushed in create_community_content
+        db.session.commit()
+
+        # Now add replies
+        for reply in replies:
+            db.session.add(reply)
         db.session.commit()
 
         # Create and add items
@@ -239,10 +363,14 @@ def populate_database():
 
         print("Database populated successfully with test data!")
         print(f"Created {len(users)} users")
+        print(
+            f"Created {len([u for u in users if u.privilege_id == 1])} Grindstone characters"
+        )
+        print(f"Created {len(posts)} community posts")
+        print(f"Created {len(replies)} community replies")
         print(f"Created {len(items)} items")
         print(f"Created {len(receipts)} receipts")
         print(f"Created {len(purchases)} purchases")
-        print(f"Created {len(tickets)} support tickets")
 
 
 if __name__ == "__main__":

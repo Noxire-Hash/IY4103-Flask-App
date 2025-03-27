@@ -51,6 +51,12 @@ ACCOUNT_STATUS = [
     "Vendor Ban",
 ]
 
+SUBSCRIPTION_MAPPING = {
+    "basic": 0,
+    "premium": 1,
+    "exclusive": 2,
+}
+
 
 class Privilege(db.Model):
     __tablename__ = "privileges"
@@ -74,7 +80,7 @@ class User(db.Model):
     purchases = db.relationship(
         "Purchase", back_populates="user", lazy=True, cascade="all, delete-orphan"
     )
-    subscriptions = db.relationship(
+    subscription = db.relationship(
         "Subscription", back_populates="user", lazy=True, cascade="all, delete-orphan"
     )
     received_transactions = db.relationship(
@@ -155,14 +161,10 @@ class Subscription(db.Model):
     __tablename__ = "subscriptions"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    subscription_type = db.Column(
-        db.String(64), nullable=False
-    )  # E.g., "Basic", "Premium"
+    subscription_type = db.Column(db.Integer, nullable=False, default=0)
     end_date = db.Column(db.DateTime, nullable=True)
-    # Null if perpetual or inactive
-
     # Add the user relationship to match User.subscriptions
-    user = db.relationship("User", back_populates="subscriptions")
+    user = db.relationship("User", back_populates="subscription")
 
 
 class DndCharacter(db.Model):
@@ -289,14 +291,12 @@ class CommunityPost(db.Model):
     upvotes = db.Column(db.Integer, default=0)
     downvotes = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    # Add relationships
+
+    # Only keep one relationship for replies
     replies = db.relationship(
         "CommunityReply", back_populates="post", lazy=True, cascade="all, delete-orphan"
     )
     creator = db.relationship("User", back_populates="community_posts")
-    comments = db.relationship(
-        "CommunityReply", back_populates="post", lazy=True, cascade="all, delete-orphan"
-    )
 
 
 class CommunityReply(db.Model):
@@ -343,3 +343,103 @@ class GrindStoneItem(db.Model):
 
     # Add relationship
     user = db.relationship("User", back_populates="grindstone_items")
+
+
+class GrindStonePlayerSave(db.Model):
+    __tablename__ = "grindstone_player_saves"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+    )
+    character_name = db.Column(db.String(50), nullable=False)
+    current_biome_id = db.Column(
+        db.String(50), nullable=False, default="biom_dark_woods"
+    )
+    level = db.Column(db.Integer, default=1)
+    exp = db.Column(db.Integer, default=0)
+    coins = db.Column(db.Integer, default=1000)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    # Relationships with explicit foreign key naming
+    equipment = db.relationship(
+        "GrindStoneEquipment",
+        backref="player_save",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="GrindStoneEquipment.player_save_id",
+    )
+
+    skills = db.relationship(
+        "GrindStoneSkill",
+        backref="player_save",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="GrindStoneSkill.player_save_id",
+    )
+
+    inventory = db.relationship(
+        "GrindStoneInventoryItem",
+        backref="player_save",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="GrindStoneInventoryItem.player_save_id",
+    )
+
+
+class GrindStoneEquipment(db.Model):
+    __tablename__ = "grindstone_equipment"
+    id = db.Column(db.Integer, primary_key=True)
+    player_save_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grindstone_player_saves.id", name="fk_equipment_player_save"),
+        nullable=False,
+    )
+
+    # Equipment slots
+    chest_armor_id = db.Column(db.Integer, default=0)
+    head_armor_id = db.Column(db.Integer, default=0)
+    leg_armor_id = db.Column(db.Integer, default=0)
+    woodcutting_tool_id = db.Column(db.Integer, default=0)
+    mining_tool_id = db.Column(db.Integer, default=0)
+    hunting_tool_id = db.Column(db.Integer, default=0)
+    melee_tool_id = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class GrindStoneSkill(db.Model):
+    __tablename__ = "grindstone_skills"
+    id = db.Column(db.Integer, primary_key=True)
+    player_save_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grindstone_player_saves.id", name="fk_skill_player_save"),
+        nullable=False,
+    )
+    skill_name = db.Column(db.String(50), nullable=False)
+    level = db.Column(db.Integer, default=1)
+    exp = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class GrindStoneInventoryItem(db.Model):
+    __tablename__ = "grindstone_inventory_items"
+    id = db.Column(db.Integer, primary_key=True)
+    player_save_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grindstone_player_saves.id", name="fk_inventory_player_save"),
+        nullable=False,
+    )
+    item_id = db.Column(db.String(50), nullable=False)
+    quantity = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )

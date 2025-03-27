@@ -14,14 +14,17 @@ from flask import (
     url_for,
 )
 from flask_migrate import Migrate
+from sqlalchemy import func
 
 import grindstone.main as grindstone
 from models import (
     ITEM_STATUS,
+    SUBSCRIPTION_MAPPING,
     SYSTEM_ID,
     TICKET_CATEGORIES,
     TICKET_STATUS,
     CommunityPost,
+    CommunityReply,
     Item,
     Privilege,
     Purchase,
@@ -32,6 +35,7 @@ from models import (
     User,
     db,
 )
+from routes.grindstone import grindstone_bp
 from utils import Logger
 from utils import SystemTransactionHandler as sth
 
@@ -55,6 +59,7 @@ app.config["SESSION_PERMANENT"] = True
 migrate = Migrate(app, db)
 logger = Logger()
 db.init_app(app)
+app.register_blueprint(grindstone_bp)
 
 
 @app.after_request
@@ -1302,23 +1307,37 @@ def api_all_items():
 
 @app.route("/community")
 def community():
-    # Query posts with joined user data to get usernames
+    # Get reply counts for each post using a subquery
+    reply_counts = (
+        db.session.query(
+            CommunityReply.post_id, func.count(CommunityReply.id).label("reply_count")
+        )
+        .group_by(CommunityReply.post_id)
+        .subquery()
+    )
+
+    # Query posts with joined user data and reply counts
     posts = (
-        db.session.query(CommunityPost, User.username.label("creator_username"))
+        db.session.query(
+            CommunityPost,
+            User.username.label("creator_username"),
+            func.coalesce(reply_counts.c.reply_count, 0).label("total_comments"),
+        )
         .join(User, CommunityPost.creator_id == User.id)
+        .outerjoin(reply_counts, CommunityPost.id == reply_counts.c.post_id)
         .all()
     )
 
     # Format the posts for template rendering
     formatted_posts = []
-    for post, username in posts:
-        post.tags = post.tags.split(",")
+    for post, username, total_comments in posts:
         post_dict = {
             "id": post.id,
             "title": post.title,
             "content": post.content,
             "category": post.category,
-            "tags": post.tags,
+            "tags": post.tags.split(",") if post.tags else [],
+            "total_comments": total_comments,
             "upvotes": post.upvotes,
             "downvotes": post.downvotes,
             "created_at": post.created_at,
@@ -1390,6 +1409,17 @@ def user_account(user_id=None):
         print(f"Error loading user profile: {e}")
         flash("Error loading user profile", "danger")
         return redirect(url_for("home"))
+
+
+@app.template_filter("subscription_type")
+def subscription_type(subscription_id):
+    return SUBSCRIPTION_MAPPING.get(subscription_id, "Unknown")
+
+
+@app.template_filter("user_name_by_id")
+def user_name_by_id(user_id):
+    user = User.query.get(user_id)
+    return user.username if user else "Unknown"
 
 
 @app.template_filter("strftime")

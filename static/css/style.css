@@ -116,8 +116,8 @@ body {
   }
 }
 
-/* Apply this to all glow instances for consistency */
-.glow {
+/* Original Purple Glow Effect */
+.glow, .glow-purple {
   position: relative;
   color: transparent !important;
   background: linear-gradient(
@@ -133,9 +133,88 @@ body {
   text-decoration: none;
   animation: unifiedGlow 4s infinite linear;
   font-weight: 600;
-
-  /* Very subtle glow that won't overpower */
   filter: drop-shadow(0 0 1px rgba(177, 152, 237, 0.3));
+}
+
+/* New Silver Glow Effect for Branding */
+.glow-silver {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    #c0c0c0 0%,
+    #ffffff 40%,
+    #a9a9a9 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+  filter: drop-shadow(0 0 1px rgba(192, 192, 192, 0.4));
+}
+
+/* New Gold Glow Effect for Branding */
+.glow-gold {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    #b78628 0%,
+    #ffd700 40%,
+    #c6a848 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+  filter: drop-shadow(0 0 1px rgba(255, 215, 0, 0.4));
+}
+
+/* Enhanced versions with stronger glow */
+.glow-silver-bright {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    #c0c0c0 0%,
+    #ffffff 40%,
+    #c0c0c0 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7));
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.glow-gold-bright {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    #b78628 0%,
+    #ffdf2b 40%,
+    #b78628 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
 
 /* Logo icon styling if you have one */
@@ -875,43 +954,104 @@ footer a:hover {
     padding: 1.5rem;
 }
 
-/* Remove shimmer animation */
-.shimmer {
-    position: relative;
-    background: var(--card-background);
-    overflow: hidden;
-    animation: shimmer-bg 2s infinite;
-}
-
-.shimmer::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+/* Original Shimmer Effect (Purple/Blue) */
+.shimmer, .shimmer-purple {
     background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(var(--accent-rgb), 0.2) 50%,
-        transparent 100%
+        to right,
+        var(--accent-color) 0%,
+        #a67fff 20%,
+        var(--accent-color) 40%
     );
-    animation: shimmer 2s infinite;
-    transform: translateX(-100%);
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
 }
 
+/* New Silver Shimmer Effect */
+.shimmer-silver {
+    background: linear-gradient(
+        to right,
+        #c0c0c0 0%,
+        #e8e8e8 20%,
+        #a9a9a9 40%,
+        #c0c0c0 60%,
+        #e8e8e8 80%,
+        #a9a9a9 100%
+    );
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+}
+
+/* New Gold Shimmer Effect */
+.shimmer-gold {
+    background: linear-gradient(
+        to right,
+        #b78628 0%,
+        #ffd700 20%,
+        #c6a848 40%,
+        #b78628 60%,
+        #ffd700 80%,
+        #c6a848 100%
+    );
+    background-size: 200% auto;
+    color: #000;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Enhanced Shimmer Animation */
 @keyframes shimmer {
-    100% {
-        transform: translateX(100%);
+    to {
+        background-position: 200% center;
     }
 }
 
-@keyframes shimmer-bg {
-    0%, 100% {
-        opacity: 0.7;
+/* Optional: Add a glow effect for each color variant */
+.shimmer-purple-glow {
+    text-shadow: 0 0 5px rgba(177, 152, 237, 0.3);
+}
+
+.shimmer-silver-glow {
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.3);
+}
+
+.shimmer-gold-glow {
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+/* Optional: Dark mode adjustments for better visibility */
+@media (prefers-color-scheme: dark) {
+    .shimmer-silver {
+        background: linear-gradient(
+            to right,
+            #c0c0c0 0%,
+            #ffffff 20%,
+            #a9a9a9 40%,
+            #c0c0c0 60%,
+            #ffffff 80%,
+            #a9a9a9 100%
+        );
     }
-    50% {
-        opacity: 0.9;
+
+    .shimmer-gold {
+        background: linear-gradient(
+            to right,
+            #b78628 0%,
+            #ffdf2b 20%,
+            #c6a848 40%,
+            #b78628 60%,
+            #ffdf2b 80%,
+            #c6a848 100%
+        );
     }
 }
 
@@ -2147,5 +2287,207 @@ a, button, .btn, .nav-link, .form-control {
   flex-direction: column;
   flex-grow: 1;
   padding-bottom: 2rem; /* Space before footer */
+}
+
+/* Grindstone Character Creation Styles */
+.grindstone-init-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.character-creation-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.character-creation-card .card-header {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.character-creation-card .card-body {
+    padding: 2rem;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.skill-card {
+    background-color: var(--input-background);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.skill-card i {
+    font-size: 2rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.skill-card h4 {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skill-card p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.location-card {
+    background-color: var(--input-background);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.location-card i {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.location-card h4 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.location-card p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.equipment-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.equipment-item {
+    background-color: var(--input-background);
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.equipment-item i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.equipment-item span {
+    color: var(--text-color);
+}
+
+/* Form styling */
+.character-creation-card .form-control {
+    background-color: var(--input-background);
+    border: 1px solid var(--input-border);
+    color: var(--text-color);
+}
+
+.character-creation-card .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(177, 152, 237, 0.2);
+}
+
+.character-creation-card .btn-primary {
+    background-color: var(--accent-color);
+    border: none;
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 2rem;
+    transition: all 0.3s ease;
+}
+
+.character-creation-card .btn-primary:hover {
+    background-color: var(--btn-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(177, 152, 237, 0.3);
+}
+
+/* Bronze Glow Effect for Basic/Free Users */
+.glow-bronze {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    #b08d57 0%,
+    #cd9c68 40%,
+    #96713d 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+  filter: drop-shadow(0 0 1px rgba(176, 141, 87, 0.3));
+}
+
+/* Enhanced bronze with stronger glow if desired */
+.glow-bronze-bright {
+  position: relative;
+  color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    #b08d57 0%,
+    #e6bd89 40%,
+    #96713d 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  animation: unifiedGlow 4s infinite linear;
+  font-weight: 600;
+  filter: drop-shadow(0 0 2px rgba(176, 141, 87, 0.4));
+  text-shadow: 0 0 3px rgba(176, 141, 87, 0.2);
+}
+
+/* Add the bronze glow option for shimmer effect too */
+.shimmer-bronze {
+  background: linear-gradient(
+    to right,
+    #b08d57 0%,
+    #cd9c68 20%,
+    #96713d 40%,
+    #b08d57 60%,
+    #cd9c68 80%,
+    #96713d 100%
+  );
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Optional bronze glow enhancement */
+.shimmer-bronze-glow {
+  text-shadow: 0 0 5px rgba(176, 141, 87, 0.3);
 }
 

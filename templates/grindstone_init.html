@@ -1,0 +1,85 @@
+{% extends "nav_footer_template.html" %}
+
+{% block content %}
+<div class="grindstone-init-container">
+    <div class="character-creation-card">
+        <div class="card-header">
+            <h2 class="glow">Create Your Character</h2>
+            <p class="text-muted">Begin your journey in the world of Grindstone</p>
+        </div>
+        <div class="card-body">
+            <form id="characterCreationForm" method="POST" action="{{ url_for('grindstone.initialize_character') }}">
+                <div class="form-group mb-4">
+                    <label for="characterName" class="form-label">Character Name</label>
+                    <input type="text" class="form-control" id="characterName" name="character_name" required>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label">Starting Skills</label>
+                    <div class="skills-grid">
+                        <div class="skill-card">
+                            <i class="fas fa-tree"></i>
+                            <h4>Woodcutting</h4>
+                            <p>Level 1</p>
+                        </div>
+                        <div class="skill-card">
+                            <i class="fas fa-hammer"></i>
+                            <h4>Mining</h4>
+                            <p>Level 1</p>
+                        </div>
+                        <div class="skill-card">
+                            <i class="fas fa-drumstick-bite"></i>
+                            <h4>Hunting</h4>
+                            <p>Level 1</p>
+                        </div>
+                        <div class="skill-card">
+                            <i class="fas fa-tools"></i>
+                            <h4>Crafting</h4>
+                            <p>Level 1</p>
+                        </div>
+                        <div class="skill-card">
+                            <i class="fas fa-compass"></i>
+                            <h4>Adventure</h4>
+                            <p>Level 1</p>
+                        </div>
+                        <div class="skill-card">
+                            <i class="fas fa-utensils"></i>
+                            <h4>Cooking</h4>
+                            <p>Level 1</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label">Starting Location</label>
+                    <div class="location-card">
+                        <i class="fas fa-tree"></i>
+                        <h4>Dark Woods</h4>
+                        <p>A mysterious forest where your journey begins</p>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label">Starting Equipment</label>
+                    <div class="equipment-list">
+                        <div class="equipment-item">
+                            <i class="fas fa-axe"></i>
+                            <span>Wooden Axe</span>
+                        </div>
+                        <div class="equipment-item">
+                            <i class="fas fa-pickaxe"></i>
+                            <span>Stone Pickaxe</span>
+                        </div>
+                        <div class="equipment-item">
+                            <i class="fas fa-sword"></i>
+                            <span>Basic Sword</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Begin Adventure</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
