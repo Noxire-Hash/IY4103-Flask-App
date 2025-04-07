@@ -556,7 +556,7 @@ def get_user_data():
                     "created_at": user.created_at.strftime("%Y-%m-%d"),
                     "balance": user.balance,
                     "pending_balance": user.pending_balance,
-                    "subscriptions": user.subscriptions,
+                    "subscriptions": user.subscription,
                 }
                 return user_data, 200
             return {"error": "User not found"}, 404

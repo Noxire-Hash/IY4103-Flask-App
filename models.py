@@ -443,3 +443,35 @@ class GrindStoneInventoryItem(db.Model):
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+
+
+class LoreTellerAiAgent(db.Model):
+    __tablename__ = "loreteller_ai_agents"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False, unique=True)
+    description = db.Column(db.String(256))
+    api_key = db.Column(db.String(128), nullable=False)
+    secret = db.Column(db.String(128), nullable=False)
+
+
+class LoreTellerPlayers(db.Model):
+    __tablename__ = "loreteller_players"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False, unique=True)
+    description = db.Column(db.String(256))
+    adventure_id = db.Column(
+        db.Integer, db.ForeignKey("LoreTellerAdventures.id"), nullable=False
+    )
+    custom_command = db.Column(db.String(256), nullable=False)
+
+
+class LoreTellerAdventures(db.Model):
+    __tablename__ = "loreteller_adventures"
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    name = db.Column(db.String(64), nullable=False, unique=True)
+    genre = db.Column(db.String(64), nullable=False)
+    sub_genre = db.Column(db.String(64), nullable=False)
+    setting = db.Column(db.String(64), nullable=False)
+    custom_command_world = db.Column(db.String(256), nullable=False)
+    metadata = db.Column(db.Text, nullable=False)
