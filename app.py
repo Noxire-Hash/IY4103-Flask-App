@@ -14,6 +14,7 @@ from flask import (
     url_for,
 )
 from flask_migrate import Migrate
+from jinja2 import TemplateNotFound
 from sqlalchemy import func
 
 import grindstone.main as grindstone
@@ -38,6 +39,7 @@ from models import (
 from routes.grindstone import grindstone_bp
 from utils import Logger
 from utils import SystemTransactionHandler as sth
+from wrapers import admin_required, login_required, moderator_required
 
 # App setup
 app = Flask(
@@ -232,10 +234,8 @@ def login():
 
 
 @app.route("/account", methods=["GET", "POST"])
+@login_required
 def account():
-    if not session.get("user_id"):
-        return redirect(url_for("login"))
-
     user = User.query.get(session.get("user_id"))
     if not user:
         session.clear()
@@ -320,9 +320,7 @@ def logout():
 
 
 @app.route("/admin", methods=["GET", "POST"])
-@app.route(
-    "/admin/", methods=["GET", "POST"]
-)  # Adding an alternate route with trailing slash
+@admin_required
 def admin_dashboard():
     # Restrict access to admin users
     if session.get("privilege_id") != 999:
@@ -382,6 +380,7 @@ def delete_user(user_id):
 
 
 @app.route("/admin/update_user/<int:user_id>", methods=["POST"])
+@admin_required
 def admin_update_user(user_id):
     if session.get("privilege_id") != 999:
         return jsonify({"error": "Access denied"}), 403
@@ -648,13 +647,23 @@ def get_items():
 
 
 @app.errorhandler(404)
-def err_404(error):
+def err_404():
     return render_template("404.html"), 404
+
+
+@app.errorhandler(TemplateNotFound)
+def template_not_found(e):
+    return render_template("500.html"), 500
 
 
 @app.errorhandler(500)
 def err_500():
-    return render_template("500.html")
+    return render_template("500.html"), 500
+
+
+@app.errorhandler(405)
+def err_405():
+    return render_template("500.html"), 405
 
 
 # Vendor routes
@@ -886,6 +895,7 @@ def user_reply_ticket(ticket_id):
 
 # Moderator routes
 @app.route("/moderator/dashboard", methods=["GET", "POST"])
+@moderator_required
 def moderator_dashboard():
     tickets = SupportTicket.query.all()
     return render_template(

@@ -107,7 +107,6 @@ class Logger:
         self.logs = []
 
 
-# Utility functions can be added here as needed
 class SystemTransactionHandler:
     """Handles creation and processing of system transactions."""
 

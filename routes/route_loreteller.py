@@ -3,15 +3,18 @@ from flask import (
     flash,
     redirect,
     render_template,
+    request,
     session,
     url_for,
-    request,
 )
+
+from wrapers import login_required
 
 loreteller_bp = Blueprint("loreteller", __name__, url_prefix="/loreteller")
 
 
 @loreteller_bp.route("/")
+@login_required
 def index():
     if not session.get("user_id"):
         flash("Please log in to use LoreTeller", "warning")
@@ -21,6 +24,7 @@ def index():
 
 
 @loreteller_bp.rotue("/init/new_adventure", methods=["GET"])
+@login_required
 def new_adventure():
     if not session.get("user_id"):
         flash("Please log in to use LoreTeller", "warning")
@@ -40,5 +44,6 @@ def new_adventure():
 
 
 @loreteller_bp.route("/api/ai_agent")
+@login_required
 def ai_agent():
     pass

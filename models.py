@@ -474,4 +474,4 @@ class LoreTellerAdventures(db.Model):
     sub_genre = db.Column(db.String(64), nullable=False)
     setting = db.Column(db.String(64), nullable=False)
     custom_command_world = db.Column(db.String(256), nullable=False)
-    metadata = db.Column(db.Text, nullable=False)
+    monolith = db.Column(db.Text, nullable=False)
