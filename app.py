@@ -97,9 +97,6 @@ def item_preview(item_id):
     # Get item details
     item = Item.query.get_or_404(item_id)
 
-    # Get vendor info
-    vendor = User.query.get(item.vendor_id)
-
     # Get reviews
     reviews = ReviewOfItem.query.filter_by(item_id=item_id).all()
 
@@ -128,7 +125,6 @@ def item_preview(item_id):
     # Get similar items (based on tags or category)
     similar_items = []
     if item.tags:
-        item_tags = [tag.strip() for tag in item.tags.split(",")]
         similar_items = (
             Item.query.filter(Item.id != item_id, Item.category == item.category)
             .limit(5)
@@ -647,22 +643,25 @@ def get_items():
 
 
 @app.errorhandler(404)
-def err_404():
+def err_404(e):
     return render_template("404.html"), 404
 
 
 @app.errorhandler(TemplateNotFound)
 def template_not_found(e):
+    print(e)
     return render_template("500.html"), 500
 
 
 @app.errorhandler(500)
-def err_500():
+def err_500(e):
+    print(e)
     return render_template("500.html"), 500
 
 
 @app.errorhandler(405)
-def err_405():
+def err_405(e):
+    print(e)
     return render_template("500.html"), 405
 
 
@@ -1567,6 +1566,66 @@ def submit_review(item_id):
         flash(f"Error submitting review: {str(e)}", "danger")
 
     return redirect(url_for("item_preview", item_id=item_id))
+
+
+@app.route("/community/post/<int:post_id>")
+def view_post(post_id):
+    try:
+        # Get the post with creator info
+        post = CommunityPost.query.get_or_404(post_id)
+
+        # Get the creator's username
+        creator = User.query.get(post.creator_id)
+        post.creator_username = creator.username if creator else "Unknown User"
+
+        # Get comments with user info
+        comments = (
+            db.session.query(CommunityReply, User.username)
+            .join(User, CommunityReply.creator_id == User.id)
+            .filter(CommunityReply.post_id == post_id)
+            .all()
+        )
+
+        # Format comments
+        formatted_comments = []
+        for comment, username in comments:
+            comment_dict = {
+                "id": comment.id,
+                "content": comment.content,
+                "user_id": comment.creator_id,
+                "username": username,
+                "upvotes": comment.upvotes,
+                "downvotes": comment.downvotes,
+                "created_at": comment.created_at,
+            }
+            formatted_comments.append(comment_dict)
+
+        return render_template(
+            "community_post_view.html",  # Make sure this matches your template name
+            post=post,
+            comments=formatted_comments,
+        )
+    except Exception as e:
+        print(f"Error in view_post: {e}")  # Add logging for debugging
+        return render_template("500.html"), 500
+
+
+@app.route("/api/community/post/<int:post_id>/reply", methods=["POST"])
+def post_comment():
+    try:
+        new_comment = request.form.get("comment")
+        db.session.add(
+            CommunityReply(
+                post_id=request.form.get("post_id"),
+                creator_id=session.get("user_id"),
+                content=new_comment,
+            )
+        )
+        flash("Comment submitted successfully!", "success")
+        return url_for("view_post", post_id=request.form.get("post_id"))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error submitting comment: {str(e)}", "danger")
 
 
 if __name__ == "__main__":
