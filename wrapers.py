@@ -19,7 +19,7 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if not session.get("user_id"):
             return redirect(url_for("login"))
-        if session.get("user_id") != 999:
+        if session.get("privilege_id") != 999:
             flash("You are not authorized to access this page", "error")
             return redirect(url_for("login"))
         return f(*args, **kwargs)
@@ -32,7 +32,7 @@ def moderator_required(f):
     def decorated_function(*args, **kwargs):
         if not session.get("user_id"):
             return redirect(url_for("login"))
-        if session.get("user_id") >= 998:
+        if session.get("privilege_id") >= 998:
             flash("You are not authorized to access this page", "error")
             return redirect(url_for("login"))
         return f(*args, **kwargs)
