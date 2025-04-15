@@ -630,7 +630,6 @@ def getCookie():
                 session["user_id"] = user.id
                 session["username"] = user.username
                 session["privilege_id"] = user.privilege_id
-                flash("Login successful!", "success")
     except Exception as e:
         print(f"Error getting cookie: {e}")
         session.clear()
