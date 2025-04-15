@@ -23,19 +23,22 @@ var/
 # Flask stuff
 instance/
 .webassets-cache
+flask_session/
 
 # Database files
 *.db
 *.sqlite
 *.sqlite3
+app.db
 
 # Migration versions
 migrations/versions/
+migrations/__pycache__/
 
 # Virtual environment
 venv/
 ENV/
-env/
+.env/
 
 # IDE files
 .idea/
@@ -47,10 +50,14 @@ env/
 # Custom files
 base.mdc
 *.log
+logs/
+log/
 
 # Environment variables
 .env
 .flaskenv
+.env.local
+.env.*.local
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -71,3 +78,19 @@ coverage.xml
 **/*$py.class
 .pytest_cache/
 pytest.ini
+
+# System files
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+
+# Custom project files
+static/uploads/
