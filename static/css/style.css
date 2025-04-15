@@ -799,6 +799,34 @@ footer a:hover {
   color: var(--text-muted);
   margin: 0;
 }
+
+/* Post header with inline layout */
+.post-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px; /* Gap between badges and author info */
+}
+
+.post-badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.post-author-info {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 767px) {
+  .post-header {
+    flex-wrap: wrap;
+  }
+}
 .card-body {
   padding: 30px;
 }
@@ -2675,27 +2703,33 @@ a, button, .btn, .nav-link, .form-control {
     margin-bottom: 0.75rem;
   }
 
-  .post-card .vote-controls-below {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin: 0.5rem 0 0.75rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .post-card .vote-controls-below .vote-btn {
-    padding: 0.25rem 0.5rem !important;
-    margin: 0 0.5rem !important;
-    background-color: rgba(30, 30, 47, 0.5);
-    border-radius: 4px;
-  }
-
-  .post-card .vote-controls-below .vote-count {
-    font-weight: bold;
-    min-width: 25px;
-    text-align: center;
-    font-size: 0.9rem;
+  /* Fix for vote controls in mobile view */
+  @media (max-width: 767px) {
+    .post-card .vote-controls-below {
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Change from flex-start to center */
+      margin: 0.5rem 0 0.75rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .post-card .vote-controls-below .vote-btn {
+      padding: 0.25rem 0.5rem !important;
+      margin: 0 0.5rem !important;
+      background-color: rgba(30, 30, 47, 0.5);
+      border-radius: 4px;
+    }
+    
+    .post-card .vote-controls-below .vote-count {
+      font-weight: bold;
+      min-width: 25px;
+      text-align: center; /* Ensure text is centered */
+      font-size: 0.9rem;
+      display: flex; /* Add display flex */
+      align-items: center; /* Center vertically */
+      justify-content: center; /* Center horizontally */
+    }
   }
 }
 
@@ -2899,6 +2933,34 @@ a, button, .btn, .nav-link, .form-control {
 
   .editor-toolbar {
     justify-content: flex-start;
+  }
+}
+
+/* Post header with inline layout */
+.post-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px; /* Gap between badges and author info */
+}
+
+.post-badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.post-author-info {
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 767px) {
+  .post-header {
+    flex-wrap: wrap;
   }
 }
 

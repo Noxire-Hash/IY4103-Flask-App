@@ -37,7 +37,7 @@ def moderator_required(f):
         if not session.get("user_id"):
             flash("You must be logged in to access this page", "warning")
             return redirect(url_for("login"))
-        if session.get("privilege_id") < 998:
+        if session.get("privilege_id") <= 998:
             flash("Moderator access required for this page", "warning")
             return redirect(url_for("home"))
         return f(*args, **kwargs)

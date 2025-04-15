@@ -369,6 +369,7 @@ def admin_dashboard():
 
 
 @app.route("/admin/delete_user/<int:user_id>", methods=["POST"])
+@admin_required
 def delete_user(user_id):
     # Restrict access to admin users
     if session.get("privilege_id") != 999:
@@ -441,6 +442,7 @@ def admin_update_user(user_id):
 
 
 @app.route("/admin/create_transaction", methods=["POST"])
+@admin_required
 def admin_create_transaction():
     if session.get("privilege_id") != 999:
         flash("Access denied! Admins only.", "danger")
@@ -527,6 +529,7 @@ def admin_create_transaction():
 
 
 @app.route("/admin/get_user/<int:user_id>")
+@admin_required
 def admin_get_user(user_id):
     if session.get("privilege_id") != 999:
         return jsonify({"error": "Access denied"}), 403
@@ -688,6 +691,7 @@ def err_405(e):
 
 
 @app.route("/vendor/dashboard", methods=["GET", "POST"])
+@login_required
 def vendor_dashboard():
     try:
         # Check if user is logged in
@@ -707,6 +711,7 @@ def vendor_dashboard():
 
 
 @app.route("/vendor/add_product", methods=["GET", "POST"])
+@login_required
 def add_product():
     if request.method == "POST":
         name = request.form.get("product_name")
@@ -746,6 +751,7 @@ def add_product():
 
 
 @app.route("/vendor/delete_item/<int:item_id>", methods=["POST"])
+@login_required
 def delete_item(item_id):
     # Check if user is logged in and is the vendor of the item
     if not session.get("user_id"):
@@ -777,6 +783,7 @@ def delete_item(item_id):
 
 
 @app.route("/vendor/edit_item/<int:item_id>", methods=["GET", "POST"])
+@login_required
 def edit_item(item_id):
     try:
         if not session.get("user_id"):
@@ -827,6 +834,7 @@ def test_error():
 
 
 @app.route("/support", methods=["GET", "POST"])
+@login_required
 def support():
     if not session.get("user_id"):
         flash("Please log in to submit a support ticket.", "warning")
@@ -876,6 +884,7 @@ def reply_ticket():
 
 
 @app.route("/support/reply_ticket/<int:ticket_id>", methods=["GET", "POST"])
+@login_required
 def user_reply_ticket(ticket_id):
     if not session.get("user_id"):
         flash("Please log in to reply to a support ticket", "warning")
@@ -924,6 +933,7 @@ def moderator_dashboard():
 
 
 @app.route("/moderator/view_ticket/<int:ticket_id>", methods=["GET"])
+@moderator_required
 def view_ticket(ticket_id):
     if session.get("privilege_id") < 998:
         flash("Access denied! Moderators only.", "danger")
@@ -948,6 +958,7 @@ def view_ticket(ticket_id):
 
 
 @app.route("/moderator/respond/<int:ticket_id>", methods=["POST"])
+@moderator_required
 def moderator_respond(ticket_id):
     if session.get("privilege_id") < 998:
         flash("Access denied! Moderators only.", "danger")
@@ -995,6 +1006,7 @@ def before_request():
 
 
 @app.route("/deposit", methods=["GET", "POST"])
+@login_required
 def deposit_funds():
     if request.method == "POST":
         if request.is_json:
@@ -1069,6 +1081,7 @@ def deposit_funds():
 
 
 @app.route("/transfer", methods=["POST"])
+@login_required
 def transfer_funds():
     try:
         amount = float(request.form.get("amount"))
@@ -1120,6 +1133,7 @@ def serve_js(filename):
 
 
 @app.route("/checkout/<int:item_id>")
+@login_required
 def checkout(item_id):
     print(f"Debug: Checkout called with item_id: {item_id}")  # Debug print
     print(f"Debug: User ID: {session.get('user_id')}")  # Debug print
@@ -1144,6 +1158,7 @@ def checkout(item_id):
 
 
 @app.route("/process_payment", methods=["POST"])
+@login_required
 def process_payment():
     try:
         item_id = request.form.get("item_id")
@@ -1182,6 +1197,7 @@ def process_payment():
 
 
 @app.route("/checkout/deposit", methods=["GET", "POST"])
+@login_required
 def deposit():
     return render_template("checkout_deposit.html")
 
@@ -1206,6 +1222,7 @@ def get_game_data():
 
 
 @app.route("/account/transactions", methods=["GET"])
+@login_required
 def transaction_history():
     if not session.get("user_id"):
         return redirect(url_for("login"))
@@ -1464,6 +1481,7 @@ def strftime_filter(date, format="%Y-%m-%d"):
 
 
 @app.route("/community/create_post", methods=["GET", "POST"])
+@login_required
 def create_post():
     if request.method == "POST":
         # Get form data
@@ -1495,6 +1513,7 @@ def create_post():
 
 
 @app.route("/community/save_draft", methods=["POST"])
+@login_required
 def save_draft():
     # Similar to create_post but mark as draft
     # Add a is_draft field to your CommunityPost model if needed
@@ -1553,6 +1572,7 @@ def format_date(date):
 
 
 @app.route("/submit_review/<int:item_id>", methods=["POST"])
+@login_required
 def submit_review(item_id):
     # Check if user is logged in
     if not session.get("user_id"):

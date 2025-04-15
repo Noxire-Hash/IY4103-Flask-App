@@ -148,41 +148,48 @@
                                         {% endfor %}
                                     </div>
 
-                                    <!-- Post author info -->
-                                    <small class="text-muted d-block w-100">Posted by <a href="/user/{{post.creator_id}}" class="text-primary post-author" data-user-id="{{post.creator_id}}">{{post.creator_username|default('User')}}</a> • <span class="post-date" data-date="{{post.created_at}}">{{post.created_at}}</span></small>
+                                    <!-- Post author info - now inline with tags -->
+                                    <small class="post-author-info">
+                                        Posted by <a href="/user/{{post.creator_id}}" class="text-primary post-author" data-user-id="{{post.creator_id}}">{{post.creator_username|default('User')}}</a> • 
+                                        <span class="post-date" data-date="{{post.created_at}}">{{post.created_at}}</span>
+                                    </small>
                                 </div>
 
-                                <!-- Post title -->
-                                <h5 class="post-title mb-2">
-                                    <a href="/community/post/{{post.id}}" class="text-light text-decoration-none hover-primary">{{post.title}}</a>
-                                </h5>
+                                <div class="d-flex">
+                                    <!-- Vote controls in Reddit style (vertical) -->
+                                    <div class="vote-controls-below">
+                                        <button class="btn btn-link text-light p-1 vote-btn" title="Upvote" data-post-id="{{post.id}}">
+                                            <i class="fas fa-chevron-up"></i>
+                                        </button>
+                                        <div class="vote-count fw-bold">{{post.upvotes - post.downvotes}}</div>
+                                        <button class="btn btn-link text-light p-1 vote-btn" title="Downvote" data-post-id="{{post.id}}">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
 
-                                <!-- Vote controls BELOW the headline -->
-                                <div class="vote-controls-below">
-                                    <button class="btn btn-link text-light p-1 vote-btn" title="Upvote" data-post-id="{{post.id}}">
-                                        <i class="fas fa-chevron-up"></i>
-                                    </button>
-                                    <div class="vote-count fw-bold mx-2">{{post.upvotes - post.downvotes}}</div>
-                                    <button class="btn btn-link text-light p-1 vote-btn" title="Downvote" data-post-id="{{post.id}}">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </button>
-                                </div>
+                                    <div class="post-content-wrapper">
+                                        <!-- Post title -->
+                                        <h5 class="post-title mb-2">
+                                            <a href="/community/post/{{post.id}}" class="text-light text-decoration-none hover-primary">{{post.title}}</a>
+                                        </h5>
 
-                                <!-- Post content with both full and truncated versions -->
-                                <p class="text-muted mb-2 d-none d-sm-block">{{post.content}}</p>
-                                <p class="text-muted mb-2 d-block d-sm-none">{{post.content|truncate(100, true)}}</p>
+                                        <!-- Post content with both full and truncated versions -->
+                                        <p class="text-muted mb-2 d-none d-sm-block">{{post.content}}</p>
+                                        <p class="text-muted mb-2 d-block d-sm-none">{{post.content|truncate(100, true)}}</p>
 
-                                <!-- Post actions -->
-                                <div class="post-actions">
-                                    <button class="btn btn-link text-muted p-0 me-3 post-action-btn">
-                                        <i class="fas fa-comment me-1"></i><span class="d-none d-sm-inline">{{post.total_comments|default('0')}} Comments</span><span class="d-inline d-sm-none">{{post.total_comments|default('0')}}</span>
-                                    </button>
-                                    <button class="btn btn-link text-muted p-0 me-3 post-action-btn">
-                                        <i class="fas fa-share me-1"></i><span class="d-none d-sm-inline">Share</span>
-                                    </button>
-                                    <button class="btn btn-link text-muted p-0 post-action-btn">
-                                        <i class="fas fa-bookmark me-1"></i><span class="d-none d-sm-inline">Save</span>
-                                    </button>
+                                        <!-- Post actions -->
+                                        <div class="post-actions">
+                                            <button class="btn btn-link text-muted p-0 me-3 post-action-btn">
+                                                <i class="fas fa-comment me-1"></i><span class="d-none d-sm-inline">{{post.total_comments|default('0')}} Comments</span><span class="d-inline d-sm-none">{{post.total_comments|default('0')}}</span>
+                                            </button>
+                                            <button class="btn btn-link text-muted p-0 me-3 post-action-btn">
+                                                <i class="fas fa-share me-1"></i><span class="d-none d-sm-inline">Share</span>
+                                            </button>
+                                            <button class="btn btn-link text-muted p-0 post-action-btn">
+                                                <i class="fas fa-bookmark me-1"></i><span class="d-none d-sm-inline">Save</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -640,6 +647,86 @@
     /* Post link interaction */
     .post-content h5 a {
         transition: color 0.2s ease;
+    }
+
+    /* Reddit-style vote controls for desktop view */
+    .vote-controls-below {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        float: left;
+        margin-right: 12px;
+        margin-top: 2px;
+    }
+
+    .vote-controls-below .vote-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .vote-controls-below .vote-count {
+        font-weight: bold;
+        text-align: center;
+        font-size: 14px;
+        margin: 2px 0;
+    }
+
+    /* Mobile view: horizontal layout */
+    @media (max-width: 767px) {
+        .vote-controls-below {
+            flex-direction: row;
+            float: none;
+            margin-right: 0;
+            padding-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .vote-controls-below .vote-btn {
+            padding: 0.25rem 0.5rem !important;
+            margin: 0 0.5rem !important;
+            background-color: rgba(30, 30, 47, 0.5);
+            border-radius: 4px;
+        }
+        
+        .vote-controls-below .vote-count {
+            margin: 0 8px;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Post header with better layout */
+    .post-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px; /* Gap between badges and author info */
+    }
+
+    .post-badges-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 0;
+    }
+
+    .post-author-info {
+        white-space: nowrap;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 767px) {
+        .post-header {
+            flex-wrap: wrap;
+        }
     }
 </style>
 {% endblock %}
