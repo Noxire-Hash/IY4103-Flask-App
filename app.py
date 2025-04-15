@@ -51,7 +51,7 @@ app.secret_key = os.urandom(24)
 app.config.update(
     SESSION_COOKIE_SECURE=False,  # Set to True in production
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SAMESITE="None",
     PERMANENT_SESSION_LIFETIME=timedelta(minutes=60),
     SESSION_REFRESH_EACH_REQUEST=True,
 )
@@ -193,7 +193,7 @@ def register():
         # Add user to the database
         try:
             user = User(
-                username=username, email=email, password=password, privilege_id=999
+                username=username, email=email, password=password, privilege_id=1
             )
             db.session.add(user)
             db.session.commit()
@@ -220,8 +220,19 @@ def login():
             session["username"] = user.username
             session["privilege_id"] = user.privilege_id
             flash("Login successful!", "success")
-            setCookie()
-            return redirect(url_for("home"))
+
+            # Set cookie directly here
+            response = make_response(redirect(url_for("home")))
+            response.set_cookie(
+                key="user_id",
+                value=str(user.id),
+                max_age=2592000,  # 30 days in seconds
+                path="/",
+                httponly=True,
+                samesite="Lax",
+            )
+            print(f"Direct cookie set for user_id: {user.id}")
+            return response
         else:
             flash("Invalid email or password!", "danger")
             return redirect(url_for("login"))
@@ -595,8 +606,16 @@ def get_username_from_id(user_id):
 @app.route("/setCookie", methods=["POST", "GET"])
 def setCookie():
     user_id = session.get("user_id")
+    print(f"Setting cookie for user_id: {user_id}")
     response = make_response(redirect(url_for("home")))
-    response.set_cookie(key="user_id", value=str(user_id))
+    response.set_cookie(
+        key="user_id",
+        value=str(user_id),
+        max_age=2592000,  # 30 days in seconds
+        path="/",  # Make cookie available across entire site
+        httponly=True,  # More secure
+        samesite="Lax",  # Allow some cross-site requests
+    )
     return response
 
 
@@ -604,6 +623,7 @@ def setCookie():
 def getCookie():
     try:
         user_id = request.cookies.get("user_id")
+        print(f"Retrieved cookie user_id: {user_id}")  # Debug line
         if user_id is not None:
             user = User.query.filter_by(id=user_id).first()
             if user:

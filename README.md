@@ -1,140 +1,106 @@
 # IY4103-Flask-App: Lorekeeper
 
-This project is a web application developed for the IY4103 Web Development course at the University of Essex. Lorekeeper is a comprehensive digital marketplace platform that demonstrates advanced web development concepts using Flask, a micro web framework for Python. **This project significantly exceeds the course requirements** by implementing numerous additional features beyond the basic assessment criteria.
+A comprehensive digital marketplace platform developed with Flask for the IY4103 Web Development course at the University of Essex. Lorekeeper enables users to trade virtual items, manage transactions, and participate in a community-driven marketplace.
 
-## Project Overview
+## Features
 
-Lorekeeper is a digital marketplace platform designed for trading virtual items and managing transactions between users. The application features a complete user authentication system, role-based access control, transaction processing, support ticket management, and detailed analytics. It integrates with a SQLite database to manage user data, products, transactions, and other resources.
+### Core Features
 
-### Assessment Requirements Met
-
-This project fulfills all the assessment requirements:
-
-- ✅ Well-written, neat, and commented code throughout all files
-- ✅ Multiple HTML templates (15+) with base templates for consistent layout
-- ✅ Bootstrap CSS library integration with custom CSS enhancements
-- ✅ Complete Flask routing for all page endpoints
-- ✅ SQLite database with 10+ models and complex relationships
-- ✅ Extensive JavaScript functionality for dynamic user interactions
-- ✅ Adherence to modern web design standards and best practices
-- ✅ Fully populated with test data to demonstrate all functionality
-
-## Core Features
-
-- **User Authentication System**:
-  - Secure registration and login
+- 🔐 **User Authentication**
+  - Secure login/registration
   - Session management with cookies
-  - Role-based access control
+  - Role-based access (Admin, Moderator, Vendor, User)
 
-- **Product Marketplace**:
+- 🏪 **Marketplace**
   - Browse and search items
-  - Detailed product pages
+  - Detailed product listings
   - Category filtering
+  - Review system
 
-- **Vendor Management**:
-  - Product creation and editing
-  - Sales tracking
-  - Inventory management
-
-- **Admin Dashboard**:
-  - User management
-  - System-wide transaction control
-  - Privilege assignment
-
-## Extended Features (Beyond Course Requirements)
-
-- **Complete Transaction System**:
+- 💰 **Transaction System**
   - Virtual currency (AW) management
-  - Multiple payment provider integration
   - User-to-user transfers
-  - Purchase processing with receipts
-  - Detailed transaction history with insights
+  - Purchase processing
+  - Transaction history
 
-- **Advanced User Roles and Permissions**:
-  - Hierarchical privilege system (Admin, Moderator, Vendor, User)
-  - Role-specific dashboards and capabilities
-  - Dynamic UI elements based on user privileges
-
-- **Support Ticket System**:
+- 🎫 **Support System**
   - Ticket creation and tracking
   - Moderator response interface
   - Category-based organization
 
-- **Enhanced Security Features**:
-  - Secure session management
-  - Input validation and sanitization
-  - Comprehensive error handling and logging
+- 💬 **Community Features**
+  - Discussion boards
+  - User profiles
+  - Item reviews
+  - Community posts
 
-- **Data Visualization and Analytics**:
-  - Transaction statistics and insights
-  - User activity tracking
-  - Financial summaries
+### Admin Features
 
-- **Database Migration System**:
-  - Structured schema evolution
-  - Version-controlled database models
+- User management
+- Transaction monitoring
+- System-wide controls
+- Support ticket management
 
-- **Community Forums**: Interactive discussion boards where users can communicate with each other, share experiences, post questions, and exchange knowledge about marketplace items and game strategies
+## Tech Stack
 
-## Technologies Used
-
-- **Backend**: Python, Flask, SQLAlchemy, Flask-Migrate
-- **Database**: SQLite
-- **Frontend**: HTML5, CSS3, JavaScript, jQuery, Bootstrap 5
+- **Backend**: Python 3.12, Flask
+- **Database**: SQLite, SQLAlchemy, Flask-Migrate
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
 - **Template Engine**: Jinja2
-- **Development Tools**: Git, Visual Studio Code
 
 ## Setup Instructions
 
-To set up the project on your local machine, follow these steps:
+1. **Clone the repository**
 
-1. **Clone the repository**:
+```bash
+git clone [repository-url]
+cd IY4103-Flask-App
+```
 
-    ```sh
-    git clone https://github.com/yourusername/IY4103-Flask-App.git
-    cd IY4103-Flask-App
-    ```
+2. **Create and activate virtual environment**
 
-2. **Set up a virtual environment**:
+```bash
+# Windows
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 
-    ```sh
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
+# Linux/MacOS
+python -m venv venv
+source venv/bin/activate
+```
 
-3. **Install the required dependencies**:
+3. **Install dependencies**
 
-    ```sh
-    pip install -r requirements.txt
-    ```
+```bash
+pip install -r requirements.txt
+```
 
-4. **Set up the database**:
+4. **Initialize database**
 
-    ```sh
-    flask db init
-    flask db migrate -m "Initial migration"
-    flask db upgrade
-    python populate_db.py  # Populate with test data
-    ```
+```bash
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+```
 
-5. **Run the application**:
+5. **Run the application**
 
-    ```sh
-    flask run
-    ```
+```bash
+python run.py
+```
 
-6. **Access the application**:
-    Open your web browser and go to `http://127.0.0.1:5000`.
+6. **Access the application**
+
+- Open browser and go to `http://127.0.0.1:5000`
 
 ## Test Accounts
 
-The application comes with several pre-configured test accounts:
-
-- **Admin**: `lorekeeper@lorekeeper.com` / `lorekeeper`
-- **Moderator**: `mod@example.com` / `moderator123`
-- **Vendor**: `gamemaster@example.com` / `vendor123`
-- **User**: `player1@example.com` / `user123`
-- **Promo**: `promo@example.com` / `promo123`
+| Role      | Email                     | Password      |
+|-----------|---------------------------|---------------|
+| Admin     | <lorekeeper@lorekeeper.com> | lorekeeper   |
+| Moderator | <mod@example.com>          | moderator123  |
+| Vendor    | <gamemaster@example.com>    | vendor123     |
+| User      | <player1@example.com>      | user123       |
 
 ## Project Structure
 
