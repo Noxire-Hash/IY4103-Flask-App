@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LoreKeeper - Preserve and Share Your Adventures</title>
+    <title>{% block title %}LoreKeeper - Preserve and Share Your Adventures{% endblock %}</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -28,8 +28,6 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container">
-        <img src=" " />
-        <a class="navbar-brand glow" href="/">LoreKeeper</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -41,6 +39,9 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
+        <a class="navbar-brand glow" href="/">LoreKeeper</a>
+
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <!-- Store Link -->
@@ -69,12 +70,14 @@
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
+                id="vendorDropdown"
                 role="button"
                 data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
                 Vendor
               </a>
-              <ul class="dropdown-menu dropdown-menu-dark">
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="vendorDropdown">
                 <li>
                   <a class="dropdown-item" href="/vendor/dashboard"
                     >Dashboard</a
@@ -90,12 +93,14 @@
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
+                id="adminDropdown"
                 role="button"
                 data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
                 Management
               </a>
-              <ul class="dropdown-menu dropdown-menu-dark">
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminDropdown">
                 <li>
                   <a
                     class="dropdown-item"
@@ -124,12 +129,14 @@
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
+                id="userDropdown"
                 role="button"
                 data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
                 {{ session['username'] }}
               </a>
-              <ul class="dropdown-menu dropdown-menu-dark">
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" href="/account">My Account</a></li>
                 <li><a class="dropdown-item" href="/support">Support</a></li>
                 <li>
@@ -152,6 +159,7 @@
         </div>
       </div>
     </nav>
+
     <!-- Flash Messages -->
     <div class="container mt-4 alert-container">
       {% with messages = get_flashed_messages(with_categories=true) %} {% if
@@ -194,11 +202,37 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
     {% block scripts %}
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- index.js -->
     <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
+
+    <!-- Fix for navbar dropdown animation lag -->
+    <script>
+      $(document).ready(function() {
+        // Disable transition effects on mobile
+        function handleResize() {
+          if (window.innerWidth < 992) {
+            $('.navbar-collapse').addClass('no-transition');
+          } else {
+            $('.navbar-collapse').removeClass('no-transition');
+          }
+        }
+
+        // Run on load and resize
+        handleResize();
+        $(window).resize(handleResize);
+
+        // Ensure instant close of dropdown
+        $('.navbar-toggler').on('click', function() {
+          if ($('.navbar-collapse').hasClass('show')) {
+            $('.navbar-collapse').removeClass('collapsing').removeClass('show');
+          }
+        });
+      });
+    </script>
     {% endblock %}
   </body>
 </html>
