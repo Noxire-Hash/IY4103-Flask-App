@@ -5,7 +5,7 @@
     <div class="container py-4">
         <!-- Back to Forums Button -->
         <div class="mb-4">
-            <a href="/community" class="btn btn-outline-primary">
+            <a href="/taverns" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left me-2"></i>Back to Forums
             </a>
         </div>
@@ -48,7 +48,9 @@
                                 <a href="/user/{{ post.creator_id }}" class="text-primary post-author">{{ post.creator_username }}</a>
                                 <div class="text-muted small">
                                     <i class="far fa-clock me-1"></i>
-                                    <span class="post-date" data-date="{{ post.created_at }}">{{ post.created_at }}</span>
+                                    <!-- Debug info -->
+                                    <small class="d-none">Raw date: {{ post.created_at }}</small>
+                                    <span class="post-date">{{ post.created_at|format_date }}</span>
                                 </div>
                             </div>
                         </div>
@@ -81,7 +83,7 @@
             <div class="card bg-dark border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h4 class="mb-3">Leave a Comment</h4>
-                    <form id="commentForm" method="POST" action="/api/community/post/{{ post.id }}/reply">
+                    <form id="commentForm" method="POST" action="/taverns/api/post/{{ post.id }}/reply">
                         <div class="mb-3">
                             <textarea class="form-control bg-dark text-light" name="comment" rows="3" placeholder="What are your thoughts?"></textarea>
                         </div>
@@ -117,9 +119,6 @@
                                 </div>
                                 <div>
                                     <a href="/user/{{ comment.user_id }}" class="text-primary post-author">{{ comment.username }}</a>
-                                    <small class="text-muted ms-2">
-                                        <span class="post-date" data-date="{{ comment.created_at }}">{{ comment.created_at }}</span>
-                                    </small>
                                 </div>
                             </div>
                             <div class="comment-content mb-2">
@@ -148,7 +147,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize vote buttons
-        const voteButtons = document.querySelectorAll('.vote-btn');
+        const voteButtons = document.querySectorAll('.vote-btn');
         voteButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const voteCount = this.parentElement.querySelector('.vote-count');
@@ -177,28 +176,6 @@
                 voteCount.classList.add('pulse-count');
                 setTimeout(() => voteCount.classList.remove('pulse-count'), 500);
             });
-        });
-
-        // Format dates
-        const formatDate = (dateString) => {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diff = now - date;
-            const seconds = Math.floor(diff / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
-
-            if (seconds < 60) return 'Just now';
-            if (minutes < 60) return `${minutes}m ago`;
-            if (hours < 24) return `${hours}h ago`;
-            if (days < 7) return `${days}d ago`;
-            return date.toLocaleDateString();
-        };
-
-        document.querySelectorAll('.post-date').forEach(element => {
-            const date = element.getAttribute('data-date');
-            element.textContent = formatDate(date);
         });
     });
 </script>

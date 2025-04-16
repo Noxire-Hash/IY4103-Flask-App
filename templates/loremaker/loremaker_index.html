@@ -1,0 +1,358 @@
+{% extends "nav_footer_template.html" %}
+
+{% block title %}LoreMaker - Game Integration Studio{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Hero Section -->
+    <header class="text-light text-center py-5 loremaker-hero">
+        <div class="container">
+            <h1 class="display-4 section-header">
+                <span class="glow-gold">Lore</span><span class="glow">Maker</span>
+            </h1>
+            <p class="lead">
+                Transform your stories into immersive gaming experiences. Create, publish, and integrate games within the LoreKeeper ecosystem.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+                <a href="/loremaker/studio" class="btn btn-primary btn-glow"><i class="fas fa-gamepad me-2"></i>Launch Studio</a>
+                <a href="/loremaker/games" class="btn btn-outline-light"><i class="fas fa-search me-2"></i>Browse Games</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center section-header mb-5">Game Creation Made Simple</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4>No-Code Game Builder</h4>
+                        <p>Create fully functional games without writing a single line of code. Our intuitive drag-and-drop interface makes game development accessible to everyone.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h4>Customizable Templates</h4>
+                        <p>Choose from our library of game templates or start from scratch. Customize every aspect of your game from characters to environments.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h4>LoreKeeper Integration</h4>
+                        <p>Seamlessly integrate with the LoreKeeper ecosystem. Add in-game purchases, collectibles, and subscription features with ease.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Showcase Section -->
+    <section id="featured" class="py-5 gradient-bg">
+        <div class="container">
+            <h2 class="text-center section-header mb-5">Featured Games</h2>
+            <div class="store-grid" id="featuredGamesContainer">
+                <!-- Featured Game 1 -->
+                <div class="featured-card">
+                    <div class="featured-content">
+                        <h5 class="card-title">The Forgotten Realms</h5>
+                        <div class="d-flex gap-2 mb-3">
+                            <span class="badge bg-secondary">RPG</span>
+                            <span class="badge bg-secondary">Fantasy</span>
+                        </div>
+                        <p class="card-text">Embark on an epic journey through magical lands. Discover ancient artifacts and battle mythical creatures.</p>
+                        <p class="card-text text-muted">By Mystical Studios</p>
+                        <h6 class="fw-bold mt-3">5,000 AW</h6>
+                        <a href="/loremaker/games/forgotten-realms" class="btn btn-primary">Play Now</a>
+                    </div>
+                </div>
+
+                <!-- Featured Game 2 -->
+                <div class="featured-card">
+                    <div class="featured-content">
+                        <h5 class="card-title">Space Frontier</h5>
+                        <div class="d-flex gap-2 mb-3">
+                            <span class="badge bg-secondary">Strategy</span>
+                            <span class="badge bg-secondary">Sci-Fi</span>
+                        </div>
+                        <p class="card-text">Explore uncharted galaxies and build your own space empire. Strategize, colonize, and dominate the cosmos.</p>
+                        <p class="card-text text-muted">By Cosmic Games</p>
+                        <h6 class="fw-bold mt-3">3,500 AW</h6>
+                        <a href="/loremaker/games/space-frontier" class="btn btn-primary">Play Now</a>
+                    </div>
+                </div>
+
+                <!-- Featured Game 3 -->
+                <div class="featured-card">
+                    <div class="featured-content">
+                        <h5 class="card-title">Mystery Manor</h5>
+                        <div class="d-flex gap-2 mb-3">
+                            <span class="badge bg-secondary">Adventure</span>
+                            <span class="badge bg-secondary">Mystery</span>
+                        </div>
+                        <p class="card-text">Solve intricate puzzles and uncover the dark secrets of the abandoned manor. Can you escape before time runs out?</p>
+                        <p class="card-text text-muted">By Enigma Interactive</p>
+                        <h6 class="fw-bold mt-3">2,800 AW</h6>
+                        <a href="/loremaker/games/mystery-manor" class="btn btn-primary">Play Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="/loremaker/games" class="btn btn-outline-light btn-lg">View All Games</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partner Studios Section -->
+    <section id="partner-studios" class="py-5">
+        <div class="container">
+            <h2 class="text-center section-header mb-5">Our Partner Studios</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4 col-lg-3">
+                    <div class="studio-card">
+                        <div class="studio-logo">
+                            <i class="fas fa-dragon"></i>
+                        </div>
+                        <h4>Dragon Forge Studios</h4>
+                        <p class="text-muted">Fantasy RPG specialists with over 20 published titles.</p>
+                        <div class="studio-game-count">
+                            <span class="badge bg-primary">12 Games</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="studio-card">
+                        <div class="studio-logo">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h4>Cosmic Horizons</h4>
+                        <p class="text-muted">Pioneering sci-fi and space exploration games.</p>
+                        <div class="studio-game-count">
+                            <span class="badge bg-primary">8 Games</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="studio-card">
+                        <div class="studio-logo">
+                            <i class="fas fa-ghost"></i>
+                        </div>
+                        <h4>Enigma Interactive</h4>
+                        <p class="text-muted">Creating award-winning mystery and horror experiences.</p>
+                        <div class="studio-game-count">
+                            <span class="badge bg-primary">15 Games</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="studio-card">
+                        <div class="studio-logo">
+                            <i class="fas fa-chess-knight"></i>
+                        </div>
+                        <h4>Strategy Masters</h4>
+                        <p class="text-muted">Complex strategy games with deep gameplay mechanics.</p>
+                        <div class="studio-game-count">
+                            <span class="badge bg-primary">10 Games</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="/loremaker/studios" class="btn btn-outline-light">View All Partner Studios</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-5">
+        <div class="container">
+            <h2 class="text-center section-header mb-5">How LoreMaker Works</h2>
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="step-container">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Choose Your Game Type</h4>
+                                <p>Select from various game templates like RPG, strategy, puzzle, or adventure as your starting point.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Design & Customize</h4>
+                                <p>Add your unique storylines, characters, environments, and game mechanics to bring your vision to life.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Test & Refine</h4>
+                                <p>Try out your game in our live testing environment and make adjustments until it's perfect.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Publish & Monetize</h4>
+                                <p>Launch your game to the LoreKeeper community and choose your monetization strategy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="loremaker-workflow-image">
+                        <div class="shimmer-overlay"></div>
+                        <img src="/static/images/loremaker-workflow.png" alt="LoreMaker Workflow" class="img-fluid rounded">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Plans Section -->
+    <section id="subscriptions" class="py-5">
+        <div class="container">
+            <h2 class="text-center section-header mb-5">Choose Your Creator Plan</h2>
+            <div class="subscription-container">
+                <div class="row g-4">
+                    <!-- Free Plan -->
+                    <div class="col-md-4">
+                        <div class="plan-card basic">
+                            <div class="card-body text-center">
+                                <div class="plan-header">
+                                    <h5 class="plan-name glow-bronze">Explorer</h5>
+                                    <div class="plan-price">
+                                        <span class="amount">Free</span>
+                                    </div>
+                                </div>
+                                <div class="plan-features">
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check"></i> Basic game templates</li>
+                                        <li><i class="fas fa-check"></i> Create up to 3 games</li>
+                                        <li><i class="fas fa-check"></i> Standard assets library</li>
+                                        <li class="disabled"><i class="fas fa-times"></i> Custom monetization</li>
+                                        <li class="disabled"><i class="fas fa-times"></i> Advanced analytics</li>
+                                    </ul>
+                                </div>
+                                <div class="plan-action">
+                                    <a href="/loremaker/signup/explorer" class="btn plan-btn basic">Get Started</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Premium Plan -->
+                    <div class="col-md-4">
+                        <div class="plan-card premium">
+                            <div class="recommended-badge">RECOMMENDED</div>
+                            <div class="card-body text-center">
+                                <div class="plan-header">
+                                    <h5 class="plan-name glow-silver">Creator</h5>
+                                    <div class="plan-price">
+                                        <span class="amount">4,500</span>
+                                        <span class="period">AW / month</span>
+                                    </div>
+                                </div>
+                                <div class="plan-features">
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check"></i> All game templates</li>
+                                        <li><i class="fas fa-check"></i> Unlimited games</li>
+                                        <li><i class="fas fa-check"></i> Premium assets library</li>
+                                        <li><i class="fas fa-check"></i> Custom monetization</li>
+                                        <li><i class="fas fa-check"></i> Basic analytics</li>
+                                    </ul>
+                                </div>
+                                <div class="plan-action">
+                                    <a href="/loremaker/signup/creator" class="btn plan-btn premium">Get Started</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Ultimate Plan -->
+                    <div class="col-md-4">
+                        <div class="plan-card ultimate">
+                            <div class="card-body text-center">
+                                <div class="plan-header">
+                                    <h5 class="plan-name glow-gold">Studio</h5>
+                                    <div class="plan-price">
+                                        <span class="amount">9,900</span>
+                                        <span class="period">AW / month</span>
+                                    </div>
+                                </div>
+                                <div class="plan-features">
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check"></i> All game templates</li>
+                                        <li><i class="fas fa-check"></i> Unlimited games</li>
+                                        <li><i class="fas fa-check"></i> Complete assets library</li>
+                                        <li><i class="fas fa-check"></i> Advanced monetization</li>
+                                        <li><i class="fas fa-check"></i> Advanced analytics</li>
+                                    </ul>
+                                </div>
+                                <div class="plan-action">
+                                    <a href="/loremaker/signup/studio" class="btn plan-btn ultimate">Get Started</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Developer Tools Section -->
+    <section id="developer-tools" class="py-5 gradient-bg">
+        <div class="container">
+            <h2 class="text-center section-header mb-5">Powerful Developer Tools</h2>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <div class="tool-content">
+                            <h4>API Integration</h4>
+                            <p>For advanced developers, our robust API allows you to integrate external services, custom scripts, and advanced functionality into your games.</p>
+                            <a href="/loremaker/docs/api" class="btn btn-sm btn-outline-light mt-3">View Documentation</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="tool-card">
+                        <div class="tool-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="tool-content">
+                            <h4>Analytics Dashboard</h4>
+                            <p>Track player engagement, retention, and monetization through our comprehensive analytics tools. Make data-driven decisions to improve your games.</p>
+                            <a href="/loremaker/demo/analytics" class="btn btn-sm btn-outline-light mt-3">See Demo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="cta" class="py-5 more-items-bg">
+        <div class="container text-center">
+            <h2 class="mb-4">Ready to Create Your First Game?</h2>
+            <p class="lead mb-5">Join thousands of creators who are building and monetizing games on the LoreKeeper platform.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="/loremaker/register" class="btn btn-lg btn-primary btn-glow px-5 py-3"><i class="fas fa-rocket me-2"></i>Get Started Now</a>
+                <a href="/loremaker/demo" class="btn btn-lg btn-outline-light px-5 py-3"><i class="fas fa-play me-2"></i>Watch Demo</a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<link rel="stylesheet" href="/static/css/loremaker.css">
+{% endblock %}

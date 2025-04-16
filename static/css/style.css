@@ -2713,14 +2713,14 @@ a, button, .btn, .nav-link, .form-control {
       padding-top: 0.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .post-card .vote-controls-below .vote-btn {
       padding: 0.25rem 0.5rem !important;
       margin: 0 0.5rem !important;
       background-color: rgba(30, 30, 47, 0.5);
       border-radius: 4px;
     }
-    
+
     .post-card .vote-controls-below .vote-count {
       font-weight: bold;
       min-width: 25px;
@@ -2962,5 +2962,302 @@ a, button, .btn, .nav-link, .form-control {
   .post-header {
     flex-wrap: wrap;
   }
+}
+
+/* LoreMaker Specific Styles */
+.loremaker-hero {
+    padding: 6rem 0 4rem;
+    position: relative;
+    background: linear-gradient(135deg, #1a1a2a, #2c1e4b, #1a1a2a);
+    overflow: hidden;
+}
+
+.loremaker-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-family: 'Cinzel', serif;
+}
+
+.loremaker-hero p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.loremaker-hero-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: 2rem;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    background-color: rgba(177, 152, 237, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.feature-icon i {
+    font-size: 2rem;
+    color: var(--accent-color);
+}
+
+.feature-card h4 {
+    font-size: 1.3rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Step Process Styling */
+.step-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content h4 {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.step-content p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.loremaker-workflow-image {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Developer Tools Styling */
+.tool-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.tool-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.tool-icon {
+    background-color: rgba(177, 152, 237, 0.1);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tool-icon i {
+    font-size: 1.75rem;
+    color: var(--accent-color);
+}
+
+.tool-content h4 {
+    font-size: 1.3rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.tool-content p {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* Partner Studios Section */
+.studio-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.studio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.studio-logo {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(177, 152, 237, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.studio-logo i {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+}
+
+.studio-card h4 {
+    font-size: 1.3rem;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.studio-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+
+.studio-game-count {
+    margin-top: 1rem;
+}
+
+/* Plan Cards - Extensions for LoreMaker */
+.plan-card.basic {
+    border-color: #b08d57;
+}
+
+.plan-card.premium {
+    border-color: var(--accent-color);
+}
+
+.plan-card.ultimate {
+    border-color: #b78628;
+}
+
+.plan-btn.basic {
+    border-color: #b08d57;
+    color: #b08d57;
+}
+
+.plan-btn.basic:hover {
+    background-color: #b08d57;
+    color: var(--text-color);
+}
+
+.plan-btn.ultimate {
+    border-color: #b78628;
+    color: #b78628;
+}
+
+.plan-btn.ultimate:hover {
+    background-color: #b78628;
+    color: var(--text-color);
+}
+
+/* Section header styling */
+.section-header {
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+    .loremaker-hero {
+        padding: 4rem 0 3rem;
+        text-align: center;
+    }
+
+    .loremaker-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .loremaker-hero p {
+        font-size: 1.1rem;
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .tool-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .loremaker-workflow-image {
+        margin-top: 2rem;
+    }
+
+    .studio-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
 }
 

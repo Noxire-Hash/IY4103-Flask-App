@@ -15,7 +15,7 @@
                     <h1 class="h2 text-primary mb-2">The Taverns</h1>
                     <p class="text-muted">Choose your tavern or join active discussions</p>
                 </div>
-                        <a href="/community/create_post" class="btn btn-primary btn-glow mt-2 mt-md-0">
+                        <a href="/taverns/create_post" class="btn btn-primary btn-glow mt-2 mt-md-0">
                     <i class="fas fa-plus me-2"></i>Create Post
                         </a>
                     </div>
@@ -150,8 +150,8 @@
 
                                     <!-- Post author info - now inline with tags -->
                                     <small class="post-author-info">
-                                        Posted by <a href="/user/{{post.creator_id}}" class="text-primary post-author" data-user-id="{{post.creator_id}}">{{post.creator_username|default('User')}}</a> • 
-                                        <span class="post-date" data-date="{{post.created_at}}">{{post.created_at}}</span>
+                                        Posted by <a href="/user/{{post.creator_id}}" class="text-primary post-author" data-user-id="{{post.creator_id}}">{{post.creator_username|default('User')}}</a> •
+                                        <span class="post-date" data-date="{{post.created_at}}">{{post.created_at|format_date}}</span>
                                     </small>
                                 </div>
 
@@ -170,7 +170,7 @@
                                     <div class="post-content-wrapper">
                                         <!-- Post title -->
                                         <h5 class="post-title mb-2">
-                                            <a href="/community/post/{{post.id}}" class="text-light text-decoration-none hover-primary">{{post.title}}</a>
+                                            <a href="/taverns/post/{{post.id}}" class="text-light text-decoration-none hover-primary">{{post.title}}</a>
                                         </h5>
 
                                         <!-- Post content with both full and truncated versions -->
@@ -242,7 +242,7 @@
             </div>
             <div class="modal-footer border-top border-secondary">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="/community/create_post" class="btn btn-primary">Create Post</a>
+                <a href="/taverns/create_post" class="btn btn-primary">Create Post</a>
             </div>
         </div>
     </div>
@@ -687,14 +687,14 @@
             margin-bottom: 0.5rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .vote-controls-below .vote-btn {
             padding: 0.25rem 0.5rem !important;
             margin: 0 0.5rem !important;
             background-color: rgba(30, 30, 47, 0.5);
             border-radius: 4px;
         }
-        
+
         .vote-controls-below .vote-count {
             margin: 0 8px;
             font-size: 0.9rem;
