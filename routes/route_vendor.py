@@ -17,7 +17,7 @@ def vendor_dashboard():
         vendor_items = Item.query.filter_by(vendor_id=session.get("user_id")).all()
 
         return render_template(
-            "vendor_dashboard.html", items=vendor_items, ITEM_STATUS=ITEM_STATUS
+            "vendor/vendor_dashboard.html", items=vendor_items, ITEM_STATUS=ITEM_STATUS
         )
     except Exception as e:
         flash(f"Error accessing vendor dashboard: {str(e)}", "danger")
@@ -61,7 +61,7 @@ def add_product():
             flash(f"Error adding item: {e}", "danger")
             return redirect(url_for("vendor.vendor_dashboard"))
 
-    return render_template("vendor_dashboard.html")
+    return render_template("vendor/vendor_dashboard.html")
 
 
 @vendor_bp.route("/delete_item/<int:item_id>", methods=["POST"])
@@ -131,14 +131,9 @@ def edit_item(item_id):
                 flash(f"Error updating item: {e}", "danger")
 
         return render_template(
-            "vendor_item_edit.html", item=item, ITEM_STATUS=ITEM_STATUS
+            "vendor/vendor_item_edit.html", item=item, ITEM_STATUS=ITEM_STATUS
         )
 
     except Exception as e:
         flash(f"Error accessing item: {e}", "danger")
         return redirect(url_for("vendor.vendor_dashboard"))
-
-
-@vendor_bp.route("/test_error")
-def test_error():
-    raise Exception("This is a test error!")
