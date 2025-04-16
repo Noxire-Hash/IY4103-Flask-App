@@ -81,10 +81,11 @@
             <div class="card bg-dark border-0 shadow-sm mb-4">
                 <div class="card-body p-4">
                     <h4 class="mb-3">Leave a Comment</h4>
-                    <form id="commentForm">
+                    <form id="commentForm" method="POST" action="/api/community/post/{{ post.id }}/reply">
                         <div class="mb-3">
-                            <textarea class="form-control bg-dark text-light" rows="3" placeholder="What are your thoughts?"></textarea>
+                            <textarea class="form-control bg-dark text-light" name="comment" rows="3" placeholder="What are your thoughts?"></textarea>
                         </div>
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
                         <button type="submit" class="btn btn-primary">Post Comment</button>
                     </form>
                 </div>

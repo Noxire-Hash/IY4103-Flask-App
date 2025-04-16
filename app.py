@@ -16,7 +16,6 @@ from flask import (
 from flask_migrate import Migrate
 from jinja2 import TemplateNotFound
 from sqlalchemy import func
-
 import grindstone.main as grindstone
 from models import (
     ITEM_STATUS,
@@ -37,6 +36,7 @@ from models import (
     db,
 )
 from routes.grindstone import grindstone_bp
+import routes.route_vendor
 from utils import Logger
 from utils import SystemTransactionHandler as sth
 from wrapers import admin_required, login_required, moderator_required
@@ -62,7 +62,7 @@ migrate = Migrate(app, db)
 logger = Logger()
 db.init_app(app)
 app.register_blueprint(grindstone_bp)
-
+app.register_blueprint(routes.route_vendor.vendor_bp)
 
 @app.after_request
 def add_header(response):
@@ -685,149 +685,6 @@ def err_500(e):
 def err_405(e):
     print(e)
     return render_template("500.html"), 405
-
-
-# Vendor routes
-
-
-@app.route("/vendor/dashboard", methods=["GET", "POST"])
-@login_required
-def vendor_dashboard():
-    try:
-        # Check if user is logged in
-        if not session.get("user_id"):
-            flash("Please log in to access vendor dashboard", "warning")
-            return redirect(url_for("login"))
-
-        # Get vendor's items
-        vendor_items = Item.query.filter_by(vendor_id=session.get("user_id")).all()
-
-        return render_template(
-            "vendor_dashboard.html", items=vendor_items, ITEM_STATUS=ITEM_STATUS
-        )
-    except Exception:
-        flash("Error accessing vendor dashboard", "danger")
-        return redirect(url_for("home"))
-
-
-@app.route("/vendor/add_product", methods=["GET", "POST"])
-@login_required
-def add_product():
-    if request.method == "POST":
-        name = request.form.get("product_name")
-        description = request.form.get("product_description")
-        price = request.form.get("product_price")
-        category = request.form.get("product_category")
-        tags = request.form.get("product_tags")
-        vendor_id = session.get("user_id")
-
-        # Validate required fields
-        if not all([name, description, price, category, vendor_id]):
-            flash("All fields except tags are required!", "danger")
-            return redirect(url_for("vendor_dashboard"))
-
-        try:
-            new_item = Item(
-                name=name,
-                description=description,
-                price=float(price),
-                category=category,
-                tags=tags,
-                vendor_id=vendor_id,
-            )
-            db.session.add(new_item)
-            db.session.commit()
-            flash("Item added successfully!", "success")
-            return redirect(url_for("vendor_dashboard"))
-        except ValueError:
-            flash("Invalid price format!", "danger")
-            return redirect(url_for("vendor_dashboard"))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Error adding item: {e}", "danger")
-            return redirect(url_for("vendor_dashboard"))
-
-    return render_template("vendor_dashboard.html")
-
-
-@app.route("/vendor/delete_item/<int:item_id>", methods=["POST"])
-@login_required
-def delete_item(item_id):
-    # Check if user is logged in and is the vendor of the item
-    if not session.get("user_id"):
-        flash("Please log in first!", "danger")
-        return redirect(url_for("login"))
-
-    try:
-        item = Item.query.get(item_id)
-
-        # Check if item exists
-        if not item:
-            flash("Item not found!", "danger")
-            return redirect(url_for("vendor_dashboard"))
-
-        # Check if the logged-in user is the vendor of this item
-        if item.vendor_id != session.get("user_id"):
-            flash("You don't have permission to delete this item!", "danger")
-            return redirect(url_for("vendor_dashboard"))
-
-        # Delete the item
-        db.session.delete(item)
-        db.session.commit()
-        flash("Item deleted successfully!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Error deleting item: {e}", "danger")
-
-    return redirect(url_for("vendor_dashboard"))
-
-
-@app.route("/vendor/edit_item/<int:item_id>", methods=["GET", "POST"])
-@login_required
-def edit_item(item_id):
-    try:
-        if not session.get("user_id"):
-            flash("Please log in first!", "danger")
-            return redirect(url_for("login"))
-
-        item = Item.query.get_or_404(item_id)
-
-        # Check if the logged-in user is the vendor of this item
-        if item.vendor_id != session.get("user_id"):
-            flash("You don't have permission to edit this item!", "danger")
-            return redirect(url_for("vendor_dashboard"))
-
-        if request.method == "POST":
-            try:
-                # Update item details
-                item.name = request.form.get("product_name")
-                item.description = request.form.get("product_description")
-                item.price = float(request.form.get("product_price"))
-                item.category = request.form.get("product_category")
-                item.tags = request.form.get("product_tags")
-                item.status = request.form.get("product_status")
-
-                db.session.commit()
-                flash("Item updated successfully!", "success")
-                return redirect(url_for("vendor_dashboard"))
-            except ValueError:
-                flash("Invalid price format!", "danger")
-            except Exception:
-                db.session.rollback()
-                flash("Error updating item", "danger")
-
-        return render_template(
-            "vendor_item_edit.html", item=item, ITEM_STATUS=ITEM_STATUS
-        )
-
-    except Exception:
-        flash("Error accessing item", "danger")
-        return redirect(url_for("vendor_dashboard"))
-
-
-@app.route("/test_error")
-def test_error():
-    raise Exception("This is a test error!")
 
 
 # Support ticket routes
@@ -1650,21 +1507,29 @@ def view_post(post_id):
 
 
 @app.route("/api/community/post/<int:post_id>/reply", methods=["POST"])
-def post_comment():
+@login_required
+def post_comment(post_id):
     try:
-        new_comment = request.form.get("comment")
-        db.session.add(
-            CommunityReply(
-                post_id=request.form.get("post_id"),
-                creator_id=session.get("user_id"),
-                content=new_comment,
-            )
+        content = request.form.get("comment")
+        if not content or content.strip() == "":
+            flash("Comment cannot be empty", "danger")
+            return redirect(url_for("view_post", post_id=post_id))
+            
+        new_reply = CommunityReply(
+            post_id=post_id,
+            creator_id=session.get("user_id"),
+            content=content
         )
+        
+        db.session.add(new_reply)
+        db.session.commit()
         flash("Comment submitted successfully!", "success")
-        return url_for("view_post", post_id=request.form.get("post_id"))
+        
     except Exception as e:
         db.session.rollback()
         flash(f"Error submitting comment: {str(e)}", "danger")
+        
+    return redirect(url_for("view_post", post_id=post_id))
 
 
 if __name__ == "__main__":
