@@ -1,45 +1,68 @@
 # IY4103-Flask-App: Lorekeeper
 
-A comprehensive digital marketplace platform developed with Flask for the IY4103 Web Development course at the University of Essex. Lorekeeper enables users to trade virtual items, manage transactions, and participate in a community-driven marketplace.
+A comprehensive digital marketplace platform developed with Flask for the IY4103 Web Development course at the University of Essex. Lorekeeper enables users to trade virtual items, manage transactions, and participate in a community-driven marketplace with integrated mini-games and interactive features.
+
+## Project Overview
+
+This application demonstrates the implementation of a full-stack web application using Python Flask, focusing on secure user management, virtual marketplace operations, and community engagement features. The project showcases database design, authentication systems, and interactive web interfaces.
 
 ## Features
 
-### Core Features
+### Core Features (Fully Implemented)
 
-- 🔐 **User Authentication**
-  - Secure login/registration
-  - Session management with cookies
-  - Role-based access (Admin, Moderator, Vendor, User)
+- 🔐 **User Authentication & Account Management**
+  - Secure login/registration system
+  - Role-based access control (Admin, Moderator, Vendor, User)
+  - User profiles with balance management
+  - Account status monitoring
 
-- 🏪 **Marketplace**
-  - Browse and search items
-  - Detailed product listings
-  - Category filtering
-  - Review system
+- 🏪 **Marketplace System**
+  - Browse and search virtual items
+  - Category filtering and tag-based organization
+  - Detailed product listings with user reviews
+  - Purchase processing with virtual currency
 
 - 💰 **Transaction System**
   - Virtual currency (AW) management
   - User-to-user transfers
-  - Purchase processing
-  - Transaction history
+  - Transaction history tracking
+  - Receipt generation and storage
 
 - 🎫 **Support System**
-  - Ticket creation and tracking
-  - Moderator response interface
-  - Category-based organization
+  - Ticket creation with categories
+  - Staff response interface
+  - Ticket status tracking
+  - Resolution workflow
 
-- 💬 **Community Features**
-  - Discussion boards
-  - User profiles
-  - Item reviews
-  - Community posts
+### Beta Features
+
+- 💬 **Taverns (Community Forums)**
+  - Discussion boards organized by topics
+  - Post creation and reply system
+  - User reputation through up/downvotes
+  - Community post management
+  - *Note: Currently in beta testing phase with core functionality working*
+
+### Work in Progress Features
+
+- 🎮 **GrindStone Mini-Game**
+  - Resource gathering simulation
+  - Character progression system
+  - Inventory management
+  - *Note: Basic implementation complete, further development ongoing*
+
+- 🎲 **LoreTeller Interactive Storytelling**
+  - AI-driven narrative experiences
+  - Player choice-based adventures
+  - Custom adventure creation tools
+  - *Note: Framework established, content development in progress*
 
 ### Admin Features
 
-- User management
-- Transaction monitoring
-- System-wide controls
-- Support ticket management
+- Comprehensive user management dashboard
+- Transaction monitoring and intervention tools
+- System-wide parameter controls
+- Support ticket oversight and moderation tools
 
 ## Tech Stack
 
@@ -47,6 +70,7 @@ A comprehensive digital marketplace platform developed with Flask for the IY4103
 - **Database**: SQLite, SQLAlchemy, Flask-Migrate
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
 - **Template Engine**: Jinja2
+- **Auxiliary Tools**: Python data analysis libraries for admin analytics
 
 ## Setup Instructions
 
@@ -83,13 +107,19 @@ flask db migrate -m "Initial migration"
 flask db upgrade
 ```
 
-5. **Run the application**
+5. **Populate database with test data (optional)**
+
+```bash
+python populate_db.py
+```
+
+6. **Run the application**
 
 ```bash
 python run.py
 ```
 
-6. **Access the application**
+7. **Access the application**
 
 - Open browser and go to `http://127.0.0.1:5000`
 
@@ -97,7 +127,7 @@ python run.py
 
 | Role      | Email                     | Password      |
 |-----------|---------------------------|---------------|
-| Admin     | <lorekeeper@lorekeeper.com> | lorekeeper   |
+| Admin     | <lorekeeper@lorekeeper.com> | lorekeeper    |
 | Moderator | <mod@example.com>          | moderator123  |
 | Vendor    | <gamemaster@example.com>    | vendor123     |
 | User      | <player1@example.com>      | user123       |
@@ -106,44 +136,52 @@ python run.py
 
 - **app.py**: Main application file with route definitions and core logic
 - **models.py**: Database models and relationships
-- **utils.py**: Utility functions for transaction handling and logging
+- **utils.py**: Utility functions for transaction handling and data processing
+- **wrapers.py**: Wrappers to better handle login state and user privileges
+- **routes/**: Modularized route handlers
 - **templates/**: HTML templates organized by functionality
+  - **taverns/**: Community forum templates
+  - **loremaker/**: Interactive storytelling templates
+  - **vendor/**: Vendor dashboard templates
 - **static/**: CSS, JavaScript, and image assets
 - **migrations/**: Database migration scripts
-- **populate_db.py**: Script to populate the database with test data
+- **grindstone/**: Mini-game implementation files
+- **populate_db.py**: Test data generation script
 
 ## Database Schema
 
-The application uses several key models with complex relationships:
+The application implements a relational database with the following key models:
 
 - **User**: Account information and authentication
 - **Privilege**: Role-based permission system
-- **Item**: Marketplace products with metadata
-- **Purchase**: Transaction records for items
-- **SystemTransaction**: Financial transaction tracking
+- **Item/Vendor**: Marketplace product management
+- **Purchase/Receipt**: Transaction records
+- **SystemTransaction/TransactionLog**: Financial tracking
 - **SupportTicket/Response**: Customer support system
-- **Receipt**: Purchase receipts and documentation
+- **CommunityPost/Reply**: Forum functionality
+- **GrindStone/LoreTeller models**: Game state management
 
-## Development Process
+## Academic Context
 
-This project was developed following a structured software development lifecycle:
+This project was developed as part of the IY4103 Web Development course at the University of Essex. It demonstrates the application of web development principles including:
 
-1. **Requirement Analysis**: Identified user needs and defined core functionality
-2. **Planning**: Created project timeline and milestone targets
-3. **Design**: Developed wireframes and UI/UX mockups
-4. **Implementation**: Built the application incrementally with regular testing
-5. **Testing**: Conducted thorough testing across all features
-6. **Deployment**: Prepared for production environment
+- Full-stack application architecture
+- Database design and implementation
+- Authentication and authorization systems
+- User interface design principles
+- RESTful API design
+- Session management and security practices
 
-## Future Development Plans
+## Future Development Roadmap
 
-This project continues to evolve with plans for:
+Planned enhancements for future iterations include:
 
-- **Enhanced Analytics Dashboard**: More comprehensive data visualization
-- **User Profile Customization**: Avatar uploads and profile personalization
-- **Notification System**: Real-time alerts for transactions and system events
-- **Community Forums**: Interactive discussion boards where users can communicate with each other, share experiences, post questions, and exchange knowledge about marketplace items and game strategies
-- **Mobile Application**: Companion app using the existing API endpoints
+- Integration of real-time notifications using WebSockets
+- Expanded analytics dashboard for vendors and administrators
+- Enhanced mobile responsiveness for all interfaces
+- Completion of the LoreTeller AI storytelling system
+- Full deployment of the GrindStone mini-game with expanded content
+- Implementation of achievement and badge systems
 
 ---
 

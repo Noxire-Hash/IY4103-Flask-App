@@ -38,7 +38,7 @@ from models import (
 from routes.grindstone import grindstone_bp
 from utils import Logger
 from utils import SystemTransactionHandler as sth
-from wrapers import admin_required, login_required, moderator_required
+from wrappers import admin_required, login_required, moderator_required
 
 # App setup
 app = Flask(
@@ -1156,7 +1156,7 @@ def transaction_history():
 @app.route("/api/featured-items")
 def api_featured_items():
     try:
-        # Get 3 featured items (could be based on popularity, new arrivals, etc.)
+        # Get 3 featured items (could be based on weight, not yet implemented)
         featured_items = Item.query.limit(3).all()
         items_data = []
 

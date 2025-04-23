@@ -2,7 +2,7 @@ from flask import Blueprint, flash, redirect, render_template, request, session,
 from sqlalchemy import func
 
 from models import CommunityPost, CommunityReply, User, db
-from wrapers import login_required
+from wrappers import login_required
 
 taverns_bp = Blueprint("taverns", __name__, url_prefix="/taverns")
 

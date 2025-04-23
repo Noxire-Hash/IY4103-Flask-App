@@ -8,7 +8,7 @@ from flask import (
     url_for,
 )
 
-from wrapers import login_required
+from wrappers import login_required
 
 loreteller_bp = Blueprint("loreteller", __name__, url_prefix="/loreteller")
 
