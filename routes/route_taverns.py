@@ -75,11 +75,11 @@ def create_post():
             db.session.add(new_post)
             db.session.commit()
             flash("Post published successfully!", "success")
-            return redirect(url_for("taverns"))
+            return redirect(url_for("taverns.taverns"))
         except Exception as e:
             db.session.rollback()
             flash(f"Error creating post: {str(e)}", "danger")
-            return redirect(url_for("create_post"))
+            return redirect(url_for("taverns.create_post"))
 
     return render_template("taverns/taverns_post_crafter.html")
 

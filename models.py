@@ -139,6 +139,7 @@ class ReviewOfItem(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     review = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class Purchase(db.Model):
@@ -460,7 +461,7 @@ class LoreTellerPlayers(db.Model):
     name = db.Column(db.String(64), nullable=False, unique=True)
     description = db.Column(db.String(256))
     adventure_id = db.Column(
-        db.Integer, db.ForeignKey("LoreTellerAdventures.id"), nullable=False
+        db.Integer, db.ForeignKey("loreteller_adventures.id"), nullable=False
     )
     custom_command = db.Column(db.String(256), nullable=False)
 

@@ -14,6 +14,7 @@ from models import (
     Privilege,
     Purchase,
     Receipt,
+    ReviewOfItem,
     SupportTicket,
     SupportTicketResponse,
     User,
@@ -110,6 +111,49 @@ def create_dummy_items(vendors):
             items.append(item)
 
     return items
+
+
+def create_item_reviews(users, items):
+    """Create reviews for items"""
+    reviews = []
+    review_texts = [
+        "Great item, totally worth the price!",
+        "Not as good as I expected, but still decent.",
+        "Amazing quality, will definitely buy again!",
+        "The item arrived quickly, but it's not as described.",
+        "Very useful, exactly what I needed.",
+        "Decent quality for the price.",
+        "Excellent craftsmanship!",
+        "Not recommended, doesn't work as advertised.",
+        "Good value for money.",
+        "Could be better but works for now.",
+    ]
+
+    # Create reviews for some items
+    for item in items:
+        # Each item gets 0-3 reviews
+        num_reviews = random.randint(0, 3)
+        reviewers = random.sample(users, min(num_reviews, len(users)))
+
+        for user in reviewers:
+            # Skip if user is the vendor
+            if user.id == item.vendor_id:
+                continue
+
+            rating = random.randint(1, 5)
+            review_text = random.choice(review_texts)
+            created_date = datetime.utcnow() - timedelta(days=random.randint(0, 20))
+
+            review = ReviewOfItem(
+                user_id=user.id,
+                item_id=item.id,
+                rating=rating,
+                review=review_text,
+                created_at=created_date,
+            )
+            reviews.append(review)
+
+    return reviews
 
 
 def create_dummy_transactions(users, items):
@@ -220,9 +264,13 @@ def create_grindstone_characters(users):
             # Add equipment
             equipment = GrindStoneEquipment(
                 player_save_id=character.id,
-                weapon="Basic Sword",
-                armor="Leather Armor",
-                tool="Basic Tool",
+                chest_armor_id=random.randint(0, 3),  # Fixed equipment slots
+                head_armor_id=random.randint(0, 3),
+                leg_armor_id=random.randint(0, 3),
+                woodcutting_tool_id=random.randint(0, 3),
+                mining_tool_id=random.randint(0, 3),
+                hunting_tool_id=random.randint(0, 3),
+                melee_tool_id=random.randint(0, 3),
             )
             db.session.add(equipment)
 
@@ -345,6 +393,12 @@ def populate_database():
             db.session.add(item)
         db.session.commit()
 
+        # Create and add item reviews
+        reviews = create_item_reviews(users, items)
+        for review in reviews:
+            db.session.add(review)
+        db.session.commit()
+
         # Create and add transactions
         receipts, purchases = create_dummy_transactions(users, items)
         for receipt in receipts:
@@ -369,6 +423,7 @@ def populate_database():
         print(f"Created {len(posts)} community posts")
         print(f"Created {len(replies)} community replies")
         print(f"Created {len(items)} items")
+        print(f"Created {len(reviews)} item reviews")
         print(f"Created {len(receipts)} receipts")
         print(f"Created {len(purchases)} purchases")
 
