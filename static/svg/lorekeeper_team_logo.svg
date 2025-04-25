@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" />
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <!-- Removed white background rectangle for transparency -->
+  
+  <!-- Circles positioned to create a center intersection -->
+  <g transform="translate(250, 250)">
+    <!-- Center the entire diagram -->
+    
+    <!-- Circle 1 (top) -->
+    <circle cx="0" cy="-100" r="120" fill="#b198ed" opacity="0.7" />
+    
+    <!-- Circle 2 (top right) -->
+    <circle cx="95" cy="-31" r="120" fill="#a78bda" opacity="0.7" />
+    
+    <!-- Circle 3 (bottom right) -->
+    <circle cx="59" cy="81" r="120" fill="#9b84d6" opacity="0.7" />
+    
+    <!-- Circle 4 (bottom left) -->
+    <circle cx="-59" cy="81" r="120" fill="#8a5cf7" opacity="0.7" />
+    
+    <!-- Circle 5 (top left) -->
+    <circle cx="-95" cy="-31" r="120" fill="#6c40e0" opacity="0.7" />
+  </g>
+  
+  <!-- Optional: add stroke to make boundaries clearer -->
+  <g transform="translate(250, 250)" fill="none" stroke="white" stroke-width="1.5">
+    <circle cx="0" cy="-100" r="120" />
+    <circle cx="95" cy="-31" r="120" />
+    <circle cx="59" cy="81" r="120" />
+    <circle cx="-59" cy="81" r="120" />
+    <circle cx="-95" cy="-31" r="120" />
+  </g>
+</svg>

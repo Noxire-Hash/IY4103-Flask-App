@@ -54,8 +54,10 @@ ACCOUNT_STATUS = [
 SUBSCRIPTION_MAPPING = {
     "basic": 0,
     "premium": 1,
-    "exclusive": 2,
+    "ultimate": 2,
 }
+
+SUBSCRIPTION_TIERS = ["basic", "premium", "ultimate"]
 
 
 class Privilege(db.Model):
@@ -163,9 +165,264 @@ class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     subscription_type = db.Column(db.Integer, nullable=False, default=0)
+    start_date = db.Column(db.DateTime, default=datetime.utcnow)
     end_date = db.Column(db.DateTime, nullable=True)
+    auto_renew = db.Column(db.Boolean, default=True)
+    plan_id = db.Column(
+        db.Integer, db.ForeignKey("subscription_plans.id"), nullable=True
+    )
+
     # Add the user relationship to match User.subscriptions
     user = db.relationship("User", back_populates="subscription")
+    plan = db.relationship("SubscriptionPlan", back_populates="subscriptions")
+
+
+class SubscriptionPlan(db.Model):
+    __tablename__ = "subscription_plans"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    tier = db.Column(db.String(32), nullable=False, index=True)
+    description = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    original_price = db.Column(db.Float, nullable=True)
+    annual_price = db.Column(db.Float, nullable=True)
+    billing_cycle = db.Column(db.String(32), default="Monthly")
+    update_frequency = db.Column(db.String(64), default="Monthly")
+    cancellation_policy = db.Column(db.Text, default="Cancel anytime with no penalty.")
+    access_details = db.Column(
+        db.Text, default="Access begins immediately after purchase."
+    )
+    features = db.Column(db.Text, nullable=False)
+    currency_symbol = db.Column(db.String(5), default="$")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    subscriptions = db.relationship("Subscription", back_populates="plan")
+    creator_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+
+def get_sample_subscription_data(plan_id=1):
+    """
+    Returns sample subscription data for template rendering when database data is not available.
+    This is for development and testing purposes.
+    """
+    sample_plans = [
+        {
+            "id": 1,
+            "name": "LoreKeeper Basic",
+            "tier": "basic",
+            "description": """<p>The LoreKeeper Basic plan gives you access to our core features and tools, perfect for casual tabletop gamers and storytellers.</p>
+            <p>With Basic subscription, you'll be able to create and manage up to 5 campaigns, access our standard library of character templates, and join the community forums.</p>""",
+            "price": 4.99,
+            "original_price": 7.99,
+            "annual_price": 47.99,
+            "billing_cycle": "Monthly",
+            "update_frequency": "Monthly content updates",
+            "cancellation_policy": "Cancel anytime with no penalty. Access remains until the end of your billing period.",
+            "access_details": "Immediate access to all Basic tier features after purchase confirmation.",
+            "features": [
+                "Create and manage up to 5 campaigns",
+                "Access to standard library of character templates",
+                "Basic map creation tools",
+                "Community forum access",
+                "1GB cloud storage for campaign files",
+            ],
+            "currency_symbol": "$",
+            "image_url": "/static/images/subscriptions/basic_subscription.jpg",
+            "next_update": "June 15, 2023",
+            "reviews": [
+                {
+                    "username": "DungeonMaster42",
+                    "rating": 4,
+                    "date": "May 12, 2023",
+                    "comment": "Great value for the price! The character templates save me hours of prep time.",
+                },
+                {
+                    "username": "ElfRanger",
+                    "rating": 5,
+                    "date": "April 28, 2023",
+                    "comment": "I love how easy it is to organize my campaigns. The interface is intuitive and user-friendly.",
+                },
+                {
+                    "username": "CriticalRoll",
+                    "rating": 3,
+                    "date": "May 5, 2023",
+                    "comment": "Good starter subscription, but I find myself wanting more features. Might upgrade soon.",
+                },
+            ],
+            "creator": {
+                "name": "LoreKeeper Team",
+                "avatar_url": "/static/images/creators/lorekeeper_team.jpg",
+                "subscribers": 15420,
+            },
+            "related_subscriptions": [
+                {
+                    "id": 2,
+                    "name": "LoreKeeper Premium",
+                    "tier": "premium",
+                    "price": 9.99,
+                    "image_url": "/static/images/subscriptions/premium_subscription.jpg",
+                },
+                {
+                    "id": 3,
+                    "name": "LoreKeeper Ultimate",
+                    "tier": "ultimate",
+                    "price": 14.99,
+                    "image_url": "/static/images/subscriptions/ultimate_subscription.jpg",
+                },
+            ],
+        },
+        {
+            "id": 2,
+            "name": "LoreKeeper Premium",
+            "tier": "premium",
+            "description": """<p>The LoreKeeper Premium plan elevates your tabletop gaming experience with advanced tools and expanded content libraries.</p>
+            <p>Premium subscribers enjoy unlimited campaign creation, access to our extensive collection of high-quality maps, advanced character creation tools, and priority support.</p>""",
+            "price": 9.99,
+            "original_price": 12.99,
+            "annual_price": 99.99,
+            "billing_cycle": "Monthly",
+            "update_frequency": "Bi-weekly content updates",
+            "cancellation_policy": "Cancel anytime with no penalty. Access remains until the end of your billing period.",
+            "access_details": "Immediate access to all Premium tier features after purchase confirmation.",
+            "features": [
+                "Unlimited campaign creation",
+                "Advanced character building tools",
+                "Access to premium map library with 500+ battle maps",
+                "Custom dice roller with save states",
+                "Advanced encounter builder",
+                "Priority support",
+                "10GB cloud storage for campaign files",
+                "Ad-free experience across the platform",
+            ],
+            "currency_symbol": "$",
+            "image_url": "/static/images/subscriptions/premium_subscription.jpg",
+            "next_update": "June 1, 2023",
+            "reviews": [
+                {
+                    "username": "WizardOfDice",
+                    "rating": 5,
+                    "date": "May 15, 2023",
+                    "comment": "The premium map library is amazing! My players are constantly impressed by the visuals.",
+                },
+                {
+                    "username": "CriticalHit",
+                    "rating": 5,
+                    "date": "May 2, 2023",
+                    "comment": "Worth every penny. The advanced encounter builder has transformed my game sessions.",
+                },
+                {
+                    "username": "TabletopTitan",
+                    "rating": 4,
+                    "date": "April 20, 2023",
+                    "comment": "Excellent service overall. The only feature I miss is integration with virtual tabletops.",
+                },
+                {
+                    "username": "RogueRoller",
+                    "rating": 5,
+                    "date": "May 10, 2023",
+                    "comment": "Upgraded from Basic and can't believe I waited so long. The premium tools are game-changers!",
+                },
+            ],
+            "creator": {
+                "name": "LoreKeeper Team",
+                "avatar_url": "/static/images/creators/lorekeeper_team.jpg",
+                "subscribers": 15420,
+            },
+            "related_subscriptions": [
+                {
+                    "id": 1,
+                    "name": "LoreKeeper Basic",
+                    "tier": "basic",
+                    "price": 4.99,
+                    "image_url": "/static/images/subscriptions/basic_subscription.jpg",
+                },
+                {
+                    "id": 3,
+                    "name": "LoreKeeper Ultimate",
+                    "tier": "ultimate",
+                    "price": 14.99,
+                    "image_url": "/static/images/subscriptions/ultimate_subscription.jpg",
+                },
+            ],
+        },
+        {
+            "id": 3,
+            "name": "LoreKeeper Ultimate",
+            "tier": "ultimate",
+            "description": """<p>The LoreKeeper Ultimate plan represents the pinnacle of digital tabletop gaming support, designed for serious GMs and professional storytellers.</p>
+            <p>With Ultimate subscription, you'll gain access to our exclusive AI-assisted storytelling tools, all premium content, commercial usage rights, and early access to new features.</p>""",
+            "price": 14.99,
+            "original_price": 19.99,
+            "annual_price": 149.99,
+            "billing_cycle": "Monthly",
+            "update_frequency": "Weekly content updates",
+            "cancellation_policy": "Cancel anytime with no penalty. Access remains until the end of your billing period.",
+            "access_details": "Immediate access to all Ultimate tier features after purchase confirmation.",
+            "features": [
+                "Everything in Premium tier",
+                "AI-assisted storytelling and NPC generation",
+                "Voice modulation tools for character voices",
+                "Commercial usage rights for all resources",
+                "Early access to new features and content",
+                "Exclusive monthly virtual workshops with game designers",
+                "Custom campaign website builder",
+                "Unlimited cloud storage",
+                "VIP support with 24-hour response time",
+                "Integration with major virtual tabletop platforms",
+            ],
+            "currency_symbol": "$",
+            "image_url": "/static/images/subscriptions/ultimate_subscription.jpg",
+            "next_update": "May 25, 2023",
+            "reviews": [
+                {
+                    "username": "LegendaryDM",
+                    "rating": 5,
+                    "date": "May 18, 2023",
+                    "comment": "The AI storytelling tools are revolutionary. I've never been able to create such dynamic campaigns with so little prep time.",
+                },
+                {
+                    "username": "ProGameMaster",
+                    "rating": 5,
+                    "date": "May 5, 2023",
+                    "comment": "As a professional GM, this subscription pays for itself. The commercial rights and VIP support are worth the price alone.",
+                },
+                {
+                    "username": "EpicBard",
+                    "rating": 5,
+                    "date": "April 30, 2023",
+                    "comment": "The voice modulation tools have completely transformed our online games. My players are constantly amazed by the immersion.",
+                },
+            ],
+            "creator": {
+                "name": "LoreKeeper Team",
+                "avatar_url": "/static/images/creators/lorekeeper_team.jpg",
+                "subscribers": 15420,
+            },
+            "related_subscriptions": [
+                {
+                    "id": 1,
+                    "name": "LoreKeeper Basic",
+                    "tier": "basic",
+                    "price": 4.99,
+                    "image_url": "/static/images/subscriptions/basic_subscription.jpg",
+                },
+                {
+                    "id": 2,
+                    "name": "LoreKeeper Premium",
+                    "tier": "premium",
+                    "price": 9.99,
+                    "image_url": "/static/images/subscriptions/premium_subscription.jpg",
+                },
+            ],
+        },
+    ]
+
+    for plan in sample_plans:
+        if plan["id"] == plan_id:
+            return plan
+
+    return sample_plans[0]
 
 
 class DndCharacter(db.Model):

@@ -21,22 +21,24 @@
               <div class="plan-card basic">
                 <div class="card-body text-center">
                   <div class="plan-header">
-                    <h5 class="plan-name glow-bronze">Standard</h5>
+                    <h5 class="plan-name glow-bronze">Basic</h5>
                     <div class="plan-price">
-                      <span class="amount">Free</span>
+                      <span class="amount">£10</span>
+                      <span class="period">/month</span>
                     </div>
                   </div>
                   <div class="plan-features">
                     <ul class="list-unstyled">
-                      <li><i class="fas fa-check"></i> Basic adventures</li>
-                      <li><i class="fas fa-check"></i> Free monsters and maps</li>
-                      <li><i class="fas fa-check"></i> Limited tools</li>
-                      <li class="disabled"><i class="fas fa-times"></i> Premium content</li>
-                      <li class="disabled"><i class="fas fa-times"></i> Priority support</li>
+                      <li><i class="fas fa-check"></i> LoreTeller AI (Limited)</li>
+                      <li><i class="fas fa-check"></i> 5 Campaign Slots</li>
+                      <li><i class="fas fa-check"></i> Basic Character Creation</li>
+                      <li class="disabled"><i class="fas fa-times"></i> DM Tools Suite</li>
+                      <li class="disabled"><i class="fas fa-times"></i> Custom NPC Generator</li>
+                      <li class="disabled"><i class="fas fa-times"></i> Priority Support</li>
                     </ul>
                   </div>
                   <div class="plan-action">
-                    <span class="btn plan-btn basic">Current Plan</span>
+                    <a href="{{ url_for('subscriptions.subscription_details', plan_id=1) }}" class="btn plan-btn basic">Subscribe Now</a>
                   </div>
                 </div>
               </div>
@@ -49,22 +51,22 @@
                   <div class="plan-header">
                     <h5 class="plan-name glow-silver">Premium</h5>
                     <div class="plan-price">
-                      <span class="amount">£9.99</span>
+                      <span class="amount">£20</span>
                       <span class="period">/month</span>
                     </div>
-                    <p class="text-muted">or £99/year</p>
+                    <p class="text-muted">or £200/year</p>
                   </div>
                   <div class="plan-features">
                     <ul class="list-unstyled">
                       <li><i class="fas fa-check"></i> All basic features</li>
-                      <li><i class="fas fa-check"></i> Access to all content</li>
-                      <li><i class="fas fa-check"></i> Exclusive maps and tools</li>
+                      <li><i class="fas fa-check"></i> DM Tools Suite</li>
+                      <li><i class="fas fa-check"></i> Custom NPC Generator</li>
+                      <li><i class="fas fa-check"></i> LoreTeller AI (Advanced)</li>
                       <li><i class="fas fa-check"></i> Priority support</li>
-                      <li><i class="fas fa-check"></i> Monthly bonus items</li>
                     </ul>
                   </div>
                   <div class="plan-action">
-                    <a href="#" class="btn plan-btn premium">Subscribe Now</a>
+                    <a href="{{ url_for('subscriptions.subscription_details', plan_id=2) }}" class="btn plan-btn premium">Subscribe Now</a>
                   </div>
                 </div>
               </div>
@@ -74,24 +76,24 @@
               <div class="plan-card ultimate">
                 <div class="card-body text-center">
                   <div class="plan-header">
-                    <h5 class="plan-name glow-gold">Exclusive</h5>
+                    <h5 class="plan-name glow-gold">Ultimate</h5>
                     <div class="plan-price">
-                      <span class="amount">£19.99</span>
+                      <span class="amount">£50</span>
                       <span class="period">/month</span>
                     </div>
-                    <p class="text-muted">or £199/year</p>
+                    <p class="text-muted">or £500/year</p>
                   </div>
                   <div class="plan-features">
                     <ul class="list-unstyled">
                       <li><i class="fas fa-check"></i> All premium features</li>
-                      <li><i class="fas fa-check"></i> Early access to releases</li>
-                      <li><i class="fas fa-check"></i> Limited-edition items</li>
-                      <li><i class="fas fa-check"></i> VIP events and perks</li>
-                      <li><i class="fas fa-check"></i> Exclusive community access</li>
+                      <li><i class="fas fa-check"></i> LoreTeller AI (Unlimited)</li>
+                      <li><i class="fas fa-check"></i> LoreMaker Game Engine</li>
+                      <li><i class="fas fa-check"></i> Basic API Access</li>
+                      <li><i class="fas fa-check"></i> 24/7 support</li>
                     </ul>
                   </div>
                   <div class="plan-action">
-                    <a href="#" class="btn plan-btn ultimate">Subscribe Now</a>
+                    <a href="{{ url_for('subscriptions.subscription_details', plan_id=3) }}" class="btn plan-btn ultimate">Subscribe Now</a>
                   </div>
                 </div>
               </div>

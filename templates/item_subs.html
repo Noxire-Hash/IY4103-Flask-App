@@ -1,0 +1,295 @@
+{% extends "nav_footer_template.html" %}
+
+{% block title %}{{ subscription.name }} Subscription{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container py-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="text-light">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('store') }}" class="text-light">Store</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('subscriptions.subscription_listings') }}" class="text-light">Subscriptions</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ subscription.name }}</li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <!-- Left Column - Subscription Details -->
+      <div class="col-lg-8">
+        <div class="card bg-dark border-0 shadow-sm mb-4">
+          <!-- Header with Title and Badges -->
+          <div class="card-header border-0 bg-transparent py-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <h2 class="card-title glow mb-0">{{ subscription.name }}</h2>
+              <div class="d-flex">
+                <span class="badge bg-primary me-2">Subscription</span>
+                <span class="badge subscription-badge {{ subscription.tier }}">
+                  {{ subscription.tier|title }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subscription Details -->
+          <div class="card-body">
+            <!-- Description with Formatting -->
+            <div class="mb-5">
+              <h4 class="glow-silver mb-3 border-bottom pb-2">Description</h4>
+              <div class="subscription-description">
+                {{ subscription.description|safe }}
+              </div>
+            </div>
+
+            <!-- Features and Benefits List -->
+            <div class="mb-5">
+              <h4 class="glow-gold mb-3 border-bottom pb-2">Features & Benefits</h4>
+              <div class="row">
+                <div class="col-md-12">
+                  <ul class="features-list">
+                    {% for feature in subscription.features %}
+                    <li class="feature-item">
+                      <i class="fas fa-check-circle text-success me-2"></i>
+                      {{ feature }}
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content Updates and Release Schedule -->
+            <div class="mb-5">
+              <h4 class="glow-silver mb-3 border-bottom pb-2">Content Schedule</h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="schedule-icon me-3">
+                      <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                      <h5 class="mb-1">Update Frequency</h5>
+                      <p class="mb-0">{{ subscription.update_frequency }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="schedule-icon me-3">
+                      <i class="fas fa-history"></i>
+                    </div>
+                    <div>
+                      <h5 class="mb-1">Next Content Update</h5>
+                      <p class="mb-0">{{ subscription.next_update }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Special Subscription Information -->
+            <div class="mb-5">
+              <h4 class="glow-bronze mb-3 border-bottom pb-2">Subscription Details</h4>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="detail-item">
+                    <div class="detail-icon">
+                      <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="detail-content">
+                      <h5>Billing Cycle</h5>
+                      <p>{{ subscription.billing_cycle }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="detail-item">
+                    <div class="detail-icon">
+                      <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="detail-content">
+                      <h5>Cancellation Policy</h5>
+                      <p>{{ subscription.cancellation_policy }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="detail-item">
+                    <div class="detail-icon">
+                      <i class="fas fa-unlock-alt"></i>
+                    </div>
+                    <div class="detail-content">
+                      <h5>Access Details</h5>
+                      <p>{{ subscription.access_details }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="mb-4">
+              <h4 class="glow-purple mb-3 border-bottom pb-2">
+                <i class="fas fa-star me-2"></i>Reviews
+                <small class="ms-2 fw-normal">({{ subscription.reviews|length }} reviews)</small>
+              </h4>
+
+              <div class="reviews-container">
+                {% for review in subscription.reviews[:3] %}
+                <div class="review-item">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="avatar-circle me-2">
+                      <span class="avatar-initials">{{ review.username[:1] }}</span>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">{{ review.username }}</h6>
+                      <div class="text-warning">
+                        {% for i in range(review.rating) %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                        {% for i in range(5 - review.rating) %}
+                        <i class="far fa-star"></i>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <div class="ms-auto text-muted small">
+                      {{ review.date }}
+                    </div>
+                  </div>
+                  <p class="mb-0">{{ review.comment }}</p>
+                  <hr class="review-divider">
+                </div>
+                {% endfor %}
+
+                {% if subscription.reviews|length > 3 %}
+                <div class="text-center mt-3">
+                  <button class="btn btn-outline-light btn-sm underglow">
+                    <i class="fas fa-comments me-2"></i>View All {{ subscription.reviews|length }} Reviews
+                  </button>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Purchase Information and Related Subscriptions -->
+      <div class="col-lg-4">
+        <!-- Purchase Card -->
+        <div class="card bg-dark border-0 shadow-sm mb-4 purchase-card">
+          <div class="card-body p-4">
+            <div class="price-container mb-4">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                  <h3 class="mb-0 display-6">{{ subscription.currency_symbol }}{{ subscription.price }}</h3>
+                  <p class="text-muted mb-0">{{ subscription.billing_cycle }}</p>
+                </div>
+                <div class="subscription-badge {{ subscription.tier }}">
+                  <i class="fas fa-crown me-1"></i>{{ subscription.tier|title }}
+                </div>
+              </div>
+
+              {% if subscription.original_price %}
+              <div class="savings-badge mt-2">
+                <i class="fas fa-tags me-1"></i>Save {{ ((subscription.original_price - subscription.price) / subscription.original_price * 100)|round|int }}%
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="payment-options mb-4">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="paymentCycle" id="monthly" checked>
+                <label class="form-check-label d-flex justify-content-between" for="monthly">
+                  <span>Monthly billing</span>
+                  <span>{{ subscription.currency_symbol }}{{ subscription.price }}/mo</span>
+                </label>
+              </div>
+
+              {% if subscription.annual_price %}
+              <div class="form-check mb-0">
+                <input class="form-check-input" type="radio" name="paymentCycle" id="annual">
+                <label class="form-check-label d-flex justify-content-between" for="annual">
+                  <span>Annual billing <span class="badge bg-success ms-1">Save 20%</span></span>
+                  <span>{{ subscription.currency_symbol }}{{ subscription.annual_price }}/yr</span>
+                </label>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Subscription Actions -->
+            <div class="mb-4">
+              <button class="btn btn-primary w-100 mb-3 landing-btn">
+                <i class="fas fa-credit-card me-2"></i>Subscribe Now
+              </button>
+              <button class="btn btn-outline-light w-100 landing-btn">
+                <i class="fas fa-gift me-2"></i>Gift Subscription
+              </button>
+            </div>
+
+            <!-- Important Information -->
+            <div class="important-info">
+              <h6><i class="fas fa-info-circle me-2"></i>Important Information</h6>
+              <ul class="small text-muted mb-0">
+                <li>Cancel anytime through your account settings</li>
+                <li>Access begins immediately after purchase</li>
+                <li>Automatic renewal unless cancelled</li>
+                <li>Full terms in our <a href="#" class="text-light underglow">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Creator Information Card -->
+        <div class="card bg-dark border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent border-0">
+            <h5 class="mb-0">Creator</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="creator-avatar me-3">
+                <img src="{{ subscription.creator.avatar_url }}" alt="{{ subscription.creator.name }}">
+              </div>
+              <div>
+                <h6 class="mb-1">{{ subscription.creator.name }}</h6>
+                <p class="text-muted mb-2 small">{{ subscription.creator.subscribers }} subscribers</p>
+                <button class="btn btn-sm btn-outline-light underglow">
+                  <i class="fas fa-user-plus me-1"></i>Follow
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Subscriptions -->
+        <div class="card bg-dark border-0 shadow-sm">
+          <div class="card-header bg-transparent border-0">
+            <h5 class="mb-0">Related Subscriptions</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="list-group list-group-flush bg-transparent">
+              {% for related in subscription.related_subscriptions %}
+              <a href="{{ url_for('subscriptions.subscription_details', plan_id=related.id) }}" class="list-group-item list-group-item-action bg-transparent text-light border-secondary">
+                <div class="d-flex align-items-center">
+                  <div class="related-sub-badge me-3 {{ related.tier }}-badge">
+                    <i class="fas fa-crown"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-1">{{ related.name }}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge {{ related.tier }}-badge">{{ related.tier|title }}</span>
+                      <span class="fw-bold">{{ subscription.currency_symbol }}{{ related.price }}</span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

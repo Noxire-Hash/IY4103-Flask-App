@@ -36,6 +36,7 @@ from models import (
     db,
 )
 from routes.grindstone import grindstone_bp
+from routes.route_subs import subs_bp
 from utils import Logger
 from utils import SystemTransactionHandler as sth
 from wrappers import admin_required, login_required, moderator_required
@@ -64,6 +65,7 @@ app.register_blueprint(grindstone_bp)
 app.register_blueprint(routes.route_vendor.vendor_bp)
 app.register_blueprint(routes.route_loremaker.loremaker_bp)
 app.register_blueprint(routes.route_taverns.taverns_bp)
+app.register_blueprint(subs_bp)
 
 
 @app.after_request
@@ -173,6 +175,9 @@ def about():
 @app.route("/lore")
 def lore():
     return render_template("lore.html")
+
+
+# Subscription routes moved to routes/route_subs.py blueprint
 
 
 # Auth routes

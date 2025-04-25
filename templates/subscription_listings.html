@@ -1,0 +1,302 @@
+{% extends "nav_footer_template.html" %}
+
+{% block title %}Subscription Plans{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Heading -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold mb-3">Choose Your <span class="text-accent underglow">Subscription</span></h1>
+        <p class="lead text-muted mx-auto" style="max-width: 700px;">
+            Unlock premium features and exclusive content with our flexible subscription plans.
+            Choose the tier that fits your needs and elevate your experience.
+        </p>
+    </div>
+
+    <!-- Subscription Plans -->
+    <div class="row g-4 mb-5">
+        {% for subscription in subscriptions %}
+        <div class="col-md-4">
+            <div class="card h-100 subscription-card border-0 bg-dark-overlay" style="border-radius: 12px; overflow: hidden;">
+                <!-- Card header with badge -->
+                <div class="card-header border-0 bg-transparent p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="subscription-badge {{ subscription.tier|lower }}">{{ subscription.tier }}</span>
+                        {% if subscription.popular %}
+                        <span class="badge bg-accent">Most Popular</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="fw-bold mb-0">{{ subscription.name }}</h3>
+                    <div class="d-flex align-items-baseline mt-2">
+                        <h2 class="display-6 fw-bold mb-0">${{ subscription.price }}</h2>
+                        <span class="text-muted ms-2">/month</span>
+                    </div>
+                </div>
+
+                <!-- Card body with features -->
+                <div class="card-body p-4">
+                    <p class="card-text text-muted mb-4">{{ subscription.description }}</p>
+                    <h6 class="text-accent mb-3">What's included:</h6>
+                    <ul class="features-list mb-4">
+                        {% for feature in subscription.features %}
+                        <li class="feature-item">
+                            <i class="bi bi-check-circle-fill text-accent me-2"></i>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Card footer with button -->
+                <div class="card-footer border-0 bg-transparent p-4">
+                    {% if subscription.savings %}
+                    <div class="mb-3">
+                        <span class="savings-badge">
+                            <i class="bi bi-tag-fill me-1"></i> Save {{ subscription.savings }}%
+                        </span>
+                    </div>
+                    {% endif %}
+                    <div class="d-grid">
+                        <a href="{{ url_for('subscriptions.subscription_details', plan_id=subscription.id) }}" class="btn btn-lg store-btn w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Background effect -->
+                {% if subscription.tier|lower == 'ultimate' %}
+                <div class="shimmer-overlay"></div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="mb-5 p-5 bg-dark-overlay rounded-4">
+        <h2 class="text-center mb-4">Why Subscribe?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="benefit-item p-3 text-center">
+                    <div class="benefit-icon mx-auto mb-3">
+                        <i class="bi bi-gem"></i>
+                    </div>
+                    <h5>Premium Tools</h5>
+                    <p class="text-muted">Access exclusive tools and features not available to free users.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="benefit-item p-3 text-center">
+                    <div class="benefit-icon mx-auto mb-3">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h5>Regular Updates</h5>
+                    <p class="text-muted">Be the first to experience new features and improvements.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="benefit-item p-3 text-center">
+                    <div class="benefit-icon mx-auto mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5>Community Support</h5>
+                    <p class="text-muted">Join a network of subscribers with exclusive community features.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Important Info -->
+    <div class="important-info mb-5">
+        <h6 class="mb-3"><i class="bi bi-info-circle me-2"></i>Important Information</h6>
+        <ul>
+            <li>All subscriptions are billed monthly and can be canceled anytime</li>
+            <li>Subscription benefits are activated immediately after payment</li>
+            <li>We offer a 14-day money-back guarantee for all new subscribers</li>
+            <li>You can upgrade or downgrade your subscription at any time</li>
+        </ul>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mb-5">
+        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+        <div class="accordion" id="subscriptionFAQ">
+            <div class="accordion-item bg-dark-overlay border-0 mb-3">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        How do I cancel my subscription?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#subscriptionFAQ">
+                    <div class="accordion-body">
+                        You can cancel your subscription anytime from your account dashboard. Go to "My Account" > "Subscriptions" and click on "Cancel Subscription". Your subscription will remain active until the end of your current billing cycle.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item bg-dark-overlay border-0 mb-3">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Can I switch between subscription tiers?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#subscriptionFAQ">
+                    <div class="accordion-body">
+                        Yes, you can upgrade or downgrade your subscription at any time. When upgrading, you'll be charged the prorated difference for the remainder of your billing cycle. When downgrading, the change will take effect at the start of your next billing cycle.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item bg-dark-overlay border-0 mb-3">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        What payment methods do you accept?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#subscriptionFAQ">
+                    <div class="accordion-body">
+                        We accept all major credit cards, PayPal, and select cryptocurrencies. Payment details are securely processed and stored using industry-standard encryption protocols.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item bg-dark-overlay border-0">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        Is there a free trial available?
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#subscriptionFAQ">
+                    <div class="accordion-body">
+                        We offer a 14-day money-back guarantee for all new subscribers. If you're not satisfied with your subscription within the first 14 days, you can request a full refund. We do not currently offer a free trial period.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center pt-3">
+        <p class="text-muted mb-4">Still have questions? We're here to help!</p>
+        <a href="#" class="btn btn-outline-light me-3">Contact Support</a>
+        <a href="#" class="btn store-btn">Learn More</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    /* Enhanced button styling using the store-btn concept from style.css */
+    .store-btn {
+        background-color: #ff7043 !important;
+        color: white !important;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(255, 112, 67, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .store-btn:hover {
+        background-color: #ff5722 !important;
+        color: white !important;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(255, 112, 67, 0.4);
+    }
+
+    .store-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .store-btn::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+            to bottom right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.1) 40%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.1) 60%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(45deg);
+        opacity: 0;
+        transition: opacity 0.7s, left 0.7s, top 0.7s;
+        z-index: 1;
+    }
+
+    .store-btn:hover::after {
+        opacity: 1;
+        left: -100%;
+        top: -100%;
+    }
+
+    /* Enhanced subscription badges */
+    .subscription-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .subscription-badge.basic {
+        color: #cd7f32;
+        border: 1px solid rgba(205, 127, 50, 0.5);
+    }
+
+    .subscription-badge.premium {
+        color: #C0C0C0;
+        border: 1px solid rgba(192, 192, 192, 0.5);
+    }
+
+    .subscription-badge.ultimate {
+        color: #FFD700;
+        border: 1px solid rgba(255, 215, 0, 0.5);
+    }
+
+    .subscription-badge.enterprise {
+        color: #b198ed;
+        border: 1px solid rgba(177, 152, 237, 0.5);
+    }
+
+    /* Enhanced feature items */
+    .features-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .feature-item {
+        padding: 0.5rem 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 112, 67, 0.1);
+        color: #ff7043;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .benefit-item:hover .benefit-icon {
+        transform: translateY(-5px);
+        background: rgba(255, 112, 67, 0.2);
+        box-shadow: 0 5px 15px rgba(255, 112, 67, 0.2);
+    }
+</style>
+{% endblock %}
