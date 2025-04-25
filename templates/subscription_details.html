@@ -38,51 +38,7 @@
                         </ul>
                     </div>
 
-                    <div class="comparison-section my-5">
-                        <h3 class="{% if subscription.tier == 'Basic' %}glow-bronze{% elif subscription.tier == 'Premium' %}glow-silver{% elif subscription.tier == 'Ultimate' %}glow-gold{% else %}glow{% endif %} mb-4 border-bottom pb-2">Compare with other plans</h3>
-                        <div class="table-responsive">
-                            <table class="table table-dark table-bordered border-secondary comparison-table">
-                                <thead>
-                                    <tr>
-                                        <th>Feature</th>
-                                        {% for plan in comparison_plans %}
-                                        <th class="text-center {% if plan.id == subscription.id %}bg-dark{% endif %}">
-                                            <span class="{% if plan.tier == 'Basic' %}glow-bronze{% elif plan.tier == 'Premium' %}glow-silver{% elif plan.tier == 'Ultimate' %}glow-gold{% else %}glow{% endif %}">{{ plan.name }}</span>
-                                        </th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for feature in all_features %}
-                                    <tr>
-                                        <td>{{ feature }}</td>
-                                        {% for plan in comparison_plans %}
-                                        <td class="text-center {% if plan.id == subscription.id %}bg-dark{% endif %}">
-                                            {% if feature in plan.features %}
-                                            <i class="fas fa-check-circle {% if plan.tier == 'Basic' %}text-bronze{% elif plan.tier == 'Premium' %}text-silver{% elif plan.tier == 'Ultimate' %}text-gold{% else %}text-accent{% endif %}"></i>
-                                            {% else %}
-                                            <i class="fas fa-times text-muted"></i>
-                                            {% endif %}
-                                        </td>
-                                        {% endfor %}
-                                    </tr>
-                                    {% endfor %}
-                                    <tr class="price-row">
-                                        <td><strong>Price</strong></td>
-                                        {% for plan in comparison_plans %}
-                                        <td class="text-center {% if plan.id == subscription.id %}bg-dark{% endif %}">
-                                            {% if plan.contact_us %}
-                                            <strong class="{% if plan.tier == 'Basic' %}glow-bronze{% elif plan.tier == 'Premium' %}glow-silver{% elif plan.tier == 'Ultimate' %}glow-gold{% else %}glow{% endif %}">Contact Us</strong>
-                                            {% else %}
-                                            <strong class="{% if plan.tier == 'Basic' %}glow-bronze{% elif plan.tier == 'Premium' %}glow-silver{% elif plan.tier == 'Ultimate' %}glow-gold{% else %}glow{% endif %}">£{{ plan.price }}</strong>/{{ plan.billing_cycle }}
-                                            {% endif %}
-                                        </td>
-                                        {% endfor %}
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
 
                     <!-- GrindStone Benefits Section -->
                     <div class="mb-5">
