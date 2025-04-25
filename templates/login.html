@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Login Form -->
-<div class="container py-5">
+<div class="container py-5 auth-container">
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card shadow-lg rounded">
@@ -30,4 +30,15 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.auth-container {
+    min-height: 70vh; /* Ensure content has enough height to push footer down */
+    display: flex;
+    align-items: center;
+}
+</style>
 {% endblock %}

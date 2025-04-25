@@ -59,6 +59,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  position: relative; /* Add this for better positioning context */
 }
 
 /* Add a content-wrapper class */
@@ -67,6 +68,8 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: calc(100vh - 140px); /* Ensures minimum height minus header and footer */
+  padding-bottom: 20px; /* Add some padding at the bottom to avoid content touching footer */
 }
 
 /* Navbar */
@@ -250,6 +253,31 @@ body {
 }
 
 .navbar-brand:hover::after {
+  transform: scaleX(1);
+}
+
+/* Underglow effect that can be applied to any element */
+.underglow {
+  position: relative;
+}
+
+.underglow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-color) 50%,
+    transparent 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.underglow:hover::after {
   transform: scaleX(1);
 }
 
@@ -610,23 +638,44 @@ section h2 {
   color: var(--text-muted) !important;
 }
 
-/* Footer */
+/* Footer styling - updated for consistent positioning */
 footer {
-  background-color: var(--card-background) !important;
-  color: var(--text-muted);
+  background-color: var(--card-background);
+  color: var(--text-color);
   padding: 20px 0;
-  text-align: center;
-  border-top: 1px solid var(--input-border);
-  margin-top: auto; /* Pushes footer to the bottom */
-  flex-shrink: 0;
   width: 100%;
+  border-top: 1px solid var(--input-border);
+  margin-top: auto; /* Push to the bottom of flex container */
+  flex-shrink: 0; /* Prevent footer from shrinking */
+  position: relative; /* Changed from fixed to relative for better layout flow */
+  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
+
 footer a {
-  color: var(--accent-color) !important;
+  color: var(--accent-color);
+  transition: color 0.2s ease;
+}
+
+footer a:hover {
+  color: var(--text-color);
   text-decoration: none;
 }
-footer a:hover {
-  text-decoration: underline;
+
+/* Responsive adjustments for footer */
+@media (max-width: 767px) {
+  .content-wrapper {
+    min-height: calc(100vh - 180px); /* Adjust for potentially larger footer on mobile */
+  }
+
+  footer {
+    padding: 15px 0;
+  }
+}
+
+/* Fix for short page content */
+html, body {
+  height: 100%;
 }
 
 /* Utility Classes */

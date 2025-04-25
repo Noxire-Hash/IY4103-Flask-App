@@ -1,6 +1,6 @@
 // 1. First define all utility functions
 function formatCurrency(amount) {
-  return `${Number(amount).toFixed(2)} AW`;
+  return `${Number(amount)} AW`;
 }
 
 // 2. Define the updateFeaturedItem function
@@ -303,12 +303,15 @@ $(document).ready(function () {
         }
         // Update user fields
         $("#username").text(userData.username);
+        $("#username").attr("href", `/user/${userData.id}`);
         $("#email").text(userData.email);
+        $("#handler").text(`@${userData.username.toLowerCase()}`);
         $("#privilege").text(userData.privilege_id);
         $("#sub-tier").text("Exclusive");
         $("#balance").text(userData.balance);
         $("#pending-balance").text(userData.pending_balance);
         $("#bio").text(userData.bio);
+        $("#created-at").text(userData.created_at);
         $("#update-bio").click(function () {
           console.log("Update bio clicked");
           $.ajax({

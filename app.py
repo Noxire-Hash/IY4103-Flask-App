@@ -110,6 +110,7 @@ def item_preview(item_id):
     # Get vendor stats
     vendor_items_count = Item.query.filter_by(vendor_id=item.vendor_id).count()
 
+    vendor_name = User.query.get(item.vendor_id).username
     # Get vendor average rating
     vendor_items = Item.query.filter_by(vendor_id=item.vendor_id).all()
     vendor_reviews = []
@@ -155,6 +156,7 @@ def item_preview(item_id):
         vendor_items_count=vendor_items_count,
         vendor_rating=vendor_rating,
         similar_items=similar_items,
+        vendor_name=vendor_name,
     )
 
 
@@ -323,9 +325,11 @@ def update_bio():
 
 @app.route("/logout")
 def logout():
+    response = make_response(redirect(url_for("home")))
+    response.delete_cookie("user_id", path="/")
     session.clear()
     flash("You have been logged out.", "success")
-    return redirect(url_for("home"))
+    return response
 
 
 @app.route("/admin", methods=["GET", "POST"])
@@ -609,14 +613,14 @@ def get_username_from_id(user_id):
 
 
 @app.route("/setCookie", methods=["POST", "GET"])
-def setCookie():
+def setCookie(max_age=2592000):
     user_id = session.get("user_id")
     print(f"Setting cookie for user_id: {user_id}")
     response = make_response(redirect(url_for("home")))
     response.set_cookie(
         key="user_id",
         value=str(user_id),
-        max_age=2592000,  # 30 days in seconds
+        max_age=max_age,  # 30 days in seconds
         path="/",  # Make cookie available across entire site
         httponly=True,  # More secure
         samesite="Lax",  # Allow some cross-site requests
@@ -638,6 +642,13 @@ def getCookie():
     except Exception as e:
         print(f"Error getting cookie: {e}")
         session.clear()
+    return redirect(url_for("home"))
+
+
+@app.route("/deleteCookie", methods=["POST", "GET"])
+def deleteCookie():
+    setCookie(max_age=0)
+    session.clear()
     return redirect(url_for("home"))
 
 
@@ -1047,8 +1058,15 @@ def process_payment():
             flash("Purchase successful!", "success")
             return redirect(url_for("account"))
         else:
+            # Display flash without redirecting
             flash(f"Purchase failed: {message}", "danger")
-            return redirect(url_for("checkout", item_id=item_id))
+
+            # Get needed data and render checkout page directly
+            user = User.query.get_or_404(user_id)
+            vendor = User.query.get_or_404(item.vendor_id)
+
+            # Render the checkout page directly to show the flash message
+            return render_template("checkout.html", user=user, item=item, vendor=vendor)
 
     except Exception as e:
         flash(f"Error: {str(e)}", "danger")

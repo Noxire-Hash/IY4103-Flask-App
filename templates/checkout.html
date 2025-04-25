@@ -1,6 +1,6 @@
 {% extends "nav_footer_template.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 checkout-container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card checkout-card">
@@ -82,10 +82,16 @@
 {% block styles %}
 {{ super() }}
 <style>
+.checkout-container {
+    min-height: 70vh; /* Ensure content has enough height to push footer down */
+    padding-bottom: 30px; /* Add padding to avoid content touching footer */
+}
+
 .checkout-card {
     background-color: var(--card-background);
     border: 1px solid var(--input-border);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px; /* Add margin to ensure space before footer */
 }
 
 .checkout-card .card-header {

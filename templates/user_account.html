@@ -12,8 +12,7 @@
                         </div>
                     </div>
                     <div class="user-info">
-                        <h2 class="mb-1">{{ user.username if user.username else 'Username' }}</h2>
-
+                        <h2 class="mb-1">{{ user.username if user.username else 'Username' }} <small id="handler" class="text-muted fs-6">@{{ user.username.lower() }}</small></h2>
                         <!-- User Status & Badges -->
                         <div class="user-badges mb-2">
                             <!-- Membership Badge -->
