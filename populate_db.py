@@ -34,6 +34,17 @@ def create_dummy_users(privileges):
         balance=1000000,
     )
     users.append(admin)
+    
+    # Create teacher account
+    teacher = User(
+        username="Professor",
+        email="essexuniversity@essex.ac.uk",
+        password="essexuniversity",
+        privilege_id=privileges["Admin"].id,
+        balance=50000,
+        bio="Your esteemed instructor for IY4103"
+    )
+    users.append(teacher)
 
     # Create moderators
     mod1 = User(
@@ -64,6 +75,9 @@ def create_dummy_users(privileges):
         "MysticMage",
         "WoodCutter",
         "MinerKing",
+        "Mysterious",  # Easter egg user
+        "NoConnection",  # Easter egg user
+        "GameFounder",  # Easter egg user
     ]
     for i, name in enumerate(user_names):
         user = User(
@@ -304,9 +318,96 @@ def create_community_content(users):
 
     categories = ["Guide", "Discussion", "Question", "Showcase", "News"]
     tags = ["gameplay", "tips", "grindstone", "community", "help", "update"]
+    
+    # Find easter egg users
+    mysterious_user = next((user for user in users if user.username == "Mysterious"), None)
+    no_connection_user = next((user for user in users if user.username == "NoConnection"), None)
+    game_founder_user = next((user for user in users if user.username == "GameFounder"), None)
+    
+    # Create class-specific easter egg posts
+    if mysterious_user:
+        mysterious_post = CommunityPost(
+            creator_id=mysterious_user.id,
+            title="Thoughts on Filteration Algorithms",
+            content="Has anyone considered that the LoreMaker engine's filteration algorithms might be the key to unlocking the true potential of immersive storytelling? I've been experimenting with several approaches and the results are fascinating...",
+            category="Discussion",
+            tags="filteration,algorithms,loremaker,theory",
+            upvotes=random.randint(20, 50),
+            downvotes=random.randint(0, 3),
+        )
+        db.session.add(mysterious_post)
+        db.session.flush()
+        posts.append(mysterious_post)
+        
+        # Add some replies to this post
+        reply1 = CommunityReply(
+            creator_id=random.choice([u.id for u in users if u != mysterious_user]),
+            post_id=mysterious_post.id,
+            content="What exactly do you mean by 'filteration'? Is that even a word?",
+            upvotes=random.randint(5, 15),
+            downvotes=random.randint(0, 2),
+        )
+        replies.append(reply1)
+    
+    if no_connection_user:
+        connection_post = CommunityPost(
+            creator_id=no_connection_user.id,
+            title="edurom Connection Issues AGAIN",
+            content="Lost connection to edurom for the third time today! How am I supposed to finish my assignment when the network keeps dropping? Anyone else having these problems?",
+            category="Question",
+            tags="edurom,network,help,frustrated",
+            upvotes=random.randint(30, 70),
+            downvotes=random.randint(0, 2),
+        )
+        db.session.add(connection_post)
+        db.session.flush()
+        posts.append(connection_post)
+        
+        # Add replies
+        reply2 = CommunityReply(
+            creator_id=random.choice([u.id for u in users if u != no_connection_user]),
+            post_id=connection_post.id,
+            content="Use guest wifi, it works better.",
+            upvotes=random.randint(10, 20),
+            downvotes=random.randint(0, 1),
+        )
+        replies.append(reply2)
+    
+    if game_founder_user:
+        startup_post = CommunityPost(
+            creator_id=game_founder_user.id,
+            title="Starting a Game Company with LoreMaker",
+            content="Hey everyone! I'm seriously considering starting a game development company using the LoreMaker engine. Who wants to join me? We could create the next big indie hit! The LoreMaker ecosystem is perfect for what I have in mind.",
+            category="Discussion",
+            tags="startup,loremaker,gamedev,opportunity",
+            upvotes=random.randint(15, 40),
+            downvotes=random.randint(5, 10),
+        )
+        db.session.add(startup_post)
+        db.session.flush()
+        posts.append(startup_post)
+        
+        # Add replies
+        reply3 = CommunityReply(
+            creator_id=mysterious_user.id if mysterious_user else random.choice([u.id for u in users]),
+            post_id=startup_post.id,
+            content="I'm not sure if it's a good idea. I've heard that the LoreMaker engine is not very stable and has a lot of bugs.",
+            upvotes=random.randint(8, 15),
+            downvotes=random.randint(0, 2),
+        )
+        replies.append(reply3)
 
-    # Create and commit posts first
-    for _ in range(10):  # Create 10 posts
+        reply4 = CommunityReply(
+            creator_id=no_connection_user.id if no_connection_user else random.choice([u.id for u in users]),
+            post_id=startup_post.id,
+            content="I'd join but my internet keeps dropping out on edurom...",
+            upvotes=random.randint(20, 30),
+            downvotes=random.randint(0, 1),
+        )
+        replies.append(reply4)
+
+    # Create normal posts
+    for _ in range(7):  # Create 7 regular posts (plus the 3 special ones = 10 total)
         creator = random.choice(users)
         post = CommunityPost(
             creator_id=creator.id,

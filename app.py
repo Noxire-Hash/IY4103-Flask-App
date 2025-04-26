@@ -1072,7 +1072,6 @@ def process_payment():
 
             # Render the checkout page directly to show the flash message
             return render_template("checkout.html", user=user, item=item, vendor=vendor)
-
     except Exception as e:
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("store"))
