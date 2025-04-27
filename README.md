@@ -2,7 +2,7 @@
 
 A comprehensive digital marketplace platform developed with Flask for the IY4103 Web Development course at the University of Essex. Lorekeeper enables users to trade virtual items, manage transactions, and participate in a community-driven marketplace with integrated mini-games and interactive features.
 
-![Lorekeeper Logo](static/svg/lorekeeper_team_logo.svg)
+<img src="static/svg/lorekeeper_team_logo.svg" alt="Lorekeeper Logo" width="300" height="auto">
 
 ## Overview
 
@@ -111,6 +111,8 @@ IY4103-Flask-App/
 
 ## Setup Instructions
 
+> **Note:** This application requires Python 3.7 or higher.
+
 1. **Clone the repository**
 
 ```bash
@@ -126,7 +128,7 @@ python -m venv venv
 .\venv\Scripts\Activate.ps1
 
 # Linux/MacOS
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -153,7 +155,11 @@ python populate_db.py
 6. **Run the application**
 
 ```bash
+# Windows
 python -m flask run
+
+# Linux/MacOS
+python3 -m flask run
 ```
 
 7. **Access the application**
@@ -164,11 +170,11 @@ Open your browser and navigate to `http://127.0.0.1:5000`
 
 | Role      | Email                       | Password      |
 |-----------|----------------------------|---------------|
-| Admin     | lorekeeper@lorekeeper.com | lorekeeper    |
-| Teacher   | essexuniversity@essex.ac.uk | essexuniversity |
-| Moderator | mod@example.com           | moderator123  |
-| Vendor    | gamemaster@example.com     | vendor123     |
-| User      | adventurer1@example.com    | user123       |
+| Admin     | <lorekeeper@lorekeeper.com> | lorekeeper    |
+| Teacher   | <essexuniversity@essex.ac.uk> | essexuniversity |
+| Moderator | <mod@example.com>           | moderator123  |
+| Vendor    | <gamemaster@example.com>     | vendor123     |
+| User      | <adventurer1@example.com>    | user123       |
 
 ## Database Schema
 
