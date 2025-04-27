@@ -116,7 +116,7 @@ IY4103-Flask-App/
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/IY4103-Flask-App.git
+git clone https://github.com/Noxire-Hash/IY4103-Flask-App.git
 cd IY4103-Flask-App
 ```
 
