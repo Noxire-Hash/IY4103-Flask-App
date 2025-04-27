@@ -156,10 +156,10 @@ python populate_db.py
 
 ```bash
 # Windows
-python -m flask run
+python app.py
 
 # Linux/MacOS
-python3 -m flask run
+python3 app.py
 ```
 
 7. **Access the application**
