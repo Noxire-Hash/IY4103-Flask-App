@@ -16,10 +16,15 @@ from flask import (
 from flask_migrate import Migrate
 from jinja2 import TemplateNotFound
 
+# Blueprints
 import grindstone.main as grindstone
+import routes.route_auth
 import routes.route_loremaker
+import routes.route_subs
 import routes.route_taverns
 import routes.route_vendor
+
+# Models
 from models import (
     SUBSCRIPTION_MAPPING,
     SYSTEM_ID,
@@ -36,9 +41,12 @@ from models import (
     db,
 )
 from routes.grindstone import grindstone_bp
-from routes.route_subs import subs_bp
+
+# Utils
 from utils import Logger
 from utils import SystemTransactionHandler as sth
+
+# Wrappers
 from wrappers import admin_required, login_required, moderator_required
 
 # App setup
@@ -65,7 +73,8 @@ app.register_blueprint(grindstone_bp)
 app.register_blueprint(routes.route_vendor.vendor_bp)
 app.register_blueprint(routes.route_loremaker.loremaker_bp)
 app.register_blueprint(routes.route_taverns.taverns_bp)
-app.register_blueprint(subs_bp)
+app.register_blueprint(routes.route_subs.subs_bp)
+app.register_blueprint(routes.route_auth.auth_bp)
 
 
 @app.after_request
@@ -183,72 +192,6 @@ def lore():
 # Auth routes
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-
-        # Debug print
-        print(f"Received: {username}, {email}, {password}")
-
-        # Check if the email is already registered
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            flash("Email is already registered.", "danger")
-            return redirect(url_for("register"))
-
-        # Add user to the database
-        try:
-            user = User(
-                username=username, email=email, password=password, privilege_id=1
-            )
-            db.session.add(user)
-            db.session.commit()
-            flash("Registration successful! Please log in.", "success")
-            return redirect(url_for("login"))
-        except Exception as err:
-            db.session.rollback()
-            flash(f"An error occurred: {err}", "danger")
-            print(f"Database Error: {err}")
-            return redirect(url_for("register"))
-    return render_template("register.html")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-
-        # Query the user by email and plain-text password
-        user = User.query.filter_by(email=email, password=password).first()
-        if user:
-            session["user_id"] = user.id
-            session["username"] = user.username
-            session["privilege_id"] = user.privilege_id
-            flash("Login successful!", "success")
-
-            # Set cookie directly here
-            response = make_response(redirect(url_for("home")))
-            response.set_cookie(
-                key="user_id",
-                value=str(user.id),
-                max_age=2592000,  # 30 days in seconds
-                path="/",
-                httponly=True,
-                samesite="Lax",
-            )
-            print(f"Direct cookie set for user_id: {user.id}")
-            return response
-        else:
-            flash("Invalid email or password!", "danger")
-            return redirect(url_for("login"))
-
-    return render_template("login.html")
-
-
 @app.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
@@ -326,15 +269,6 @@ def update_bio():
                 logger.SYSTEM, f"Error updating bio for user {user.username}: {e}"
             )
             return jsonify({"error": str(e)}), 500
-
-
-@app.route("/logout")
-def logout():
-    response = make_response(redirect(url_for("home")))
-    response.delete_cookie("user_id", path="/")
-    session.clear()
-    flash("You have been logged out.", "success")
-    return response
 
 
 @app.route("/admin", methods=["GET", "POST"])
