@@ -5,7 +5,6 @@ from flask import (
     Flask,
     flash,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
@@ -18,6 +17,7 @@ from jinja2 import TemplateNotFound
 
 # Blueprints
 import grindstone.main as grindstone
+import routes.route_api
 import routes.route_auth
 import routes.route_loremaker
 import routes.route_subs
@@ -75,6 +75,7 @@ app.register_blueprint(routes.route_loremaker.loremaker_bp)
 app.register_blueprint(routes.route_taverns.taverns_bp)
 app.register_blueprint(routes.route_subs.subs_bp)
 app.register_blueprint(routes.route_auth.auth_bp)
+app.register_blueprint(routes.route_api.api_bp)
 
 
 @app.after_request
@@ -520,28 +521,6 @@ def get_user_data():
         return {"error": "Server error"}, 500
 
 
-@app.route("/get_item_data_from_id/<int:item_id>")
-def get_item_data_from_id(item_id):
-    try:
-        item = Item.query.get_or_404(item_id)
-        vendor = User.query.get(item.vendor_id)
-
-        item_data = {
-            "id": item.id,
-            "name": item.name,
-            "description": item.description,
-            "price": item.price,
-            "vendor_name": vendor.username,
-            "sales": item.sales,
-            "tags": item.tags,
-            "status": item.status,
-        }
-
-        return jsonify(item_data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-
 @app.route("/get_username_from_id/<int:user_id>")
 def get_username_from_id(user_id):
     user = User.query.filter_by(id=user_id).first()
@@ -551,27 +530,10 @@ def get_username_from_id(user_id):
 # Cookie management
 
 
-@app.route("/setCookie", methods=["POST", "GET"])
-def setCookie(max_age=2592000):
-    user_id = session.get("user_id")
-    print(f"Setting cookie for user_id: {user_id}")
-    response = make_response(redirect(url_for("home")))
-    response.set_cookie(
-        key="user_id",
-        value=str(user_id),
-        max_age=max_age,  # 30 days in seconds
-        path="/",  # Make cookie available across entire site
-        httponly=True,  # More secure
-        samesite="Lax",  # Allow some cross-site requests
-    )
-    return response
-
-
 @app.route("/getCookie", methods=["POST", "GET"])
 def getCookie():
     try:
         user_id = request.cookies.get("user_id")
-        print(f"Retrieved cookie user_id: {user_id}")  # Debug line
         if user_id is not None:
             user = User.query.filter_by(id=user_id).first()
             if user:
@@ -582,38 +544,6 @@ def getCookie():
         print(f"Error getting cookie: {e}")
         session.clear()
     return redirect(url_for("home"))
-
-
-@app.route("/deleteCookie", methods=["POST", "GET"])
-def deleteCookie():
-    setCookie(max_age=0)
-    session.clear()
-    return redirect(url_for("home"))
-
-
-@app.route("/get_items")
-def get_items():
-    # Fix this function to match the structure of api_featured_items
-    items = Item.query.all()
-    items_list = []  # Change from dict to list
-    for item in items:
-        vendor_name = get_username_from_id(item.vendor_id)
-        items_list.append(
-            {  # Append to list instead of dict
-                "id": item.id,  # Make sure ID is included
-                "name": item.name,
-                "description": item.description,
-                "price": item.price,
-                "vendor_id": item.vendor_id,
-                "vendor_name": vendor_name,
-                "category": item.category,
-                "tags": item.tags,
-                "sales": item.sales,
-                "status": item.status,
-                "created_at": str(item.created_at),
-            }
-        )
-    return jsonify({"items": items_list})  # Return in same format as api_featured_items
 
 
 @app.errorhandler(404)
@@ -645,10 +575,6 @@ def err_405(e):
 @app.route("/support", methods=["GET", "POST"])
 @login_required
 def support():
-    if not session.get("user_id"):
-        flash("Please log in to submit a support ticket.", "warning")
-        return redirect(url_for("login"))
-
     if request.method == "POST":
         category = request.form.get("category")
         subject = request.form.get("subject")
@@ -685,20 +611,9 @@ def support():
     )
 
 
-def reply_ticket():
-    if not session.get("user_id"):
-        flash("Please log in to reply a support ticket", "warning")
-        return redirect(url_for("login"))
-    return render_template("user_reply_ticket.html")
-
-
 @app.route("/support/reply_ticket/<int:ticket_id>", methods=["GET", "POST"])
 @login_required
 def user_reply_ticket(ticket_id):
-    if not session.get("user_id"):
-        flash("Please log in to reply to a support ticket", "warning")
-        return redirect(url_for("login"))
-
     ticket = SupportTicket.query.get_or_404(ticket_id)
 
     # Check if the ticket belongs to the user

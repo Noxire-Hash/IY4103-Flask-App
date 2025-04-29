@@ -265,7 +265,7 @@ $(document).ready(function () {
     return new Promise((resolve, reject) => {
       $.ajax({
         type: "GET",
-        url: "get_items",
+        url: "/api/get_all_items",
         dataType: "json",
         success: function (response) {
           resolve(response);
@@ -370,7 +370,7 @@ $(document).ready(function () {
   function handleItemPreview(itemId) {
     $.ajax({
       type: "GET",
-      url: `/get_item_data_from_id/${itemId}`,
+      url: `/api/get_item/${itemId}`,
       success: function (response) {
         console.log("Item data received:", response);
         updateItemPreview(response);

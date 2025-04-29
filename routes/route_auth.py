@@ -10,6 +10,7 @@ from flask import (
 )
 
 from models import User, db
+from utils import Logger
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -26,7 +27,7 @@ def login():
             session["username"] = user.username
             session["privilege_id"] = user.privilege_id
             flash("Login successful!", "success")
-
+            Logger.info(f"Login successful: {user.id}")
             response = make_response(redirect(url_for("home")))
             response.set_cookie(
                 key="user_id",
@@ -36,9 +37,10 @@ def login():
                 httponly=True,
                 samesite="Lax",
             )
-            print(f"Direct cookie set for user_id: {user.id}")
+            Logger.info(f"Direct cookie set for user_id: {user.id}")
             return response
         else:
+            Logger.error(f"Invalid email or password: {email} {password}")
             flash("Invalid email or password!", "danger")
             return redirect(url_for("login"))
 
@@ -55,6 +57,7 @@ def register():
         # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
+            Logger.error(f"User already exists: {email}")
             flash(
                 "User already exists! if you forgot your password, please reset it.",
                 "danger",
@@ -71,6 +74,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         flash("Registration successful!", "success")
+        Logger.info(f"Registration successful: {new_user.id}")
         session["user_id"] = new_user.id
         session["username"] = new_user.username
         session["privilege_id"] = new_user.privilege_id
@@ -84,6 +88,7 @@ def register():
             httponly=True,
             samesite="Lax",
         )
+        Logger.info(f"Direct cookie set for user_id: {new_user.id}")
         return response
 
     return render_template("auth/register.html")
