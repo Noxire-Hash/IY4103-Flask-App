@@ -109,6 +109,33 @@ IY4103-Flask-App/
 └── populate_db.py         # Test data generation
 ```
 
+## Project Tekamul: Modularization Initiative
+
+Project Tekamul is an ongoing initiative to enhance the application's architecture by modularizing the codebase. The goal is to improve maintainability, scalability, and code organization by moving routes into their respective feature-specific files.
+
+### Current Progress
+
+- ✅ **Completed Modules**:
+  - GrindStone mini-game routes (`routes/grindstone.py`)
+  - LoreTeller storytelling routes (`routes/route_loremaker.py`)
+  - Subscription management (`routes/route_subs.py`)
+  - Taverns (forum) functionality (`routes/route_taverns.py`)
+  - Vendor dashboard (`routes/route_vendor.py`)
+
+- 🔄 **In Progress**:
+  - Authentication and user management routes
+  - Marketplace transaction routes
+  - Support ticket system routes
+  - Admin dashboard routes
+
+### Benefits of Modularization
+
+- Improved code organization and maintainability
+- Better separation of concerns
+- Easier feature development and testing
+- Simplified collaboration among developers
+- Enhanced scalability for future features
+
 ## Setup Instructions
 
 > **Note:** This application requires Python 3.7 or higher.
