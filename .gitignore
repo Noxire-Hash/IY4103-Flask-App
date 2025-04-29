@@ -93,3 +93,4 @@ desktop.ini
 
 # Custom project files
 static/uploads/
+instance/app.db
