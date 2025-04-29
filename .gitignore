@@ -32,8 +32,7 @@ flask_session/
 app.db
 
 # Migration versions
-migrations/versions/
-migrations/__pycache__/
+migrations/
 
 # Virtual environment
 venv/

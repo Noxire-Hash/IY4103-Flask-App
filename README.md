@@ -1,83 +1,122 @@
-# IY4103-Flask-App: Lorekeeper
+# Lorekeeper: A Digital Marketplace for Virtual Items
 
 A comprehensive digital marketplace platform developed with Flask for the IY4103 Web Development course at the University of Essex. Lorekeeper enables users to trade virtual items, manage transactions, and participate in a community-driven marketplace with integrated mini-games and interactive features.
 
-## Project Overview
+<img src="static/svg/lorekeeper_team_logo.svg" alt="Lorekeeper Logo" width="300" height="auto">
 
-This application demonstrates the implementation of a full-stack web application using Python Flask, focusing on secure user management, virtual marketplace operations, and community engagement features. The project showcases database design, authentication systems, and interactive web interfaces.
+## Overview
+
+Lorekeeper is a full-stack web application that demonstrates advanced concepts in web development, focusing on:
+
+- Digital marketplace functionality
+- User authentication and role management
+- Virtual currency systems
+- Community interaction
+- Mini-games and storytelling features
 
 ## Features
 
-### Core Features (Fully Implemented)
+### Core Marketplace Features
 
-- 🔐 **User Authentication & Account Management**
-  - Secure login/registration system
-  - Role-based access control (Admin, Moderator, Vendor, User)
-  - User profiles with balance management
-  - Account status monitoring
+- **User Authentication System**
+  - Secure login/registration with role-based access control
+  - User profiles with customizable bios
+  - Session management with cookies
 
-- 🏪 **Marketplace System**
-  - Browse and search virtual items
-  - Category filtering and tag-based organization
-  - Detailed product listings with user reviews
-  - Purchase processing with virtual currency
+- **Virtual Item Marketplace**
+  - Browse and filter items by category and tags
+  - Detailed product listings with reviews
+  - Vendor management system
 
-- 💰 **Transaction System**
+- **Transaction System**
   - Virtual currency (AW) management
   - User-to-user transfers
+  - Purchase processing
   - Transaction history tracking
-  - Receipt generation and storage
 
-- 🎫 **Support System**
-  - Ticket creation with categories
+- **Support Ticketing**
+  - User ticket creation and management
   - Staff response interface
-  - Ticket status tracking
-  - Resolution workflow
+  - Categorized support requests
 
-### Beta Features
+### Community Features
 
-- 💬 **Taverns (Community Forums)**
-  - Discussion boards organized by topics
-  - Post creation and reply system
-  - User reputation through up/downvotes
-  - Community post management
-  - *Note: Currently in beta testing phase with core functionality working*
+- **Taverns (Forums)**
+  - Discussion boards by topic
+  - Post and reply system
+  - Upvote/downvote functionality
+  - User reputation tracking
 
-### Work in Progress Features
+### Gaming Features(In development)
 
-- 🎮 **GrindStone Mini-Game**
+- **GrindStone Mini-Game**
   - Resource gathering simulation
-  - Character progression system
+  - Character progression
+  - Skill development
   - Inventory management
-  - *Note: Basic implementation complete, further development ongoing*
 
-- 🎲 **LoreTeller Interactive Storytelling**
+- **LoreTeller Interactive Storytelling**
   - AI-driven narrative experiences
   - Player choice-based adventures
-  - Custom adventure creation tools
-  - *Note: Framework established, content development in progress*
+  - Custom adventure creation
 
-### Admin Features
+### Administration Features
 
-- Comprehensive user management dashboard
-- Transaction monitoring and intervention tools
-- System-wide parameter controls
-- Support ticket oversight and moderation tools
+- **Admin Dashboard**
+  - User management and privilege control
+  - Transaction monitoring
+  - System parameter configuration
+  - Support ticket oversight
+
+- **Moderator Tools**
+  - Content moderation
+  - Support ticket handling
+  - Community management
 
 ## Tech Stack
 
-- **Backend**: Python 3.12, Flask
-- **Database**: SQLite, SQLAlchemy, Flask-Migrate
-- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
+- **Backend**: Python 3.x, Flask
+- **Database**: SQLite with SQLAlchemy ORM
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap
+- **Authentication**: Flask session management
 - **Template Engine**: Jinja2
-- **Auxiliary Tools**: Python data analysis libraries for admin analytics
+
+## Project Structure
+
+```
+IY4103-Flask-App/
+├── app.py                 # Main application file
+├── models.py              # Database models
+├── utils.py               # Utility functions
+├── wrappers.py            # Authentication wrappers
+├── config.py              # Configuration settings
+├── routes/                # Route modules
+│   ├── grindstone.py      # Mini-game routes
+│   ├── route_loremaker.py # Storytelling routes
+│   ├── route_subs.py      # Subscription routes
+│   ├── route_taverns.py   # Forum routes
+│   └── route_vendor.py    # Vendor dashboard routes
+├── templates/             # HTML templates
+│   ├── taverns/           # Forum templates
+│   ├── loremaker/         # Storytelling templates
+│   └── vendor/            # Vendor templates
+├── static/                # Static assets
+│   ├── css/               # Stylesheets
+│   ├── scripts/           # JavaScript files
+│   └── svg/               # SVG assets
+├── migrations/            # Database migrations
+├── grindstone/            # Mini-game implementation
+└── populate_db.py         # Test data generation
+```
 
 ## Setup Instructions
+
+> **Note:** This application requires Python 3.7 or higher.
 
 1. **Clone the repository**
 
 ```bash
-git clone [repository-url]
+git clone https://github.com/Noxire-Hash/IY4103-Flask-App.git
 cd IY4103-Flask-App
 ```
 
@@ -89,7 +128,7 @@ python -m venv venv
 .\venv\Scripts\Activate.ps1
 
 # Linux/MacOS
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -116,37 +155,26 @@ python populate_db.py
 6. **Run the application**
 
 ```bash
-python run.py
+# Windows
+python app.py
+
+# Linux/MacOS
+python3 app.py
 ```
 
 7. **Access the application**
 
-- Open browser and go to `http://127.0.0.1:5000`
+Open your browser and navigate to `http://127.0.0.1:5000`
 
 ## Test Accounts
 
-| Role      | Email                     | Password      |
-|-----------|---------------------------|---------------|
+| Role      | Email                       | Password      |
+|-----------|----------------------------|---------------|
 | Admin     | <lorekeeper@lorekeeper.com> | lorekeeper    |
-| Moderator | <mod@example.com>          | moderator123  |
-| Vendor    | <gamemaster@example.com>    | vendor123     |
-| User      | <player1@example.com>      | user123       |
-
-## Project Structure
-
-- **app.py**: Main application file with route definitions and core logic
-- **models.py**: Database models and relationships
-- **utils.py**: Utility functions for transaction handling and data processing
-- **wrapers.py**: Wrappers to better handle login state and user privileges
-- **routes/**: Modularized route handlers
-- **templates/**: HTML templates organized by functionality
-  - **taverns/**: Community forum templates
-  - **loremaker/**: Interactive storytelling templates
-  - **vendor/**: Vendor dashboard templates
-- **static/**: CSS, JavaScript, and image assets
-- **migrations/**: Database migration scripts
-- **grindstone/**: Mini-game implementation files
-- **populate_db.py**: Test data generation script
+| Teacher   | <essexuniversity@essex.ac.uk> | essexuniversity |
+| Moderator | <mod@example.com>           | moderator123  |
+| Vendor    | <gamemaster@example.com>     | vendor123     |
+| User      | <adventurer1@example.com>    | user123       |
 
 ## Database Schema
 
@@ -154,35 +182,40 @@ The application implements a relational database with the following key models:
 
 - **User**: Account information and authentication
 - **Privilege**: Role-based permission system
-- **Item/Vendor**: Marketplace product management
+- **Item**: Marketplace product management
 - **Purchase/Receipt**: Transaction records
 - **SystemTransaction/TransactionLog**: Financial tracking
 - **SupportTicket/Response**: Customer support system
 - **CommunityPost/Reply**: Forum functionality
-- **GrindStone/LoreTeller models**: Game state management
+- **GrindStone models**: Game state management
+- **LoreTeller models**: Storytelling system
 
-## Academic Context
+## Contribution Guidelines
 
-This project was developed as part of the IY4103 Web Development course at the University of Essex. It demonstrates the application of web development principles including:
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Submit a pull request
 
-- Full-stack application architecture
-- Database design and implementation
-- Authentication and authorization systems
-- User interface design principles
-- RESTful API design
-- Session management and security practices
+## Future Development
 
-## Future Development Roadmap
+Planned enhancements include:
 
-Planned enhancements for future iterations include:
+- Real-time notifications with WebSockets
+- Enhanced analytics dashboard
+- Mobile responsive design improvements
+- AI-driven content recommendation system
+- Expanded mini-game system
+- Achievement and badge systems
 
-- Integration of real-time notifications using WebSockets
-- Expanded analytics dashboard for vendors and administrators
-- Enhanced mobile responsiveness for all interfaces
-- Completion of the LoreTeller AI storytelling system
-- Full deployment of the GrindStone mini-game with expanded content
-- Implementation of achievement and badge systems
+## License
 
----
+This project was developed for educational purposes as part of the IY4103 Web Development course at the University of Essex.
 
-University of Essex - IY4103 Web Development
+## Acknowledgments
+
+- IY4103 Web Development course faculty
+- University of Essex
+- Flask and related package developers
+- Bootstrap team
